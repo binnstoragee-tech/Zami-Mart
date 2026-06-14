@@ -1,0 +1,3178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Categories — Zami Mart</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  .page-hero{
+    padding: 150px 0 3rem;
+    background: var(--cream);
+    position:relative;
+    overflow:hidden;
+  }
+  .page-hero .container{ position:relative; z-index:1; }
+  .page-hero h1{ font-size: clamp(2.4rem, 5.5vw, 4rem); margin-bottom:1rem; max-width:760px; }
+  .page-hero p{ max-width:560px; font-size:1.05rem; }
+
+  /* Search */
+  .cat-search{
+    margin-top: 2.2rem;
+    max-width: 460px;
+    position: relative;
+  }
+  .cat-search input{
+    width:100%;
+    font-family: var(--font-body);
+    padding: 15px 20px 15px 50px;
+    border-radius: 100px;
+    border: 1.5px solid rgba(6,59,63,.12);
+    background: var(--paper);
+    color: var(--ink);
+    font-size: .95rem;
+    transition: border-color .3s, box-shadow .3s;
+  }
+  .cat-search input:focus{
+    outline:none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 4px rgba(253,77,2,.1);
+  }
+  .cat-search i{
+    position:absolute; left:20px; top:50%; transform:translateY(-50%);
+    color: var(--orange);
+    font-size: .95rem;
+  }
+
+  /* Filter pills */
+  .cat-filters{
+    display:flex; gap:.6rem; flex-wrap:wrap;
+    margin-top: 1.6rem;
+  }
+  .filter-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-weight:700; font-size:.82rem;
+    padding:10px 18px;
+    border-radius:100px;
+    background:var(--paper);
+    border:1.5px solid rgba(6,59,63,.1);
+    color:var(--teal);
+    font-family: var(--font-display);
+    transition: background .3s, color .3s, transform .3s var(--ease-soft), border-color .3s;
+  }
+  .filter-btn .count{
+    font-size:.72rem;
+    background: rgba(6,59,63,.08);
+    color: var(--teal);
+    padding: 1px 8px;
+    border-radius: 100px;
+    font-weight:700;
+    transition: background .3s, color .3s;
+  }
+  .filter-btn:hover{
+    border-color: var(--orange);
+    transform: translateY(-2px);
+  }
+  .filter-btn.active{
+    background:var(--teal); color:#fff; border-color:var(--teal);
+  }
+  .filter-btn.active .count{
+    background: var(--orange); color:#fff;
+  }
+
+  .cat-block{
+    padding: 4.5rem 0;
+    border-bottom: 1px solid rgba(6,59,63,.06);
+    scroll-margin-top: 100px;
+  }
+  .cat-block:nth-child(even){ background: var(--cream); }
+  .cat-block:last-of-type{ border-bottom:none; }
+  .cat-block.cat-hidden{ display:none; }
+
+  .cat-block-head{
+    display:flex; align-items:center; gap:1.4rem;
+    margin-bottom: 2.2rem;
+  }
+  .cat-block-icon{
+    width:64px; height:64px; min-width:64px;
+    border-radius:18px;
+    background:var(--mint);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--teal);
+    font-size:1.7rem;
+    transition: transform .5s var(--ease-soft);
+  }
+  .cat-block-head:hover .cat-block-icon{
+    transform: rotate(-10deg) scale(1.08);
+    background:var(--orange); color:#fff;
+  }
+  .cat-block-head h2{ font-size: clamp(1.7rem, 3.2vw, 2.4rem); margin-bottom:.3rem; }
+  .cat-block-head p{ margin:0; font-size:.95rem; }
+  .item-count{
+    display:inline-block;
+    margin-left:8px;
+    font-weight:700; font-size:.74rem;
+    letter-spacing:.1em; text-transform:uppercase;
+    color:var(--orange);
+    background: var(--mint);
+    padding:3px 10px;
+    border-radius:100px;
+    white-space:nowrap;
+    vertical-align: middle;
+  }
+
+  /* Product cards */
+  .item-tags{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.2rem;
+  }
+  .item-tag{
+    background: var(--paper);
+    border: 1px solid rgba(6,59,63,.08);
+    border-radius: 14px;
+    overflow: hidden;
+    transition: transform .35s var(--ease-soft), box-shadow .35s, border-color .3s;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+  }
+  .item-tag:hover{
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px -16px rgba(6,59,63,.22);
+    border-color: var(--orange);
+  }
+  .item-tag.tag-hidden{ display:none; }
+
+  /* Image slot — 1350×1080 ratio = 4:3.24 ≈ aspect-ratio 1350/1080 */
+  .product-img-wrap{
+    width: 100%;
+    aspect-ratio: 1350 / 1080;
+    background: var(--cream);
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .product-img-wrap img{
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform .5s var(--ease-soft);
+  }
+  .item-tag:hover .product-img-wrap img{
+    transform: scale(1.05);
+  }
+  /* Placeholder shown when no img src set */
+  .product-img-wrap.no-img{
+    background: linear-gradient(135deg, #f0f5f0 0%, #e8eeeb 100%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .product-img-wrap.no-img::after{
+    content: '';
+    display: block;
+    width: 48px; height: 48px;
+    opacity: .3;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23063B3F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2'/%3E%3Ccircle cx='8.5' cy='8.5' r='1.5'/%3E%3Cpath d='M21 15l-5-5L5 21'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+
+  .product-name{
+    padding: 12px 14px 14px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--teal);
+    line-height: 1.35;
+    flex: 1;
+  }
+
+  @media (max-width: 1100px){
+    .item-tags{ grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 700px){
+    .item-tags{ grid-template-columns: repeat(2, 1fr); gap:.8rem; }
+    .product-name{ font-size:.78rem; padding:10px 12px 12px; }
+  }
+  @media (max-width: 400px){
+    .item-tags{ grid-template-columns: repeat(2, 1fr); gap:.6rem; }
+  }
+
+  .no-results{
+    text-align:center;
+    padding: 4rem 0;
+    display:none;
+  }
+  .no-results.show{ display:block; }
+  .no-results i{ font-size:2.4rem; color:var(--orange); margin-bottom:1rem; }
+  .no-results h3{ margin-bottom:.4rem; }
+
+  @media (max-width: 560px){
+    .cat-block-head{ align-items:flex-start; }
+    .item-tag{ font-size:.8rem; padding:8px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Page transition overlay -->
+<div class="page-transition">
+  <div class="pt-panel pt-1"></div>
+  <div class="pt-panel pt-2"></div>
+  <div class="pt-panel pt-3"></div>
+</div>
+
+<!-- Navbar -->
+<header class="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="img/logo.png" alt="Zami Mart logo">
+    <span class="nav-logo-text">zami<span>mart</span></span>
+  </a>
+  <nav class="nav-links">
+    <button class="nav-close" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="categories.html" class="active">Categories</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <button class="nav-toggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- Page hero -->
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow">Full Catalog</div>
+    <h1>Everything on our shelves — retail and wholesale.</h1>
+    <p>Browse our full product range below. Search by name or filter by category — every item is available for individual purchase or full-case wholesale, ask us for bulk pricing.</p>
+
+    <div class="cat-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="productSearch" placeholder="Search products, e.g. Dettol, Shampoo, Vicks...">
+    </div>
+
+    <div class="cat-filters" id="catFilters">
+      <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-grip"></i> All Categories</button>
+      <button class="filter-btn" data-filter="personal-care"><i class="fa-solid fa-pump-soap"></i> Personal Care <span class="count">358</span></button>
+      <button class="filter-btn" data-filter="health"><i class="fa-solid fa-suitcase-medical"></i> Health &amp; Wellness <span class="count">74</span></button>
+      <button class="filter-btn" data-filter="household"><i class="fa-solid fa-spray-can-sparkles"></i> Household &amp; Cleaning <span class="count">33</span></button>
+      <button class="filter-btn" data-filter="snacks"><i class="fa-solid fa-candy-cane"></i> Snacks &amp; Confectionery <span class="count">40</span></button>
+      <button class="filter-btn" data-filter="baby"><i class="fa-solid fa-baby"></i> Baby Care <span class="count">12</span></button>
+      <button class="filter-btn" data-filter="pantry"><i class="fa-solid fa-bowl-rice"></i> Pantry &amp; Cooking <span class="count">6</span></button>
+      <button class="filter-btn" data-filter="beverages"><i class="fa-solid fa-bottle-water"></i> Beverages &amp; Hydration <span class="count">7</span></button>
+      <button class="filter-btn" data-filter="stationery"><i class="fa-solid fa-pen"></i> Stationery &amp; Misc <span class="count">16</span></button>
+    </div>
+  </div>
+</section>
+
+<!-- No results -->
+<div class="container no-results" id="noResults">
+  <i class="fa-solid fa-box-open"></i>
+  <h3>No products found</h3>
+  <p>Try a different search term or category — or send us your shopping list and we'll confirm availability.</p>
+</div>
+
+<section class="cat-block" id="personal-care" data-cat="personal-care">
+  <div class="container">
+    <div class="cat-block-head reveal">
+      <div class="cat-block-icon"><i class="fa-solid fa-pump-soap"></i></div>
+      <div>
+        <h2>Personal Care</h2>
+        <p>Soaps, shampoos, skincare, oral care, and grooming essentials from trusted brands. <span class="item-count">358 items</span></p>
+      </div>
+    </div>
+    <div class="item-tags">
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Age Lite Face Serum 30ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Amrutanjan Extra Power Yellow 27.5ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Amrutanjan Strong Green 27.5ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Anti Dandruff Coolmint Shampoo 340ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Anti Dandruff Tea Tree Shampoo 340ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Africa Shower Gel 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Africa Shower Gel 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Alaska Shower Gel 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Alaska Shower Gel 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Apollo Shower Gel 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Apollo Shower Gel 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Black Shower Gel 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Black Shower Gel 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Dark Temptation Shower Gel 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Dark Temptation Shower Gel 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Excite Shower Gel 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Excite Shower Gel 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Sport Blast Shower Gel 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Sport Blast Shower Gel 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE 24*7 Body Spray 150ML/96G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Gold Temptation Body Spray 150ML/96G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Intense Body Spray 150ML/96G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Dark Temptation Body Spray 150ML/96G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Midnight Body Spray 150ML/96G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">AXE Pulse Body Spray 150ML/96G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Bajaj Almond Hair Oil 114ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Bajaj Almond Hair Oil 190ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Bajaj Almond Hair Oil 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Banjara`s Aloe Vera Gel 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Bigen Hair Color Conditioner Natural Black</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Binaca Extra Clean Tooth Brush Soft</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Bioline Jelly 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Bioline Lip Care</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Bot X 28.8GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Care Touch Paper Tissue 100`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cauvery Papaya Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cauvery Sandal Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cauvery Sandal Soap 3`S Pack</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Cleansing Liquid 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Dam 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Moisturising Cream 80GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Moist Cream 250GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Moisturising Lotion 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Bar</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Pro Urea Lotion 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Sun Cream SPF 50</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Oil Control Foam Wash 236ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Refresh Toner 150ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Restoraderm 295ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cinthol Original Soap 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cinthol Original Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Chanthirika Soap 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Closeup Tooth Paste 90G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Closeup Toothpaste 42GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Charcoal Clean Gel 120GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Active Salt 115GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Gentle Clean Tooth Brush</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Sensitive Tooth Brush</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Herbal Teeth Paste 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Max Fresh Peppermint Mouth Wash 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Plax Freshmint Mouth Wash 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Maxfresh Red Tooth Paste 38GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Visible White Daily Tooth Paste 120GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Visible Whith Tooth Paste 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Strong Teeth 38GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Strong Teeth Tooth Paste 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Maxfresh Tooth Paste 80GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Super Flexi Tooth Brush</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Total 12 Advance Health 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Total 12 Charcoal Deep Clean Tooth</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Paste 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Colgate Zig-zag Tooth Brush</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dabur Almond Hair Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dabur Almond Hair Oil 190ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dabur Amla Hair Oil 180ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dabur Red Tooth Paste 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dabur Red Tooth Paste 16GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dabur Red Tooth Paste 200GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dabur Red Toothpaste 36G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dabur Special Hair Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Soap Cool 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Soap Cool 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Soap Original 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Soap Original 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dhathri Hair Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.morepen Herbal Tooth Paste 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Aloe Vera Facial Kit</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Aloe Vera Foot Mask</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Aloevera Face &amp; Body Gel 380ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Aloe Vera Face &amp; Body Scrub 380ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel De-tan Face &amp; Body Scrub 380ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Multani Mitti Face &amp; Body Scrub 380ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Redwine Cream 380ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel De-tan Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Neem Fresh Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Ubtan Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel De-tan Sunscreen Spf50 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Aloevera Face Serum 30ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Aloevera Wet Wipes 25`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel De-tan Wet Wipes 25`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Lavender Wet Wipes 25`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Lemon Wet Wipes 25`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Strawberry Wet Wipes 25`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Ice Fresh Wet Wipes 25`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Onion Black Seed Hair Oil 100 ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Onion Shampoo 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Papaya Facial Kit</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Strong Hold Hair Styling Spray 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Ultra Hold Hair Styling Spray 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashil VIT-C Body Lotion 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.tooth Smile Tooth Brush 8`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Evereve Period Panties M-l [60CM-100CM]2</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Eye Brow Razor Tinkie 3`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fair &amp; Handsome Insatant Face Wash</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fair &amp; Handsome Oil Clear Face Wash</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fair And Handsome 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fair And Handsome 60GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Faiza Whitening Soap</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Gold Bleach 8GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Gold Bleach 24GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Gold Bleach 40GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Hair Removal Cream Rose 60GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Hair Removal Cream Sandle 60GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Hair Removal Cream Turmeric 60GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Hair Removal Cream Gold 60GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Soft Glow Bleach 24GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fem Soft Glow Bleach 8GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fiama Gel Bar Soap Peach &amp; Avocado 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fiama Gel Bar Soap Golden Sandalwood Oil &amp;</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Patchouli 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fiama Gel Bar Soap Blackcurrant &amp; Bearberry 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Fiama Gel Bar Soap Patchouli &amp; Macadamia 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Foot Care Cream 25GM Cadila</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Color Natural Black Men And Women 60GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Colour Natural Black Men 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Colour Natural Black Women 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Colour Natural Men Darkest Brown 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Colour Natural Women Darkest Brown 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Colour Natural Women Darkest Brown 60GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Acno Fight Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Acno Fight Face Wash 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Oilclear Face Wash 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Oilclear Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Turbo Bright Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Turbo Bright Face Wash 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Shampoo Based Hair Color 10ML [black]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Shampoo Based Hair Color 10ML [brown]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Gentle Daily Care Shampoo 340ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Gillete Blades 50 Pack</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Gillete Guard Dispo Raizor (single)</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Gillete Guard Dispo Raizor</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Gillete Shaving Brush</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Gillette Foam Regular 196GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Gillette Foam Regular 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Gillette Lime Shaving Cream 70GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Gillette Regular Saving Cream 70GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely BB Cream 9GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely BB Cream 18GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely BB Cream 40GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely Ayurvedic Cream 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely Ayurvedic Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely Face Wash 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely Face Cream 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely Face Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely Face Cream 80GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow &amp; Lovely Face Wash 110GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow Fair &amp; Handsome 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glow Fair &amp; Handsome 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Godrej Hair Colour 3GM 12`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Green Leaf Aloevera Gel 120GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Green Leaf Pure Aloe Vera Skin Gel 60GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Hamam Lemon Flowers 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Hamam Neem Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Herbal Veni Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Hide AC Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Hide AC Gel 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Almond Rose Soap 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Anti Dandruff Hair Cream 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Anti Hair Fall Cream 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Cucumber Soap 75G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Lipblam 10GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Natural Glow Kesar Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Natural Glow Kesar Cream 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Natural Glow Rose Face Cream 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Natural Glow Rose Face Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Neem &amp; Turmeric Soap 125GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Neem Face Wash 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Neem Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Protein Hair Cream 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Indu Bringha Hair Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Jovees De-tan Face Pack 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Jovees Men Essential Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Jovees Sun Cover Spf30 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Kayathirumen Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Krack Cream 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">LA Sheild SPF 40 Gel 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lifebuoy Clear Skin Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lifebuoy Lemon Aloe Fresh 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lifebuoy Soap 125GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lifebuoy Neem Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lifebuoy Turmeric Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Listerine Coolmint Mouthwash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Listerine Coolmint Mouthwash 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Listerine Original Mouthwash 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Listerine Original Mouthwash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Listerine Original Mouthwash 80ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Livion Anti-frizz Hair Serum 95ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Loreal Anti Hairfall Shampoo 340ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Loreal Conditioner Anti-hairfall 180ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Loreal Color Protecting Shampoo 340ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Loreal Extraordinary Oil Shampoo 340ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Loreal Total Repair Shampoo 340ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Loreal Total Repair Serum 80ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lux Bright Glow Soap Jasmine 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lux Clear Glow Soap Sandalwood 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lux Even-toned Glow Soap Rose 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lux Fresh Glow Plus Soap Lotus 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Alovera Facewash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Alovera Gel 300ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Charcol Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Multani Mitti Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Onion Shampoo 180ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Oilfree Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Onion Hair Fall Control Shampoo 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Onion Conditioner 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Rosmary Anti-hair Fall Conditioner 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Rosmary Anti-hair Fall Shampoo 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Ubtan Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Teatree Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Beetroot Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Manoj Heera Panna 20GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Manoj Heera Panna 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Manoj Heera Panna 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mediker Shampoo 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Medimix Soap 125GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mysore Sandal Soap 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mysore Sandal Soap 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nature`s Aloe Beauty Gel 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Natures Almond &amp; Honey Lotion 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Natures Papaya Face Wash 65ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Natures Neem &amp; Aloe Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Natures Sunban Cream Spf30 120ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Navratna Hair Oil 45ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Navratna Hair Oil 90ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Navratna Hair Oil 180ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Navratna Hair Oil 270ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Navratna Hair Oil 450ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nomarks Ayurvedic Antimarks Cream All Skin 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nomarks Ayurvedic Antimarks Cream Dry Skin 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nomarks Ayurvedic Antimarks Cream Oily Skin 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nycil Powder</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Odomos Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Odomos Lotion 60ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Odomos Lotion 120ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Oral -B Bacteria Fighter Medium Extra Soft</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tooth Brush</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Oral -B Everyday Care Extra Soft Tooth Brush</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Bot X 27.3GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Orthoherb Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Oxylife Cream Bleach 9GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Parachute Coconut Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Parachute Coconut Oil 175ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pears Oil - Clear &amp; Glow 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pears Alovevera Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pears Naturale Pomegranate Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pears Pure And Gentle Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pears Soft And Fresh Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pepsodent Germi Check White Paste 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pepsodent Tooth Brush</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pigeon Breast Pads Comfy 12`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pond &amp; Pure Detox Face Face Wash 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pond`s Bb+cream 9GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ponds Bb+ Cream 18GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ponds Bb+ Cream 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pond`s Bright Beauty Face Wash 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pond`s Bright Beauty Face Wash 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pond`s Dreamflower Powder 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pond`s Pure Detox Face Wash 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ponds Bright Beauty Serm Cream 23GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ponds Bright Beauty Serm Cream 34GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ponds Bright Beauty Serm Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Power Papaya Soap 125GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Raktha Chandan Soap 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rexona Deodorant Aloe-vera 25ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rexona Deodorant Aloe-vera 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rexona Deodorant Powder Dry 25ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rexona Deodorant Powder Dry 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rexona Deodorant Shower Fresh 25ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rexona Deodorant Shower Fresh 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ritco Scissor RC002 [6.3 Inch]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ritco Scissor RC003 (5.5 Inch)</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ritco Scissor RC004 (5 Inch)</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ritco Scissor RC008 (7 Inch)</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ritco Scissor RC009 (7.5 Inch)</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Santoor Sandal &amp; Turmeric Soap 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Santoor Sandal &amp; Turmeric Soap 125GM [5PACK]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Santoor Sandal &amp; Turmeric Soap 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Daily Care Tooth Brush Soft 1`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Fresh Gel 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Fresh Mint 75GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Mouth Wash 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Multicare Tooth Brush Soft 1`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Rapid Relief Paste</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Repair Protect 70GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Sensitive Tooth Brush Soft 1`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sensodyne Sensitive Tooth Brush Soft 4`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sesa Oil 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Shower TO Shower Cologene Powder 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Shower TO Shower Sandal 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Stayfree BY OB Tampons 10`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Stayfree Drymax Allnight 14`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Stayfree Secure Nights 18`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Stayfree Ultra Drymax 16`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sunshield SPF 70 Cream 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Balls 50PCS</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Buds Bamboo Sticks Jar 100`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Buds Paper Stick Flat Box 100`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Buds Bamboo Sticks Jar 200`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Buds Bamboo Sticks Packet 100`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Buds Paper Stick Jar 100`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Buds Paper Stick Jar 200`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Buds Paper Stick Packet 100`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Pads 100`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Cotton Pads 50`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Nail Polish Remover Wipes 30`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulips Super Soft Facial Tissues 10`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">UV Doux Blue Sunscreen Gel 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">UV Doux D-tan Aqua Sunscreen Lotion Spf50; 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">UV Doux Gold Sunscreen Gel Spf50; 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">UV Doux Mineral Sunscreen Gel 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">UV Doux Sunscreen Gel Spf50; 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">UV Doux Sunscreen Gel Spf50; 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">UV Doux Sunscreen Lotion Spf30; 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">V Wash Plus 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">V Wash Plus 20ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">V Wash Plus Lotion 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vaseline Petro Jelly Orginal 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vaseline Petro Jelly Orginal 20GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vaseline Petro Jelly Orginal 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Body Wax Strips Dry Skin 20`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Body Wax Strips Dry Skin 8`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Body Wax Strips Normal Skin 20`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Body Wax Strips Normal Skin 8`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Body Wax Strips Sensitive Skin 20`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Body Wax Strips Sensitive Skin 8`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Hair Removal Dry Skin 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Hair Removal Normal 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Hair Removal Normal Skin 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Hair Removal Sensitive Skin 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Hair Removal Sensitive Skin 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Men Hair Removal Skin Cream 50GM Blue</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Veet Men Hair Removal Skin Cream 50GM Pink</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicco Turmeric Skin Cream 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicco Turmeric Wso Skin Cream 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">White Tone Cream 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">White Tone Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Women Max Shave Body Raiser (6 Pieces)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cat-block" id="health" data-cat="health">
+  <div class="container">
+    <div class="cat-block-head reveal">
+      <div class="cat-block-icon"><i class="fa-solid fa-suitcase-medical"></i></div>
+      <div>
+        <h2>Health &amp; Wellness</h2>
+        <p>Pain relief balms, cough &amp; cold remedies, antiseptics, and everyday wellness items. <span class="item-count">74 items</span></p>
+      </div>
+    </div>
+    <div class="item-tags">
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Amrutanjan Back Pain Rollon 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Amrutanjan Green Balm 8ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Amrutanjan Yellow Balm 8ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Amrutanjan Headache Faster Relaxation Rollon 5ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Calamine Lotion 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Closeup Multivitamin Paste 80GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cofsils Lozenges Ginger Lemon</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cofsils Lozenges Honey Lemon</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cofsils Lozenges Orange</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Hand Wash 200ML 2`S (pack)</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Hand Wash Sensitive 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Hand Wash Skincare 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Original Hand Sanitizer 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Original Hand Sanitizer 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Strawberry Lip Balm</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Vitamin-c Day Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Vitamin-c Face &amp; Body Cream 380ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Vitamin-c Face Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Vitamin-c Face Serum 30ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Vitamin-c Lip Balm</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Vitamin-c Night Cream 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dr.rashel Vitamin-c Wet Wipes 25`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Eno Lemon</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Eno Orange</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Vitamin C Face Wash 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Men Vitamin C Face Wash 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Vitamin-c B.b Cream 18GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Vitamin-c B.b Cream 30GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Garnier Vitamin-c Serum Cream 23GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glucose 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Glucose Jar 500GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Hansaplast Regular 140`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Hansaplast Water Proof 140`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Cold Balm 10GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Iodex Balm 16GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Iodex Balm 40GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Jeewaka Vata Lepaya Balm 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Koflet Lozenges 175`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Koflet Lozenges 65`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Lacto Calamin Lotion [LK] 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Vitamin-c Face Cream 80GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Vitamin-c Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ors Lemon</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ors Orange</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Panadol Tab</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">RA Thermoseal Toothpaste 100G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rumalaya Pain Balm 10GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Siddhalepa Balm 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Siddhalepa Balm 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sloans Liniment 71ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sterillium Liquid 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sterillium Liquid 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Strepsils Honey Lemon PK 150`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Strepsils Orange 128`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Thermoseal Repair Toothpaste 100G</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tiger Balm Red 21ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tiger Balm Red 9ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tiger Balm White 21ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tiger Balm White 9ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">UV Doux Lip Lightening Balm 8GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vaseline Lip Balm 10GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vaseline Rosy Lip Care Balm 10GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Cough Drops Double Power 110`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Cough Drops Double Power 140`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Inhelar 12`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Roll-on Inhaler 2-IN-1</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Vaporub 110GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Vaporub 19GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Vaporub Extra Strong 25ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Vaporub Extra Strong 50ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Vaporup 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Vaporup 50GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Zandu Balm 8ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Zandu Balm 25ML</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cat-block" id="household" data-cat="household">
+  <div class="container">
+    <div class="cat-block-head reveal">
+      <div class="cat-block-icon"><i class="fa-solid fa-spray-can-sparkles"></i></div>
+      <div>
+        <h2>Household &amp; Cleaning</h2>
+        <p>Cleaning liquids, detergents, insect repellents, batteries, and home essentials. <span class="item-count">33 items</span></p>
+      </div>
+    </div>
+    <div class="item-tags">
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Body Guard Mosquito Coil</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Body Guard Mosquito Spray 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Comfort Fabric Conditionar Pink 860ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Comfort Fabric Conditionar Perfume 860ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Liquid 125ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Liquid 1 L</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Liquid 250ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Liquid 550ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dettol Liquid 60ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Duracell Long Lasting AAA Battery 10`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Duracell Longer Lasting AA Battery 10`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Duracell Ultra AAA Battery 8`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Good Night Machine</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Good Night Refil 45ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Harpic Bathroom Cleaner Lemon Fresh 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Harpic Liquid 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Harpic Liquid 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Harpic White &amp; Shine Bleach 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Hit Antiroach Gel</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">More Light Detergent 5 Ltr</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mortein Cockroach Spray 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mortein Cockroach Spray 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Odonil Room Spray Jasmine Fresh 220ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Odonil Room Spray Citrus Fresh 220ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Odonil Room Spray Lavender Mist 220ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Odonil Room Spray Rose Garden 220ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Odonil Room Spray Sandal Bouquet 220ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pigeon Liquid Cleanser 200ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rin Soap 230GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Sunlight Laundry Soap 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Surf Excel Detergent Bar 150GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Surf Excel Detergent Bar 250GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vim Dishwash Liquid Gel 250ML</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cat-block" id="snacks" data-cat="snacks">
+  <div class="container">
+    <div class="cat-block-head reveal">
+      <div class="cat-block-icon"><i class="fa-solid fa-candy-cane"></i></div>
+      <div>
+        <h2>Snacks &amp; Confectionery</h2>
+        <p>Chewing gums, candies, chocolates, and mints — single packs to full jars. <span class="item-count">40 items</span></p>
+      </div>
+    </div>
+    <div class="item-tags">
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Boomer Chewing Gum 200`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Boomer Krunch Strawberry Flavour Chewing Gum [8x28.8GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Boomer Strawberry Flavour Stick 24`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Boomer Mint Flavour Stick 24`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">C-candy Orange Flavour Jar 250`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Center Fresh 150`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Center Fresh Extra Sticks 24`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Center Fruit Watermelon Flavour 150`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Center Fruit Strawberry 150`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Dark Fantasy Choco 69GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Five Star Chocolate 18GM 40`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Five Star Chocolate 33GM 28`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Good Day Choco 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Happydent Wave Mint 18`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Happydent Wave Strawberry 18`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Happydent White Mint 18`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Happydent White Mint Jar 210`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Himalaya Ayurveda Gum Care Tooth Paste 100GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Kopiko Coffee Chocklate 235`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mentos Mini Bottle Gum 12`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mentos Mint 210`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mentos Mint Stick 30`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mentos Orange &amp; Strawberry Stick 30`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mentos Orange 200`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mentos Rainbow Stick 30`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mentos Strwberry 200`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Orbit Mixed Fruit Flavour Chewing Gum [8 Bot X 19.8GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Orbit Spearmint [32 Units X 3.3GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Orbit Spearmint Flavour Chewing Gum [8 Bot X 19.8GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Orbit Sweetmint Flavour Chewing Gum [8 Bot X 19.8GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Orbit Sweetmint [32 Units X 3.3GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Skittles Sour Bite Size Fruit Candies [8 Bot X 27.3GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Skittles Original Bite Size Fruit Candies [8x27.3GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Skittles Wild Berry Bite Size Fruit Candies [8x27.3GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Doublemint Lemonmint Flavour [8 Bot X 22GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Doublemint Straberrymint Flavour [8 Bot X 22GM]</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Oreo Choco 120GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Oreo Vennila</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pepsodent Gum Care 70GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Solano Choco Candy Jar 600`S</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cat-block" id="baby" data-cat="baby">
+  <div class="container">
+    <div class="cat-block-head reveal">
+      <div class="cat-block-icon"><i class="fa-solid fa-baby"></i></div>
+      <div>
+        <h2>Baby Care</h2>
+        <p>Wipes, fabric care, and treats for little ones. <span class="item-count">12 items</span></p>
+      </div>
+    </div>
+    <div class="item-tags">
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Baby Daily Lotion 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Baby Organic Calendula Cream 85GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Baby Organic Calendula Daily Lotion 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Baby Organic Calendula Wash &amp; Shampoo 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Cetaphil Baby Wash &amp;shampoo 230ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Kinderjoy Choco 20GM Blue</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Kinderjoy Choco 20GM Pink</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Luv Lap Baby Wipes 72`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Pigeon Baby Fabric Softener 400ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulip Safety Baby Buds 50`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Baby Rub 25GM</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Vicks Baby Rub 50GM</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cat-block" id="pantry" data-cat="pantry">
+  <div class="container">
+    <div class="cat-block-head reveal">
+      <div class="cat-block-icon"><i class="fa-solid fa-bowl-rice"></i></div>
+      <div>
+        <h2>Pantry &amp; Cooking</h2>
+        <p>Basmati rice varieties and cooking oils for the kitchen. <span class="item-count">6 items</span></p>
+      </div>
+    </div>
+    <div class="item-tags">
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Basmati Platinum Rice 1KG</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Basmati Royal Rice Heritage 1KG</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Basmati Seeraga Samba Rice 1KG</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Basmati Xxxl Rice Heritage 1KG</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Mamaearth Rice Face Wash 100ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Turky Plus Olive Oil Green 100ML</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cat-block" id="beverages" data-cat="beverages">
+  <div class="container">
+    <div class="cat-block-head reveal">
+      <div class="cat-block-icon"><i class="fa-solid fa-bottle-water"></i></div>
+      <div>
+        <h2>Beverages &amp; Hydration</h2>
+        <p>Fruit drinks, glucose, and hydration essentials. <span class="item-count">7 items</span></p>
+      </div>
+    </div>
+    <div class="item-tags">
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ocean Fruit Drink Apple 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ocean Fruit Drink Mango &amp; Passion Fruit 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ocean Fruit Drink Peach &amp; Passion 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ocean Fruit Drink Strawberry &amp; Lime 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Ocean Fruit Drink Guava 500ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rose Water 120ML</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Rose Water 250ML</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cat-block" id="stationery" data-cat="stationery">
+  <div class="container">
+    <div class="cat-block-head reveal">
+      <div class="cat-block-icon"><i class="fa-solid fa-pen"></i></div>
+      <div>
+        <h2>Stationery &amp; Misc</h2>
+        <p>Pens, pencils, staplers, and everyday office supplies. <span class="item-count">16 items</span></p>
+      </div>
+    </div>
+    <div class="item-tags">
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nail Clippers Gloaa</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nail Clippers Kcorona</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nail Clippers Munika</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Nail Cutter Xindong M</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tooth Pick 200`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tooth Pick 25`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Tulips Wooden Toothpick Jar 240`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Wooden Cotton Buds Bottle 50`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Wooden Cotton Buds Jar 200`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Wooden Cotton Buds Pkt 100`S</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Apsara Matt Magic Pencil 2.0 Pack OF 10</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Doms Correction Pen Whitener</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Kangaro Stapler HD 10</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Kangaro Stapler Pin HD 10</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Doms Marker Pen CD DVD</div>
+      </div>
+      <div class="item-tag">
+        <div class="product-img-wrap no-img">
+                  </div>
+        <div class="product-name">Casio Calculator MJ 120D</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- CTA banner -->
+<section class="container">
+  <div class="cta-banner reveal">
+    <div class="cta-content">
+      <h2>Need a specific item or brand? We can source it.</h2>
+      <p>Send us your shopping list or order sheet and we'll confirm availability and pricing.</p>
+    </div>
+    <a href="contact.html" class="btn btn-primary"><span>Send Inquiry</span></a>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-logo">
+        <img src="img/logo.png" alt="Zami Mart">
+        <span class="footer-logo-text">zami<span>mart</span></span>
+      </div>
+      <p>Your neighborhood convenience store and wholesale supplier for everyday essentials in Male', Maldives.</p>
+    </div>
+    <div>
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="categories.html">Categories</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Categories</h4>
+      <ul>
+        <li><a href="categories.html#personal-care">Personal Care</a></li>
+        <li><a href="categories.html#health">Health &amp; Wellness</a></li>
+        <li><a href="categories.html#household">Household &amp; Cleaning</a></li>
+        <li><a href="categories.html#snacks">Snacks &amp; Confectionery</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Get in touch</h4>
+      <p style="margin-bottom:1rem;">Male', Maldives</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="#" aria-label="Viber"><i class="fa-brands fa-viber"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>&copy; 2026 Zami Mart. All rights reserved.</span>
+    <span>Convenience &amp; Wholesale — Everyday Essentials</span>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script src="catalog.js"></script>
+</body>
+</html>

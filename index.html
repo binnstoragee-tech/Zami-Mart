@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zami Mart — Convenience &amp; Wholesale Store, Male'</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+
+/* =============================================
+   HERO — full-viewport split
+   ============================================= */
+.hero {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+  background: var(--cream);
+  overflow: hidden;
+  position: relative;
+}
+
+.hero-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 140px 5% 80px 8%;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 1.8rem;
+  opacity: 0;
+  animation: fadeUp .7s var(--ease-soft) .1s forwards;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 28px; height: 2px;
+  background: var(--orange);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.hero-title {
+  font-size: clamp(2.8rem, 4.2vw, 5.2rem);
+  line-height: 1.04;
+  letter-spacing: -.035em;
+  color: var(--teal);
+  margin-bottom: 1.6rem;
+}
+.hero-title .line { display: block; overflow: hidden; }
+.hero-title .line span {
+  display: block;
+  transform: translateY(110%);
+  animation: lineUp .9s var(--ease-soft) forwards;
+}
+.hero-title .line:nth-child(1) span { animation-delay: .15s; }
+.hero-title .line:nth-child(2) span { animation-delay: .28s; }
+.hero-title .line:nth-child(3) span { animation-delay: .38s; }
+@keyframes lineUp { to { transform: translateY(0); } }
+
+.hero-title .accent {
+  color: var(--orange);
+  font-style: italic;
+  position: relative;
+  display: inline-block;
+}
+.hero-title .accent::after {
+  content: '';
+  position: absolute;
+  left: -3%; right: -3%; bottom: .06em;
+  height: .22em;
+  background: var(--mint);
+  z-index: -1;
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: underlineGrow .6s var(--ease-soft) .9s forwards;
+}
+@keyframes underlineGrow { to { transform: scaleX(1); } }
+
+.hero-sub {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  color: #5a6e6e;
+  max-width: 440px;
+  margin-bottom: 2.6rem;
+  opacity: 0;
+  animation: fadeUp .8s var(--ease-soft) .5s forwards;
+}
+
+.hero-ctas {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  margin-bottom: 3.5rem;
+  opacity: 0;
+  animation: fadeUp .8s var(--ease-soft) .65s forwards;
+}
+
+.hero-divider {
+  width: 48px; height: 2px;
+  background: rgba(6,59,63,.12);
+  margin-bottom: 2rem;
+  opacity: 0;
+  animation: fadeUp .6s var(--ease-soft) .78s forwards;
+}
+
+.hero-stat-row {
+  display: flex; gap: 2.8rem;
+  opacity: 0;
+  animation: fadeUp .8s var(--ease-soft) .82s forwards;
+}
+.hero-stat { display: flex; flex-direction: column; }
+.hero-stat-num {
+  font-size: 2rem; font-weight: 800;
+  color: var(--teal); letter-spacing: -.04em; line-height: 1;
+}
+.hero-stat-num span { color: var(--orange); }
+.hero-stat-label {
+  font-size: .72rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: #9ab0b0; margin-top: .3rem;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =============================================
+   SLIDESHOW
+   ============================================= */
+.hero-slideshow {
+  position: relative;
+  overflow: hidden;
+  background: var(--teal);
+  opacity: 0;
+  animation: fadeIn .9s var(--ease-soft) .2s forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+.slide {
+  position: absolute; inset: 0;
+  opacity: 0;
+  transition: opacity .8s cubic-bezier(.4,0,.2,1);
+  will-change: opacity;
+}
+.slide.active { opacity: 1; }
+
+.slide img {
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: center;
+  display: block;
+  transform: scale(1.05);
+  transition: transform 6s ease-out;
+}
+.slide.active img { transform: scale(1); }
+
+.slide::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(6,30,33,.6) 0%, rgba(6,30,33,.15) 60%, transparent 100%);
+  pointer-events: none;
+}
+
+.slide-placeholder {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(145deg, var(--teal-soft), var(--teal));
+}
+.slide-placeholder .ph-icon { font-size: 5rem; color: rgba(255,255,255,.1); }
+
+.slide-label {
+  position: absolute; bottom: 2.4rem; left: 2.4rem;
+  z-index: 10; color: #fff;
+  opacity: 0; transform: translateY(14px);
+  transition: opacity .55s ease .25s, transform .55s ease .25s;
+  pointer-events: none;
+  text-shadow: 0 2px 12px rgba(0,0,0,.7), 0 1px 4px rgba(0,0,0,.5);
+}
+.slide.active .slide-label { opacity: 1; transform: translateY(0); }
+.slide-label-tag {
+  font-size: .65rem; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: .4rem;
+  display: flex; align-items: center; gap: 6px;
+  text-shadow: 0 2px 8px rgba(0,0,0,.6);
+}
+.slide-label-tag::before {
+  content: ''; width: 16px; height: 2px;
+  background: var(--orange); border-radius: 2px;
+}
+.slide-label h3 {
+  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+  font-weight: 800; color: #fff;
+  line-height: 1.12; letter-spacing: -.025em;
+  text-shadow: 0 2px 16px rgba(0,0,0,.8), 0 1px 4px rgba(0,0,0,.6);
+}
+.slide-label p { font-size: .85rem; color: rgba(255,255,255,.85); margin-top: .3rem; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+
+.slide-progress {
+  position: absolute; top: 0; left: 0;
+  height: 3px; background: var(--orange);
+  z-index: 20; width: 0%;
+  border-radius: 0 2px 2px 0;
+}
+
+.slide-counter {
+  position: absolute; top: 2rem; right: 2rem;
+  z-index: 20; font-size: .75rem; font-weight: 700;
+  letter-spacing: .1em; color: rgba(255,255,255,.45);
+}
+.slide-counter span { color: #fff; }
+
+.slide-dots {
+  position: absolute; top: 50%; right: 1.6rem;
+  transform: translateY(-50%);
+  z-index: 20; display: flex; flex-direction: column; gap: .55rem;
+}
+.slide-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: rgba(255,255,255,.3);
+  border: none; cursor: pointer; padding: 0;
+  transition: background .3s, height .35s var(--ease-soft), border-radius .35s;
+}
+.slide-dot.active {
+  background: #fff; height: 22px; border-radius: 3px;
+}
+
+.slide-controls {
+  position: absolute; bottom: 2.4rem; right: 2.4rem;
+  z-index: 20; display: flex; align-items: center; gap: .7rem;
+}
+.slide-btn {
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,.25);
+  background: rgba(255,255,255,.08);
+  backdrop-filter: blur(8px);
+  color: #fff; font-size: .85rem;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background .3s, border-color .3s, transform .25s var(--ease-soft);
+}
+.slide-btn:hover { background: var(--orange); border-color: var(--orange); transform: scale(1.1); }
+
+/* =============================================
+   NEW ARRIVALS — fresh modern redesign
+   ============================================= */
+.new-arrivals-section {
+  padding: 0 0 5rem;
+  background: var(--teal);
+  position: relative;
+}
+.new-arrivals-section .container {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+/* Diagonal cut that transitions into white below */
+.new-arrivals-section::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0; right: 0;
+  height: 90px;
+  background: #fff;
+  clip-path: polygon(0 100%, 100% 100%, 100% 0);
+  pointer-events: none;
+}
+
+.na-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  border-radius: 28px;
+  overflow: hidden;
+  isolation: isolate;
+  min-height: 340px;
+  box-shadow: 0 4px 0 0 rgba(255,255,255,.06), 0 32px 80px -16px rgba(0,0,0,.45);
+  transition: box-shadow .45s var(--ease-soft), transform .45s var(--ease-soft);
+}
+.na-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 0 0 rgba(255,255,255,.06), 0 52px 100px -20px rgba(0,0,0,.55);
+}
+
+/* LEFT half — orange burst */
+.na-left {
+  background: var(--orange);
+  padding: 3.2rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.1rem;
+  position: relative;
+  overflow: hidden;
+}
+/* Big radial burst behind content */
+.na-left::before {
+  content: '';
+  position: absolute;
+  top: -40%; left: -20%;
+  width: 160%; height: 200%;
+  background: radial-gradient(ellipse at 30% 40%, rgba(255,255,255,.18) 0%, transparent 60%);
+  pointer-events: none;
+}
+/* Diagonal stripe texture */
+.na-left::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255,255,255,.04) 0px,
+    rgba(255,255,255,.04) 1px,
+    transparent 1px,
+    transparent 12px
+  );
+  pointer-events: none;
+}
+
+.na-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(6,30,33,.55);
+  border: 1px solid rgba(255,255,255,.18);
+  backdrop-filter: blur(8px);
+  color: #fff;
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  padding: .35rem .85rem;
+  border-radius: 100px;
+  width: fit-content;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 2px 12px rgba(0,0,0,.18);
+}
+.na-badge-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #4eff91;
+  box-shadow: 0 0 6px #4eff91;
+  animation: nabDotBlink 1.4s ease-in-out infinite;
+}
+@keyframes nabDotBlink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px #4eff91; }
+  50%       { opacity: .4; box-shadow: none; }
+}
+
+.na-left h2 {
+  color: #fff;
+  font-size: clamp(2.2rem, 3.8vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -.03em;
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+.na-left h2 em {
+  font-style: italic;
+  color: rgba(255,255,255,.75);
+}
+
+.na-left p {
+  color: rgba(255,255,255,.7);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  max-width: 340px;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* Divider */
+.na-divider {
+  background: rgba(6,59,63,.08);
+  align-self: stretch;
+}
+
+/* RIGHT half — white/cream, action area */
+.na-right {
+  background: #fff;
+  padding: 3.2rem 3.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.6rem;
+}
+
+.na-right-label {
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #9ab0b0;
+}
+
+.na-right h3 {
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  font-weight: 700;
+  color: var(--teal);
+  line-height: 1.25;
+  letter-spacing: -.02em;
+  margin: 0;
+}
+
+.na-perks {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+.na-perk {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  font-size: .88rem;
+  color: #5a6e6e;
+}
+.na-perk-icon {
+  width: 32px; height: 32px;
+  border-radius: 9px;
+  background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--orange);
+  font-size: .8rem;
+  flex-shrink: 0;
+}
+
+.na-cta-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.na-btn-viber {
+  display: inline-flex;
+  align-items: center;
+  gap: .65rem;
+  background: #7360f2;
+  color: #fff;
+  font-weight: 700;
+  font-size: .88rem;
+  padding: .85rem 1.6rem;
+  border-radius: 100px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background .3s, transform .3s var(--ease-soft), box-shadow .3s;
+  box-shadow: 0 8px 24px -8px rgba(115,96,242,.45);
+}
+.na-btn-viber:hover {
+  background: #5a49e0;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px -8px rgba(115,96,242,.5);
+}
+.na-btn-viber i { font-size: 1rem; }
+
+.na-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  color: var(--teal);
+  font-weight: 600;
+  font-size: .85rem;
+  text-decoration: none;
+  opacity: .65;
+  transition: opacity .25s, gap .3s var(--ease-soft);
+}
+.na-btn-secondary:hover { opacity: 1; gap: .75rem; }
+
+/* =============================================
+   WHY US — redesigned cards
+   ============================================= */
+.why-section {
+  padding: 8rem 0;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.why-section::before {
+  content: '';
+  position: absolute; top: -120px; right: -120px;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: var(--cream);
+  pointer-events: none;
+}
+
+.why-header {
+  text-align: center;
+  margin-bottom: 4.5rem;
+}
+.why-header .section-label {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 1rem;
+}
+.why-header .section-label::before {
+  content: ''; width: 28px; height: 2px;
+  background: var(--orange); border-radius: 2px;
+}
+.why-header h2 {
+  font-size: clamp(2rem, 3.8vw, 3.1rem);
+  color: var(--teal); letter-spacing: -.03em;
+  line-height: 1.1; max-width: 560px; margin: 0 auto .9rem;
+}
+.why-header p {
+  font-size: 1rem; color: #6a8080; max-width: 480px;
+  margin: 0 auto; line-height: 1.75;
+}
+
+.why-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+}
+
+.why-card {
+  background: var(--cream);
+  border-radius: 24px;
+  padding: 2.6rem 2.2rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform .4s var(--ease-soft), box-shadow .4s;
+  border: 1px solid rgba(6,59,63,.05);
+}
+.why-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 28px 56px -20px rgba(6,59,63,.14);
+}
+.why-card::before {
+  content: '';
+  position: absolute; bottom: -30px; right: -30px;
+  width: 110px; height: 110px; border-radius: 50%;
+  background: var(--orange);
+  opacity: 0;
+  transition: opacity .4s, transform .5s var(--ease-soft);
+  transform: scale(.7);
+}
+.why-card:hover::before {
+  opacity: .06;
+  transform: scale(1.4);
+}
+
+.why-card-num {
+  font-size: .65rem; font-weight: 800;
+  letter-spacing: .2em; color: var(--orange);
+  margin-bottom: 1.4rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.why-card-num::after {
+  content: ''; flex: 1; height: 1px;
+  background: rgba(253,77,2,.2);
+  max-width: 32px;
+}
+
+.why-card-icon {
+  width: 56px; height: 56px;
+  border-radius: 16px;
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; color: var(--teal);
+  margin-bottom: 1.4rem;
+  box-shadow: 0 4px 16px -6px rgba(6,59,63,.12);
+  transition: background .35s, color .35s, transform .4s var(--ease-soft);
+}
+.why-card:hover .why-card-icon {
+  background: var(--orange); color: #fff;
+  transform: rotate(-8deg) scale(1.08);
+}
+
+.why-card h4 {
+  font-size: 1.1rem; color: var(--teal);
+  letter-spacing: -.02em; margin-bottom: .6rem; line-height: 1.2;
+}
+.why-card p {
+  font-size: .88rem; color: #6e8a8a; line-height: 1.7; margin: 0;
+}
+
+/* =============================================
+   CTA BANNER
+   ============================================= */
+.cta-section { padding: 0 0 7rem; background: #fff; }
+.cta-banner {
+  background: var(--teal);
+  border-radius: 28px;
+  padding: 4.5rem 7%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center; gap: 3rem;
+  position: relative; overflow: hidden;
+}
+.cta-banner::before {
+  content: '';
+  position: absolute; right: 0; top: 0; bottom: 0; width: 45%;
+  background: var(--orange); opacity: .07;
+  clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+}
+.cta-banner::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+.cta-banner h2 {
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+  color: #fff; max-width: 520px;
+  line-height: 1.12; position: relative; z-index: 1;
+  letter-spacing: -.025em;
+}
+.cta-banner p {
+  color: rgba(255,255,255,.5); margin-top: .8rem;
+  font-size: .96rem; position: relative; z-index: 1;
+}
+.cta-banner .btn-primary {
+  position: relative; z-index: 1;
+  background: #fff; color: var(--teal);
+  white-space: nowrap; flex-shrink: 0;
+}
+.cta-banner .btn-primary:hover {
+  background: var(--orange); color: #fff;
+  box-shadow: 0 16px 40px -10px rgba(253,77,2,.45);
+}
+.cta-banner .btn-primary::before { background: var(--orange); }
+
+/* =============================================
+   SHARED UTILS
+   ============================================= */
+.section-label {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: .72rem; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 1rem;
+}
+.section-label::before {
+  content: ''; width: 28px; height: 2px;
+  background: var(--orange); border-radius: 2px;
+}
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 1024px) {
+  .hero { grid-template-columns: 1fr; grid-template-rows: auto 55vw; min-height: auto; }
+  .hero-copy { padding: 130px 6% 60px; }
+  .why-cards { grid-template-columns: 1fr 1fr; }
+  .na-card { grid-template-columns: 1fr; grid-template-rows: auto 1px auto; }
+  .na-divider { grid-column: 1; grid-row: 2; min-height: 1px; }
+}
+
+@media (max-width: 700px) {
+  .hero { grid-template-rows: auto 72vw; }
+  .hero-copy { padding: 110px 5% 50px; }
+  .hero-stat-row { gap: 1.6rem; }
+  .why-cards { grid-template-columns: 1fr; }
+  .na-left { padding: 2.4rem 1.8rem; }
+  .na-right { padding: 2.4rem 1.8rem; }
+  .slide-dots { display: none; }
+  .cta-banner { grid-template-columns: 1fr; text-align: center; justify-items: center; padding: 3rem 6%; }
+}
+</style>
+</head>
+<body>
+
+<!-- Page transition overlay -->
+<div class="page-transition">
+  <div class="pt-panel pt-1"></div>
+  <div class="pt-panel pt-2"></div>
+  <div class="pt-panel pt-3"></div>
+</div>
+
+<!-- NAVBAR -->
+<header class="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="img/logo.png" alt="Zami Mart logo">
+  </a>
+  <nav class="nav-links">
+    <button class="nav-close" aria-label="Close menu">&times;</button>
+    <a href="index.html" class="active">Home</a>
+    <a href="categories.html">Categories</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <button class="nav-toggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- =============================================
+     HERO
+     ============================================= -->
+<section class="hero">
+
+  <!-- LEFT: Copy -->
+  <div class="hero-copy">
+    <div class="hero-eyebrow">Convenience Store &amp; Wholesale</div>
+    <h1 class="hero-title">
+      <span class="line"><span>Everyday</span></span>
+      <span class="line"><span>essentials,</span></span>
+      <span class="line"><span><em class="accent">stocked</em> &amp; priced</span></span>
+    </h1>
+    <p class="hero-sub">
+      From personal care to household needs — Zami Mart supplies households, shops, and businesses across Male' with everyday essentials, fair prices, and fast turnaround.
+    </p>
+    <div class="hero-ctas">
+      <a href="categories.html" class="btn btn-primary"><span>Browse Categories</span></a>
+      <a href="contact.html" class="btn btn-outline">Get a Wholesale Quote</a>
+    </div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat-row">
+      <div class="hero-stat">
+        <span class="hero-stat-num">8<span>+</span></span>
+        <span class="hero-stat-label">Categories</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">200<span>+</span></span>
+        <span class="hero-stat-label">Products</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">B2B<span> &amp; B2C</span></span>
+        <span class="hero-stat-label">Retail &amp; Wholesale</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Slideshow -->
+  <div class="hero-slideshow" id="heroSlideshow">
+    <div class="slide-progress" id="slideProgress"></div>
+    <div class="slide-counter"><span id="slideCurrentNum">1</span> / 8</div>
+    <div class="slide-dots" id="slideDots"></div>
+
+    <div class="slide active" data-index="0">
+      <div class="slide-placeholder"><i class="fa-solid fa-pump-soap ph-icon"></i></div>
+      <img src="img/personal care.jpeg" alt="Personal Care" loading="eager">
+      <div class="slide-label">
+        <div class="slide-label-tag">Category 1 of 8</div>
+        <h3>Personal Care</h3>
+        <p>Soaps, shampoos, skincare &amp; oral care</p>
+      </div>
+    </div>
+    <div class="slide" data-index="1">
+      <div class="slide-placeholder"><i class="fa-solid fa-suitcase-medical ph-icon"></i></div>
+      <img src="img/categories/health.jpg" alt="Health & Wellness" loading="lazy">
+      <div class="slide-label">
+        <div class="slide-label-tag">Category 2 of 8</div>
+        <h3>Health &amp; Wellness</h3>
+        <p>Balms, cold &amp; cough remedies, first aid</p>
+      </div>
+    </div>
+    <div class="slide" data-index="2">
+      <div class="slide-placeholder"><i class="fa-solid fa-spray-can-sparkles ph-icon"></i></div>
+      <img src="img/categories/household.jpg" alt="Household & Cleaning" loading="lazy">
+      <div class="slide-label">
+        <div class="slide-label-tag">Category 3 of 8</div>
+        <h3>Household &amp; Cleaning</h3>
+        <p>Detergents, cleaners &amp; insect control</p>
+      </div>
+    </div>
+    <div class="slide" data-index="3">
+      <div class="slide-placeholder"><i class="fa-solid fa-candy-cane ph-icon"></i></div>
+      <img src="img/categories/snacks.jpg" alt="Snacks & Confectionery" loading="lazy">
+      <div class="slide-label">
+        <div class="slide-label-tag">Category 4 of 8</div>
+        <h3>Snacks &amp; Confectionery</h3>
+        <p>Gums, candies &amp; chocolates</p>
+      </div>
+    </div>
+    <div class="slide" data-index="4">
+      <div class="slide-placeholder"><i class="fa-solid fa-baby ph-icon"></i></div>
+      <img src="img/categories/baby.jpg" alt="Baby Care" loading="lazy">
+      <div class="slide-label">
+        <div class="slide-label-tag">Category 5 of 8</div>
+        <h3>Baby Care</h3>
+        <p>Wipes, fabric care &amp; baby treats</p>
+      </div>
+    </div>
+    <div class="slide" data-index="5">
+      <div class="slide-placeholder"><i class="fa-solid fa-bowl-rice ph-icon"></i></div>
+      <img src="img/categories/pantry.jpg" alt="Pantry & Cooking" loading="lazy">
+      <div class="slide-label">
+        <div class="slide-label-tag">Category 6 of 8</div>
+        <h3>Pantry &amp; Cooking</h3>
+        <p>Basmati rice varieties &amp; cooking oils</p>
+      </div>
+    </div>
+    <div class="slide" data-index="6">
+      <div class="slide-placeholder"><i class="fa-solid fa-bottle-water ph-icon"></i></div>
+      <img src="img/categories/beverages.jpg" alt="Beverages & Hydration" loading="lazy">
+      <div class="slide-label">
+        <div class="slide-label-tag">Category 7 of 8</div>
+        <h3>Beverages &amp; Hydration</h3>
+        <p>Fruit drinks, glucose &amp; essentials</p>
+      </div>
+    </div>
+    <div class="slide" data-index="7">
+      <div class="slide-placeholder"><i class="fa-solid fa-pen ph-icon"></i></div>
+      <img src="img/categories/stationery.jpg" alt="Stationery & Misc" loading="lazy">
+      <div class="slide-label">
+        <div class="slide-label-tag">Category 8 of 8</div>
+        <h3>Stationery &amp; Misc</h3>
+        <p>Pens, pencils, staplers &amp; office supplies</p>
+      </div>
+    </div>
+
+    <div class="slide-controls">
+      <button class="slide-btn" id="slidePrev" aria-label="Previous"><i class="fa-solid fa-arrow-left"></i></button>
+      <button class="slide-btn" id="slideNext" aria-label="Next"><i class="fa-solid fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+</section>
+
+<!-- =============================================
+     NEW ARRIVALS
+     ============================================= -->
+<section class="new-arrivals-section">
+  <div class="container">
+    <div class="na-card reveal">
+
+      <!-- LEFT: announcement -->
+      <div class="na-left">
+        <span class="na-badge">
+          <span class="na-badge-dot"></span>
+          New Arrivals
+        </span>
+        <h2>Fresh stock,<br><em>dropping soon.</em></h2>
+        <p>New products hit our shelves regularly. Be first in line before they sell out.</p>
+      </div>
+
+      <!-- Divider -->
+      <div class="na-divider"></div>
+
+      <!-- RIGHT: perks + CTA -->
+      <div class="na-right">
+        <div class="na-right-label">Join the community</div>
+        <h3>Get notified the moment new stock arrives — straight to your Viber.</h3>
+        <div class="na-perks">
+          <div class="na-perk">
+            <div class="na-perk-icon"><i class="fa-solid fa-bolt"></i></div>
+            Early access before we announce publicly
+          </div>
+          <div class="na-perk">
+            <div class="na-perk-icon"><i class="fa-solid fa-tag"></i></div>
+            Exclusive wholesale pricing for members
+          </div>
+          <div class="na-perk">
+            <div class="na-perk-icon"><i class="fa-solid fa-truck-fast"></i></div>
+            Priority order slots on high-demand items
+          </div>
+        </div>
+        <div class="na-cta-row">
+          <a href="https://invite.viber.com/?g2=AQB%2Fd4PEZ8YkAVYmZZ762Zy6AqCJROwY3pa1dbwERu0F5rWFZX65J325G%2Fra1A5m" target="_blank" rel="noopener" class="na-btn-viber">
+            <i class="fa-brands fa-viber"></i> Join Viber Community
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     WHY ZAMI MART
+     ============================================= -->
+<section class="why-section">
+  <div class="container">
+
+    <div class="why-header reveal">
+      <div class="section-label">Why Zami Mart</div>
+      <h2>Stocking a store? We've got you covered.</h2>
+      <p>From single retail purchases to standing bulk orders — we serve homes and businesses across Male' with the same commitment to quality and pricing.</p>
+    </div>
+
+    <div class="why-cards reveal-stagger">
+
+      <div class="why-card">
+        <div class="why-card-num">01</div>
+        <div class="why-card-icon"><i class="fa-solid fa-tags"></i></div>
+        <h4>Retail &amp; Wholesale Pricing</h4>
+        <p>Whether you're buying one unit or a full carton, we price fairly. Ask about standing wholesale accounts for shops and resellers.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-num">02</div>
+        <div class="why-card-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <h4>Daily Restocked Essentials</h4>
+        <p>Our shelves are refreshed daily so you always find what you need — from soaps to snacks — without waiting on backorders.</p>
+      </div>
+
+      <div class="why-card">
+        <div class="why-card-num">03</div>
+        <div class="why-card-icon"><i class="fa-brands fa-whatsapp"></i></div>
+        <h4>WhatsApp &amp; Viber Orders</h4>
+        <p>Skip the trip — send us a list on WhatsApp or Viber and we'll confirm availability and pricing fast.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     CTA BANNER
+     ============================================= -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-banner reveal">
+      <div>
+        <h2>Stocking a store? Get wholesale pricing on full cases &amp; cartons.</h2>
+        <p>Talk to our team for bulk rates, delivery schedules, and standing orders.</p>
+      </div>
+      <a href="contact.html" class="btn btn-primary"><span>Contact Us →</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- =============================================
+     FOOTER
+     ============================================= -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-logo">
+        <img src="img/logo.png" alt="Zami Mart">
+      </div>
+      <p>Your neighborhood convenience store and wholesale supplier for everyday essentials in Male', Maldives.</p>
+    </div>
+    <div>
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="categories.html">Categories</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Categories</h4>
+      <ul>
+        <li><a href="categories.html#personal-care">Personal Care</a></li>
+        <li><a href="categories.html#health">Health &amp; Wellness</a></li>
+        <li><a href="categories.html#household">Household &amp; Cleaning</a></li>
+        <li><a href="categories.html#snacks">Snacks &amp; Confectionery</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Get in touch</h4>
+      <p style="margin-bottom:1rem;">Male', Maldives</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="#" aria-label="Viber"><i class="fa-brands fa-viber"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>&copy; 2026 Zami Mart. All rights reserved.</span>
+    <span>Convenience &amp; Wholesale — Everyday Essentials</span>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+<script>
+// =============================================
+// HERO SLIDESHOW
+// =============================================
+(function () {
+  const SLIDE_DURATION = 5000;
+  const slides = document.querySelectorAll('.slide');
+  const dotsWrap = document.getElementById('slideDots');
+  const progress = document.getElementById('slideProgress');
+  const counter = document.getElementById('slideCurrentNum');
+  const btnPrev = document.getElementById('slidePrev');
+  const btnNext = document.getElementById('slideNext');
+  let current = 0;
+  let timer = null;
+  const total = slides.length;
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
+    dot.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(dot);
+  });
+
+  function getDots() { return dotsWrap.querySelectorAll('.slide-dot'); }
+
+  function goTo(idx) {
+    slides[current].classList.remove('active');
+    getDots()[current].classList.remove('active');
+    current = (idx + total) % total;
+    slides[current].classList.add('active');
+    getDots()[current].classList.add('active');
+    counter.textContent = current + 1;
+    restartProgress();
+    restartTimer();
+  }
+
+  function restartTimer() {
+    clearTimeout(timer);
+    timer = setTimeout(() => goTo(current + 1), SLIDE_DURATION);
+  }
+
+  function restartProgress() {
+    progress.style.transition = 'none';
+    progress.style.width = '0%';
+    void progress.offsetWidth;
+    progress.style.transition = 'width ' + SLIDE_DURATION + 'ms linear';
+    progress.style.width = '100%';
+  }
+
+  btnNext.addEventListener('click', () => goTo(current + 1));
+  btnPrev.addEventListener('click', () => goTo(current - 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') goTo(current + 1);
+    if (e.key === 'ArrowLeft')  goTo(current - 1);
+  });
+
+  let touchX = 0;
+  const ss = document.getElementById('heroSlideshow');
+  ss.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  ss.addEventListener('touchend', e => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 40) dx < 0 ? goTo(current + 1) : goTo(current - 1);
+  });
+
+  ss.addEventListener('mouseenter', () => {
+    clearTimeout(timer);
+    progress.style.transition = 'none';
+  });
+  ss.addEventListener('mouseleave', () => {
+    restartProgress();
+    restartTimer();
+  });
+
+  restartProgress();
+  restartTimer();
+})();
+</script>
+</body>
+</html>

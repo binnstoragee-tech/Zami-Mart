@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Zami Mart</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  .page-hero{
+    padding: 150px 0 4rem;
+    background: var(--cream);
+    position:relative;
+    overflow:hidden;
+  }
+  .page-hero .container{ position:relative; z-index:1; }
+  .page-hero h1{ font-size: clamp(2.4rem, 5.5vw, 4rem); margin-bottom:1rem; max-width:760px; }
+  .page-hero p{ max-width:560px; font-size:1.05rem; }
+
+  .contact-section{
+    padding: 5rem 0 7rem;
+  }
+  .contact-grid{
+    display:grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 3rem;
+    align-items:start;
+  }
+
+  .info-card{
+    background: var(--teal);
+    border-radius: var(--radius);
+    padding: 2.6rem;
+    color:#fff;
+    position:relative;
+    overflow:hidden;
+  }
+  .info-card::before{
+    content:'';
+    position:absolute; top:-25%; right:-25%;
+    width:65%; height:65%;
+    background: var(--orange);
+    opacity:.18;
+    border-radius:50%;
+    filter: blur(40px);
+  }
+  .info-card h2{
+    color:#fff; font-size:1.7rem; margin-bottom:.5rem;
+    position:relative; z-index:1;
+  }
+  .info-card > p{
+    color: var(--mint); margin-bottom:2rem; position:relative; z-index:1;
+  }
+  .info-list{ display:flex; flex-direction:column; gap:1.4rem; position:relative; z-index:1; }
+  .info-item{ display:flex; gap:14px; align-items:flex-start; }
+  .info-item .icon{
+    width:44px; height:44px; min-width:44px;
+    border-radius:12px;
+    background: rgba(255,255,255,.08);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--orange);
+    font-size:1.1rem;
+    transition: transform .4s var(--ease-soft), background .35s;
+  }
+  .info-item:hover .icon{
+    background: var(--orange); color:#fff;
+    transform: rotate(-8deg) scale(1.08);
+  }
+  .info-item h4{ color:#fff; font-size:1rem; margin-bottom:.2rem; }
+  .info-item p{ color:#bcd6d3; font-size:.9rem; margin:0; }
+  .info-item a{ color:#bcd6d3; transition:color .25s; }
+  .info-item a:hover{ color:var(--orange); }
+
+  .info-hours{
+    margin-top: 2.2rem;
+    padding-top: 2rem;
+    border-top:1px solid rgba(255,255,255,.12);
+    position:relative; z-index:1;
+  }
+  .info-hours h4{ color:#fff; margin-bottom:.8rem; font-size:1rem; }
+  .hours-row{
+    display:flex; justify-content:space-between;
+    font-size:.9rem; color:#bcd6d3;
+    padding: 6px 0;
+    border-bottom:1px dashed rgba(255,255,255,.08);
+  }
+  .hours-row:last-child{ border-bottom:none; }
+  .hours-row span:last-child{ color:#fff; font-weight:600; }
+
+  .form-card{
+    background: var(--paper);
+    border-radius: var(--radius);
+    padding: 2.6rem;
+    border:1px solid rgba(6,59,63,.06);
+  }
+  .form-card h2{ font-size:1.7rem; margin-bottom:.4rem; }
+  .form-card > p{ margin-bottom:2rem; }
+
+  .form-row{ display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-bottom:1.2rem; }
+  .form-group{ display:flex; flex-direction:column; gap:.5rem; }
+  .form-group.full{ grid-column: 1 / -1; }
+  label{
+    font-weight:600; font-size:.85rem; color:var(--teal);
+    letter-spacing:.02em;
+  }
+  input, select, textarea{
+    font-family: var(--font-body);
+    padding: 13px 16px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(6,59,63,.12);
+    background: var(--cream);
+    color: var(--ink);
+    font-size:.95rem;
+    transition: border-color .3s, box-shadow .3s, background .3s;
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:none;
+    border-color: var(--orange);
+    background:#fff;
+    box-shadow: 0 0 0 4px rgba(253,77,2,.1);
+  }
+  textarea{ resize:vertical; min-height:120px; }
+
+  .form-submit{
+    margin-top:.5rem;
+    width:100%; justify-content:center;
+    font-size:1rem;
+  }
+
+  .map-wrap{
+    margin-top: 3rem;
+    border-radius: var(--radius);
+    overflow:hidden;
+    aspect-ratio: 16/6;
+    border:1px solid rgba(6,59,63,.08);
+    position:relative;
+  }
+  .map-wrap iframe{ width:100%; height:100%; border:0; display:block; filter: grayscale(.15) contrast(1.05); }
+  .map-wrap::after{
+    content:'';
+    position:absolute; inset:0;
+    background: linear-gradient(135deg, rgba(6,59,63,.12), transparent 60%);
+    pointer-events:none;
+  }
+
+  @media (max-width: 980px){
+    .contact-grid{ grid-template-columns:1fr; }
+    .form-row{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Page transition overlay -->
+<div class="page-transition">
+  <div class="pt-panel pt-1"></div>
+  <div class="pt-panel pt-2"></div>
+  <div class="pt-panel pt-3"></div>
+</div>
+
+<!-- Navbar -->
+<header class="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="img/logo.png" alt="Zami Mart logo">
+    <span class="nav-logo-text">zami<span>mart</span></span>
+  </a>
+  <nav class="nav-links">
+    <button class="nav-close" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="categories.html">Categories</a>
+    <a href="contact.html" class="active">Contact</a>
+  </nav>
+  <button class="nav-toggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<!-- Page hero -->
+<section class="page-hero">
+  <div class="container">
+    <div class="eyebrow">Get In Touch</div>
+    <h1>Let's talk stock, pricing &amp; delivery.</h1>
+    <p>Whether it's a single order or a standing wholesale account, our team is ready to help. Reach out below or visit us in Male'.</p>
+  </div>
+</section>
+
+<!-- Contact -->
+<section class="contact-section container">
+  <div class="contact-grid">
+
+    <div class="info-card reveal">
+      <h2>Contact details</h2>
+      <p>We typically respond within a few hours during business days.</p>
+      <div class="info-list">
+        <div class="info-item">
+          <div class="icon"><i class="fa-solid fa-location-dot"></i></div>
+          <div>
+            <h4>Visit our store</h4>
+            <p>Zami Mart, Male  Ma. Motherland, Maldives</p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="icon"><i class="fa-solid fa-phone"></i></div>
+          <div>
+            <h4>Call us</h4>
+            <p><a href="tel:+960 9906025">+960 9906025</a></p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="icon"><i class="fa-brands fa-whatsapp"></i></div>
+          <div>
+            <h4>WhatsApp / Viber</h4>
+            <p><a href="https://wa.me/+960 9906025">+960 9906025</a></p>
+          </div>
+        </div>
+        <div class="info-item">
+          <div class="icon"><i class="fa-solid fa-envelope"></i></div>
+          <div>
+            <h4>Email</h4>
+            <p><a href="mailto:zamimart@gmail.com">zamimart@gmail.com</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-hours">
+        <h4>Store hours</h4>
+        <div class="hours-row"><span>09:00 – 12:00</span></div>
+        <div class="hours-row"><span>13:30 – 18:00</span></div>
+        <div class="hours-row"><span>20:00 – 22:00</span></div>
+      </div>
+    </div>
+
+    <div class="form-card reveal">
+      <h2>Send an inquiry</h2>
+      <p>Tell us what you're looking for — retail order, wholesale account, or a general question.</p>
+      <form>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Full name</label>
+            <input type="text" id="name" name="name" placeholder="Your name" required>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone number</label>
+            <input type="tel" id="phone" name="phone" placeholder="+960 ___ ____" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="you@email.com">
+          </div>
+          <div class="form-group">
+            <label for="type">Inquiry type</label>
+            <select id="type" name="type">
+              <option>Retail order</option>
+              <option>Wholesale account</option>
+              <option>Bulk pricing request</option>
+              <option>General question</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group full">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell us what you need — items, quantities, or your question."></textarea>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary form-submit"><span>Send Message</span></button>
+      </form>
+    </div>
+  </div>
+
+  <div class="map-wrap reveal">
+    <iframe
+      src="https://maps.google.com/maps?q=4.1749,73.5076&z=17&output=embed"
+      loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade"
+      title="Zami Mart location map"
+      allowfullscreen></iframe>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <div class="footer-logo">
+        <img src="img/logo.png" alt="Zami Mart">
+        <span class="footer-logo-text">zami<span>mart</span></span>
+      </div>
+      <p>Your neighborhood convenience store and wholesale supplier for everyday essentials in Male', Maldives.</p>
+    </div>
+    <div>
+      <h4>Navigate</h4>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="categories.html">Categories</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Categories</h4>
+      <ul>
+        <li><a href="categories.html#personal-care">Personal Care</a></li>
+        <li><a href="categories.html#health">Health &amp; Wellness</a></li>
+        <li><a href="categories.html#household">Household &amp; Cleaning</a></li>
+        <li><a href="categories.html#snacks">Snacks &amp; Confectionery</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Get in touch</h4>
+      <p style="margin-bottom:1rem;">Male', Republic of Maldives</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="#" aria-label="Viber"><i class="fa-brands fa-viber"></i></a>
+      </div>
+    </div>
+  </div>
+  <div class="container footer-bottom">
+    <span>&copy; 2026 Zami Mart. All rights reserved.</span>
+    <span>Convenience &amp; Wholesale — Everyday Essentials</span>
+  </div>
+</footer>
+
+<script src="main.js"></script>
+</body>
+</html>
