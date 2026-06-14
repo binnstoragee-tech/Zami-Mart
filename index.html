@@ -148,6 +148,19 @@
   background: var(--teal);
   opacity: 0;
   animation: fadeIn .9s var(--ease-soft) .2s forwards;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 5%;
+}
+.hero-slideshow-inner {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 1 / 1;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 32px 80px -16px rgba(0,0,0,.35);
 }
 @keyframes fadeIn { to { opacity: 1; } }
 
@@ -267,16 +280,7 @@
   padding-top: 4rem;
   padding-bottom: 4rem;
 }
-/* Diagonal cut that transitions into white below */
-.new-arrivals-section::after {
-  content: '';
-  position: absolute;
-  bottom: -1px; left: 0; right: 0;
-  height: 90px;
-  background: #fff;
-  clip-path: polygon(0 100%, 100% 100%, 100% 0);
-  pointer-events: none;
-}
+/* Diagonal cut removed */
 
 .na-card {
   position: relative;
@@ -655,16 +659,18 @@
    RESPONSIVE
    ============================================= */
 @media (max-width: 1024px) {
-  .hero { grid-template-columns: 1fr; grid-template-rows: auto 55vw; min-height: auto; }
+  .hero { grid-template-columns: 1fr; grid-template-rows: auto auto; min-height: auto; }
   .hero-copy { padding: 130px 6% 60px; }
+  .hero-slideshow { padding: 40px 6% 60px; }
   .why-cards { grid-template-columns: 1fr 1fr; }
   .na-card { grid-template-columns: 1fr; grid-template-rows: auto 1px auto; }
   .na-divider { grid-column: 1; grid-row: 2; min-height: 1px; }
 }
 
 @media (max-width: 700px) {
-  .hero { grid-template-rows: auto 72vw; }
+  .hero-slideshow-inner { box-shadow: 0 16px 40px -12px rgba(0,0,0,.3); }
   .hero-copy { padding: 110px 5% 50px; }
+  .hero-slideshow { padding: 30px 5% 40px; }
   .hero-stat-row { gap: 1.6rem; }
   .why-cards { grid-template-columns: 1fr; }
   .na-left { padding: 2.4rem 1.8rem; }
@@ -738,6 +744,7 @@
 
   <!-- RIGHT: Slideshow -->
   <div class="hero-slideshow" id="heroSlideshow">
+   <div class="hero-slideshow-inner">
     <div class="slide-progress" id="slideProgress"></div>
     <div class="slide-counter"><span id="slideCurrentNum">1</span> / 8</div>
     <div class="slide-dots" id="slideDots"></div>
@@ -819,6 +826,7 @@
       <button class="slide-btn" id="slidePrev" aria-label="Previous"><i class="fa-solid fa-arrow-left"></i></button>
       <button class="slide-btn" id="slideNext" aria-label="Next"><i class="fa-solid fa-arrow-right"></i></button>
     </div>
+   </div>
   </div>
 
 </section>

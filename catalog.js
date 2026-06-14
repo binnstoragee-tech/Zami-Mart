@@ -66,4 +66,136 @@ document.addEventListener('DOMContentLoaded', () => {
     debounceTimer = setTimeout(applyFilters, 120);
   });
 
+  /* ============================================
+     Product Viewer (zoom modal)
+  ============================================ */
+  const pvOverlay = document.getElementById('pvOverlay');
+  const pvStage   = document.getElementById('pvStage');
+  const pvImg     = document.getElementById('pvImg');
+  const pvName    = document.getElementById('pvName');
+  const pvClose   = document.getElementById('pvClose');
+  const pvZoomIn  = document.getElementById('pvZoomIn');
+  const pvZoomOut = document.getElementById('pvZoomOut');
+
+  const ZOOM_MIN = 1;
+  const ZOOM_MAX = 4;
+  const ZOOM_STEP = 0.5;
+
+  let scale = 1;
+  let posX = 0, posY = 0;
+  let dragging = false;
+  let startX = 0, startY = 0;
+
+  function setTransform() {
+    pvImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
+  }
+
+  function resetView() {
+    scale = 1;
+    posX = 0;
+    posY = 0;
+    setTransform();
+    pvStage.classList.remove('dragging');
+    pvZoomOut.disabled = true;
+    pvZoomIn.disabled = false;
+  }
+
+  function clampPos() {
+    const maxOffset = (scale - 1) * (pvStage.offsetWidth / 2);
+    posX = Math.max(-maxOffset, Math.min(maxOffset, posX));
+    const maxOffsetY = (scale - 1) * (pvStage.offsetHeight / 2);
+    posY = Math.max(-maxOffsetY, Math.min(maxOffsetY, posY));
+  }
+
+  function zoomBy(delta) {
+    const newScale = Math.round((scale + delta) * 100) / 100;
+    scale = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newScale));
+    if (scale === ZOOM_MIN) { posX = 0; posY = 0; }
+    clampPos();
+    setTransform();
+    pvZoomOut.disabled = scale <= ZOOM_MIN;
+    pvZoomIn.disabled = scale >= ZOOM_MAX;
+  }
+
+  function openViewer(tag) {
+    const img = tag.querySelector('.product-img-wrap img');
+    const name = tag.querySelector('.product-name');
+    const wrap = tag.querySelector('.product-img-wrap');
+
+    pvName.textContent = name ? name.textContent : '';
+    resetView();
+
+    if (img && !wrap.classList.contains('no-img')) {
+      pvImg.src = img.src;
+      pvImg.classList.remove('pv-hidden');
+      pvStage.classList.remove('no-img');
+    } else {
+      pvImg.src = '';
+      pvImg.classList.add('pv-hidden');
+      pvStage.classList.add('no-img');
+    }
+
+    pvOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeViewer() {
+    pvOverlay.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('.item-tag').forEach(tag => {
+    tag.addEventListener('click', () => openViewer(tag));
+  });
+
+  pvClose.addEventListener('click', closeViewer);
+  pvOverlay.addEventListener('click', (e) => {
+    if (e.target === pvOverlay) closeViewer();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pvOverlay.classList.contains('open')) closeViewer();
+  });
+
+  pvZoomIn.addEventListener('click', () => zoomBy(ZOOM_STEP));
+  pvZoomOut.addEventListener('click', () => zoomBy(-ZOOM_STEP));
+
+  pvStage.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    zoomBy(e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP);
+  }, { passive: false });
+
+  pvStage.addEventListener('mousedown', (e) => {
+    if (scale <= ZOOM_MIN) return;
+    dragging = true;
+    pvStage.classList.add('dragging');
+    startX = e.clientX - posX;
+    startY = e.clientY - posY;
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!dragging) return;
+    posX = e.clientX - startX;
+    posY = e.clientY - startY;
+    clampPos();
+    setTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    dragging = false;
+    pvStage.classList.remove('dragging');
+  });
+
+  pvStage.addEventListener('touchstart', (e) => {
+    if (scale <= ZOOM_MIN || e.touches.length !== 1) return;
+    dragging = true;
+    startX = e.touches[0].clientX - posX;
+    startY = e.touches[0].clientY - posY;
+  }, { passive: true });
+  pvStage.addEventListener('touchmove', (e) => {
+    if (!dragging || e.touches.length !== 1) return;
+    posX = e.touches[0].clientX - startX;
+    posY = e.touches[0].clientY - startY;
+    clampPos();
+    setTransform();
+  }, { passive: true });
+  pvStage.addEventListener('touchend', () => { dragging = false; });
+
 });
