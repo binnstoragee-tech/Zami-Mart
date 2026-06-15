@@ -268,130 +268,100 @@
 .slide-btn:hover { background: var(--orange); border-color: var(--orange); transform: scale(1.1); }
 
 /* =============================================
-   NEW ARRIVALS — fresh modern redesign
+   NEW ARRIVALS — coming soon centered style
    ============================================= */
 .new-arrivals-section {
-  padding: 0 0 5rem;
-  background: var(--teal);
+  padding: 5rem 0 6rem;
+  background: var(--cream);
   position: relative;
 }
-.new-arrivals-section .container {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+
+.na-section-head {
+  text-align: center;
+  margin-bottom: 2.6rem;
 }
-/* Diagonal cut removed */
+.na-section-head h2 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: .5rem;
+}
+.na-section-head h2 em {
+  color: #FD4D02;
+  font-style: normal;
+}
+.na-section-head p {
+  color: #FD4D02;
+  font-size: 1rem;
+}
 
 .na-card {
   position: relative;
-  display: grid;
-  grid-template-columns: 1fr 1px 1fr;
-  border-radius: 28px;
-  overflow: hidden;
-  isolation: isolate;
-  min-height: 340px;
-  box-shadow: 0 4px 0 0 rgba(255,255,255,.06), 0 32px 80px -16px rgba(0,0,0,.45);
-  transition: box-shadow .45s var(--ease-soft), transform .45s var(--ease-soft);
-}
-.na-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 0 0 rgba(255,255,255,.06), 0 52px 100px -20px rgba(0,0,0,.55);
-}
-
-/* LEFT half — orange burst */
-.na-left {
-  background: var(--orange);
-  padding: 3.2rem 3.5rem;
+  background: #f4f5ee;
+  border-radius: 24px;
+  padding: 4rem 2rem 3.5rem;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
-  gap: 1.1rem;
-  position: relative;
+  text-align: center;
+  gap: 1.4rem;
+  max-width: 640px;
+  margin: 0 auto;
   overflow: hidden;
 }
-/* Big radial burst behind content */
-.na-left::before {
+
+/* Pulse rings */
+.na-pulse-rings {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: .5rem;
+}
+.na-pulse-rings::before,
+.na-pulse-rings::after {
   content: '';
   position: absolute;
-  top: -40%; left: -20%;
-  width: 160%; height: 200%;
-  background: radial-gradient(ellipse at 30% 40%, rgba(255,255,255,.18) 0%, transparent 60%);
-  pointer-events: none;
+  border-radius: 50%;
+  border: 1.5px solid #FD4D02;
+  animation: naPulseRing 2.4s ease-out infinite;
 }
-/* Diagonal stripe texture */
-.na-left::after {
-  content: '';
-  position: absolute; inset: 0;
-  background-image: repeating-linear-gradient(
-    -45deg,
-    rgba(255,255,255,.04) 0px,
-    rgba(255,255,255,.04) 1px,
-    transparent 1px,
-    transparent 12px
-  );
-  pointer-events: none;
+.na-pulse-rings::before {
+  width: 90px; height: 90px;
+  animation-delay: 0s;
 }
-
-/* Scanning sweep effect */
-.na-scan {
-  position: absolute;
-  top: 0; left: -60%;
-  width: 45%; height: 100%;
-  background: linear-gradient(
-    100deg,
-    transparent 0%,
-    rgba(255,255,255,.16) 45%,
-    rgba(255,255,255,.32) 50%,
-    rgba(255,255,255,.16) 55%,
-    transparent 100%
-  );
-  pointer-events: none;
-  animation: naScanSweep 5s ease-in-out infinite;
+.na-pulse-rings::after {
+  width: 120px; height: 120px;
+  animation-delay: .6s;
+}
+.na-pulse-inner {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 1.5px solid #FD4D02;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   z-index: 1;
 }
-@keyframes naScanSweep {
-  0%   { left: -60%; }
-  35%  { left: 130%; }
-  100% { left: 130%; }
+.na-pulse-inner i {
+  color: #FD4D02;
+  font-size: 1.4rem;
 }
-
-/* Scanning grid overlay */
-.na-grid {
-  position: absolute; inset: 0;
-  background-image:
-    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
-  background-size: 36px 36px;
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 30% 50%, rgba(0,0,0,.6) 0%, transparent 75%);
-  mask-image: radial-gradient(ellipse 70% 60% at 30% 50%, rgba(0,0,0,.6) 0%, transparent 75%);
-  pointer-events: none;
-}
-
-/* Corner scan brackets */
-.na-corner {
-  position: absolute;
-  width: 26px; height: 26px;
-  border: 2px solid rgba(255,255,255,.3);
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0;
-  animation: naCornerFade 5s ease-in-out infinite;
-}
-.na-corner-tl { top: 18px; left: 18px; border-right: none; border-bottom: none; border-radius: 6px 0 0 0; }
-.na-corner-br { bottom: 18px; right: 18px; border-left: none; border-top: none; border-radius: 0 0 6px 0; animation-delay: .15s; }
-@keyframes naCornerFade {
-  0%, 100% { opacity: 0; }
-  10%, 30% { opacity: 1; }
-  40% { opacity: 0; }
+@keyframes naPulseRing {
+  0%   { opacity: .7; transform: scale(.85); }
+  80%  { opacity: 0;  transform: scale(1.2); }
+  100% { opacity: 0;  transform: scale(1.2); }
 }
 
 .na-badge {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  background: rgba(6,30,33,.55);
-  border: 1px solid rgba(255,255,255,.18);
-  backdrop-filter: blur(8px);
-  color: #fff;
+  background: #f8f8f8;
+  border: 1px solid#FD4D02;
+  color:#FD4D02;
   font-size: .65rem;
   font-weight: 800;
   letter-spacing: .22em;
@@ -399,57 +369,63 @@
   padding: .35rem .85rem;
   border-radius: 100px;
   width: fit-content;
-  position: relative;
-  z-index: 1;
-  box-shadow: 0 2px 12px rgba(0,0,0,.18);
 }
 .na-badge-dot {
   width: 7px; height: 7px;
   border-radius: 50%;
-  background: #4eff91;
-  box-shadow: 0 0 6px #4eff91;
+  background: #FD4D02;
+  box-shadow: 0 0 6px#FD4D02;
   animation: nabDotBlink 1.4s ease-in-out infinite;
 }
 @keyframes nabDotBlink {
-  0%, 100% { opacity: 1; box-shadow: 0 0 6px #4eff91; }
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px #FD4D02; }
   50%       { opacity: .4; box-shadow: none; }
 }
 
-.na-left h2 {
+.na-card h3 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--teal);
+  margin: 0;
+}
+.na-card > p {
+  color: #9cbbbb;
+  font-size: .95rem;
+  max-width: 380px;
+  margin: 0;
+}
+
+/* Viber button */
+.na-btn-viber {
+  display: inline-flex;
+  align-items: center;
+  gap: .55rem;
+  background: #7360f2;
   color: #fff;
-  font-size: clamp(2.2rem, 3.8vw, 3.5rem);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -.03em;
-  position: relative;
-  z-index: 1;
-  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .9rem;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 13px 28px;
+  border-radius: 100px;
+  transition: transform .35s var(--ease-soft), box-shadow .35s;
+  box-shadow: 0 10px 28px -8px rgba(115,96,242,.55);
+  margin-top: .4rem;
 }
-.na-left h2 em {
-  font-style: italic;
-  color: rgba(255,255,255,.75);
-}
-
-.na-left p {
-  color: rgba(255,255,255,.7);
-  font-size: 1.05rem;
-  line-height: 1.65;
-  max-width: 340px;
-  margin: 0;
-  position: relative;
-  z-index: 1;
+.na-btn-viber:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px -8px rgba(115,96,242,.7);
 }
 
-/* Divider */
-.na-divider {
-  background: rgba(6,59,63,.08);
-  align-self: stretch;
-}
+/* hide old elements not used */
+.na-left, .na-divider, .na-right, .na-scan, .na-grid, .na-corner { display: none; }
 
-/* RIGHT half — white/cream, action area */
-.na-right {
-  background: #fff;
-  padding: 3.2rem 3.5rem;
+/* =============================================
+   (placeholder for old na-right styles — kept for safety)
+   ============================================= */
+.na-right-placeholder {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -478,70 +454,6 @@
   flex-direction: column;
   gap: .75rem;
 }
-.na-perk {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  font-size: .88rem;
-  color: #5a6e6e;
-}
-.na-perk-icon {
-  width: 32px; height: 32px;
-  border-radius: 9px;
-  background: var(--cream);
-  display: flex; align-items: center; justify-content: center;
-  color: var(--orange);
-  font-size: .8rem;
-  flex-shrink: 0;
-  transition: transform .35s var(--ease-soft), background .3s, color .3s;
-}
-.na-perk:hover .na-perk-icon {
-  background: var(--orange);
-  color: #fff;
-  transform: scale(1.08) rotate(-6deg);
-}
-
-.na-cta-row {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.na-btn-viber {
-  display: inline-flex;
-  align-items: center;
-  gap: .65rem;
-  background: #7360f2;
-  color: #fff;
-  font-weight: 700;
-  font-size: .88rem;
-  padding: .85rem 1.6rem;
-  border-radius: 100px;
-  white-space: nowrap;
-  text-decoration: none;
-  transition: background .3s, transform .3s var(--ease-soft), box-shadow .3s;
-  box-shadow: 0 8px 24px -8px rgba(115,96,242,.45);
-}
-.na-btn-viber:hover {
-  background: #5a49e0;
-  transform: translateY(-2px);
-  box-shadow: 0 14px 32px -8px rgba(115,96,242,.5);
-}
-.na-btn-viber i { font-size: 1rem; }
-
-.na-btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  color: var(--teal);
-  font-weight: 600;
-  font-size: .85rem;
-  text-decoration: none;
-  opacity: .65;
-  transition: opacity .25s, gap .3s var(--ease-soft);
-}
-.na-btn-secondary:hover { opacity: 1; gap: .75rem; }
 
 /* =============================================
    WHY US — redesigned cards
@@ -894,49 +806,34 @@
      ============================================= -->
 <section class="new-arrivals-section">
   <div class="container">
+
+    <!-- Section heading -->
+    <div class="na-section-head reveal">
+      <h2>New <em>Arrivals</em></h2>
+      <p>Fresh stock just in — be the first to get the latest products.</p>
+    </div>
+
+    <!-- Coming soon card -->
     <div class="na-card reveal">
 
-      <!-- LEFT: announcement -->
-      <div class="na-left">
-        <div class="na-grid"></div>
-        <div class="na-scan"></div>
-        <span class="na-corner na-corner-tl"></span>
-        <span class="na-corner na-corner-br"></span>
-        <span class="na-badge">
-          <span class="na-badge-dot"></span>
-          New Arrivals
-        </span>
-        <h2>Fresh stock,<br><em>dropping soon.</em></h2>
-        <p>New products hit our shelves regularly. Be first in line before they sell out.</p>
-      </div>
+      <span class="na-badge">
+        <span class="na-badge-dot"></span>
+        New Stock
+      </span>
 
-      <!-- Divider -->
-      <div class="na-divider"></div>
-
-      <!-- RIGHT: perks + CTA -->
-      <div class="na-right">
-        <div class="na-right-label">Join the community</div>
-        <h3>Get notified the moment new stock arrives — straight to your Viber.</h3>
-        <div class="na-perks">
-          <div class="na-perk">
-            <div class="na-perk-icon"><i class="fa-solid fa-bolt"></i></div>
-            Early access before we announce publicly
-          </div>
-          <div class="na-perk">
-            <div class="na-perk-icon"><i class="fa-solid fa-tag"></i></div>
-            Exclusive wholesale pricing for members
-          </div>
-          <div class="na-perk">
-            <div class="na-perk-icon"><i class="fa-solid fa-truck-fast"></i></div>
-            Priority order slots on high-demand items
-          </div>
-        </div>
-        <div class="na-cta-row">
-          <a href="https://invite.viber.com/?g2=AQB%2Fd4PEZ8YkAVYmZZ762Zy6AqCJROwY3pa1dbwERu0F5rWFZX65J325G%2Fra1A5m" target="_blank" rel="noopener" class="na-btn-viber">
-            <i class="fa-brands fa-viber"></i> Join Viber Community
-          </a>
+      <!-- Pulse rings + box icon -->
+      <div class="na-pulse-rings">
+        <div class="na-pulse-inner">
+          <i class="fa-solid fa-box-open"></i>
         </div>
       </div>
+
+      <h3>New Arrivals Coming Soon...</h3>
+      <p>We're preparing fresh new products for you. Join our Viber community to be the first to know when they drop!</p>
+
+      <a href="https://invite.viber.com/?g2=AQB%2Fd4PEZ8YkAVYmZZ762Zy6AqCJROwY3pa1dbwERu0F5rWFZX65J325G%2Fra1A5m" target="_blank" rel="noopener" class="na-btn-viber">
+        <i class="fa-brands fa-viber"></i> Join Viber Community
+      </a>
 
     </div>
   </div>
