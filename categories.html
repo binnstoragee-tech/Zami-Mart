@@ -23,7 +23,7 @@
 
   /* Search */
   .cat-search{
-    margin-top: 2.2rem;
+    margin-top: 1.6rem;
     max-width: 460px;
     position: relative;
   }
@@ -52,7 +52,7 @@
   /* Filter pills */
   .cat-filters{
     display:flex; gap:.6rem; flex-wrap:wrap;
-    margin-top: 1.6rem;
+    margin-top: 2.2rem;
   }
   .filter-btn{
     display:inline-flex; align-items:center; gap:8px;
@@ -63,7 +63,14 @@
     border:1.5px solid rgba(6,59,63,.1);
     color:var(--teal);
     font-family: var(--font-display);
-    transition: background .3s, color .3s, transform .3s var(--ease-soft), border-color .3s;
+    white-space:nowrap;
+    flex-shrink:0;
+    transition: background .3s, color .3s, transform .3s var(--ease-soft), border-color .3s, box-shadow .3s;
+  }
+  .filter-btn i{
+    color: var(--orange);
+    font-size:.85rem;
+    transition: color .3s;
   }
   .filter-btn .count{
     font-size:.72rem;
@@ -77,12 +84,39 @@
   .filter-btn:hover{
     border-color: var(--orange);
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px -8px rgba(6,59,63,.18);
   }
   .filter-btn.active{
     background:var(--teal); color:#fff; border-color:var(--teal);
+    box-shadow: 0 8px 20px -8px rgba(6,59,63,.3);
   }
+  .filter-btn.active i{ color: var(--orange); }
   .filter-btn.active .count{
     background: var(--orange); color:#fff;
+  }
+
+  @media (max-width: 760px){
+    .cat-filters{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:.6rem;
+      margin-top: 1.6rem;
+    }
+    .cat-filters .filter-btn[data-filter="all"]{
+      grid-column: 1 / -1;
+    }
+    .filter-btn{
+      font-size:.78rem;
+      padding:10px 14px;
+      justify-content: flex-start;
+      white-space: normal;
+    }
+    .filter-btn[data-filter="all"]{
+      justify-content: center;
+    }
+    .filter-btn .count{
+      margin-left: auto;
+    }
   }
 
   .cat-block{
@@ -358,11 +392,6 @@
     <h1>Everything on our shelves — retail and wholesale.</h1>
     <p>Browse our full product range below. Search by name or filter by category — every item is available for individual purchase or full-case wholesale, ask us for bulk pricing.</p>
 
-    <div class="cat-search">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="productSearch" placeholder="Search products, e.g. Dettol, Shampoo, Vicks...">
-    </div>
-
     <div class="cat-filters" id="catFilters">
       <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-grip"></i> All Categories</button>
       <button class="filter-btn" data-filter="personal-care"><i class="fa-solid fa-pump-soap"></i> Personal Care <span class="count">358</span></button>
@@ -373,6 +402,11 @@
       <button class="filter-btn" data-filter="pantry"><i class="fa-solid fa-bowl-rice"></i> Pantry &amp; Cooking <span class="count">6</span></button>
       <button class="filter-btn" data-filter="beverages"><i class="fa-solid fa-bottle-water"></i> Beverages &amp; Hydration <span class="count">7</span></button>
       <button class="filter-btn" data-filter="stationery"><i class="fa-solid fa-pen"></i> Stationery &amp; Misc <span class="count">16</span></button>
+    </div>
+
+    <div class="cat-search">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" id="productSearch" placeholder="Search products, e.g. Dettol, Shampoo, Vicks...">
     </div>
   </div>
 </section>

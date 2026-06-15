@@ -184,7 +184,6 @@
 .slide::after {
   content: '';
   position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(6,30,33,.6) 0%, rgba(6,30,33,.15) 60%, transparent 100%);
   pointer-events: none;
 }
 
@@ -332,6 +331,59 @@
   pointer-events: none;
 }
 
+/* Scanning sweep effect */
+.na-scan {
+  position: absolute;
+  top: 0; left: -60%;
+  width: 45%; height: 100%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255,255,255,.16) 45%,
+    rgba(255,255,255,.32) 50%,
+    rgba(255,255,255,.16) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+  animation: naScanSweep 5s ease-in-out infinite;
+  z-index: 1;
+}
+@keyframes naScanSweep {
+  0%   { left: -60%; }
+  35%  { left: 130%; }
+  100% { left: 130%; }
+}
+
+/* Scanning grid overlay */
+.na-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 36px 36px;
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 30% 50%, rgba(0,0,0,.6) 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 70% 60% at 30% 50%, rgba(0,0,0,.6) 0%, transparent 75%);
+  pointer-events: none;
+}
+
+/* Corner scan brackets */
+.na-corner {
+  position: absolute;
+  width: 26px; height: 26px;
+  border: 2px solid rgba(255,255,255,.3);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  animation: naCornerFade 5s ease-in-out infinite;
+}
+.na-corner-tl { top: 18px; left: 18px; border-right: none; border-bottom: none; border-radius: 6px 0 0 0; }
+.na-corner-br { bottom: 18px; right: 18px; border-left: none; border-top: none; border-radius: 0 0 6px 0; animation-delay: .15s; }
+@keyframes naCornerFade {
+  0%, 100% { opacity: 0; }
+  10%, 30% { opacity: 1; }
+  40% { opacity: 0; }
+}
+
 .na-badge {
   display: inline-flex;
   align-items: center;
@@ -441,6 +493,12 @@
   color: var(--orange);
   font-size: .8rem;
   flex-shrink: 0;
+  transition: transform .35s var(--ease-soft), background .3s, color .3s;
+}
+.na-perk:hover .na-perk-icon {
+  background: var(--orange);
+  color: #fff;
+  transform: scale(1.08) rotate(-6deg);
 }
 
 .na-cta-row {
@@ -751,7 +809,7 @@
 
     <div class="slide active" data-index="0">
       <div class="slide-placeholder"><i class="fa-solid fa-pump-soap ph-icon"></i></div>
-      <img src="img/personal care.jpeg" alt="Personal Care" loading="eager">
+      <img src="img/personal_care.jpg" alt="Personal Care" loading="eager">
       <div class="slide-label">
         <div class="slide-label-tag">Category 1 of 8</div>
         <h3>Personal Care</h3>
@@ -760,7 +818,7 @@
     </div>
     <div class="slide" data-index="1">
       <div class="slide-placeholder"><i class="fa-solid fa-suitcase-medical ph-icon"></i></div>
-      <img src="img/categories/health.jpg" alt="Health & Wellness" loading="lazy">
+      <img src="img/health&wellness.jpg" alt="Health & Wellness" loading="lazy">
       <div class="slide-label">
         <div class="slide-label-tag">Category 2 of 8</div>
         <h3>Health &amp; Wellness</h3>
@@ -769,7 +827,7 @@
     </div>
     <div class="slide" data-index="2">
       <div class="slide-placeholder"><i class="fa-solid fa-spray-can-sparkles ph-icon"></i></div>
-      <img src="img/categories/household.jpg" alt="Household & Cleaning" loading="lazy">
+      <img src="img/household&cleaning.jpg" alt="Household & Cleaning" loading="lazy">
       <div class="slide-label">
         <div class="slide-label-tag">Category 3 of 8</div>
         <h3>Household &amp; Cleaning</h3>
@@ -778,7 +836,7 @@
     </div>
     <div class="slide" data-index="3">
       <div class="slide-placeholder"><i class="fa-solid fa-candy-cane ph-icon"></i></div>
-      <img src="img/categories/snacks.jpg" alt="Snacks & Confectionery" loading="lazy">
+      <img src="img/snacks&confectionery.jpg" alt="Snacks & Confectionery" loading="lazy">
       <div class="slide-label">
         <div class="slide-label-tag">Category 4 of 8</div>
         <h3>Snacks &amp; Confectionery</h3>
@@ -787,7 +845,7 @@
     </div>
     <div class="slide" data-index="4">
       <div class="slide-placeholder"><i class="fa-solid fa-baby ph-icon"></i></div>
-      <img src="img/categories/baby.jpg" alt="Baby Care" loading="lazy">
+      <img src="img/baby_care.jpg" alt="Baby Care" loading="lazy">
       <div class="slide-label">
         <div class="slide-label-tag">Category 5 of 8</div>
         <h3>Baby Care</h3>
@@ -796,7 +854,7 @@
     </div>
     <div class="slide" data-index="5">
       <div class="slide-placeholder"><i class="fa-solid fa-bowl-rice ph-icon"></i></div>
-      <img src="img/categories/pantry.jpg" alt="Pantry & Cooking" loading="lazy">
+      <img src="img/pantry&coocking.jpg" alt="Pantry & Cooking" loading="lazy">
       <div class="slide-label">
         <div class="slide-label-tag">Category 6 of 8</div>
         <h3>Pantry &amp; Cooking</h3>
@@ -805,7 +863,7 @@
     </div>
     <div class="slide" data-index="6">
       <div class="slide-placeholder"><i class="fa-solid fa-bottle-water ph-icon"></i></div>
-      <img src="img/categories/beverages.jpg" alt="Beverages & Hydration" loading="lazy">
+      <img src="img/beverages&hydration.jpg" alt="Beverages & Hydration" loading="lazy">
       <div class="slide-label">
         <div class="slide-label-tag">Category 7 of 8</div>
         <h3>Beverages &amp; Hydration</h3>
@@ -814,7 +872,7 @@
     </div>
     <div class="slide" data-index="7">
       <div class="slide-placeholder"><i class="fa-solid fa-pen ph-icon"></i></div>
-      <img src="img/categories/stationery.jpg" alt="Stationery & Misc" loading="lazy">
+      <img src="img/stationery&misc.jpg" alt="Stationery & Misc" loading="lazy">
       <div class="slide-label">
         <div class="slide-label-tag">Category 8 of 8</div>
         <h3>Stationery &amp; Misc</h3>
@@ -840,6 +898,10 @@
 
       <!-- LEFT: announcement -->
       <div class="na-left">
+        <div class="na-grid"></div>
+        <div class="na-scan"></div>
+        <span class="na-corner na-corner-tl"></span>
+        <span class="na-corner na-corner-br"></span>
         <span class="na-badge">
           <span class="na-badge-dot"></span>
           New Arrivals
