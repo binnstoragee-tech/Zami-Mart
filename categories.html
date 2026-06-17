@@ -51,26 +51,34 @@
 
   /* Filter pills */
   .cat-filters{
-    display:flex; gap:.6rem; flex-wrap:wrap;
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap:.7rem;
     margin-top: 2.2rem;
   }
+  .cat-filters .filter-btn[data-filter="all"]{
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
   .filter-btn{
-    display:inline-flex; align-items:center; gap:8px;
+    display:flex; align-items:center; gap:8px;
     font-weight:700; font-size:.82rem;
-    padding:10px 18px;
+    padding:13px 20px;
     border-radius:100px;
     background:var(--paper);
     border:1.5px solid rgba(6,59,63,.1);
     color:var(--teal);
     font-family: var(--font-display);
-    white-space:nowrap;
-    flex-shrink:0;
+    white-space:normal;
+    text-align:left;
+    width:100%;
     transition: background .3s, color .3s, transform .3s var(--ease-soft), border-color .3s, box-shadow .3s;
   }
   .filter-btn i{
     color: var(--orange);
     font-size:.85rem;
     transition: color .3s;
+    flex-shrink:0;
   }
   .filter-btn .count{
     font-size:.72rem;
@@ -79,6 +87,8 @@
     padding: 1px 8px;
     border-radius: 100px;
     font-weight:700;
+    margin-left: auto;
+    flex-shrink:0;
     transition: background .3s, color .3s;
   }
   .filter-btn:hover{
@@ -95,27 +105,21 @@
     background: var(--orange); color:#fff;
   }
 
+  @media (max-width: 980px){
+    .cat-filters{
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
   @media (max-width: 760px){
     .cat-filters{
-      display:grid;
       grid-template-columns: 1fr 1fr;
       gap:.6rem;
       margin-top: 1.6rem;
     }
-    .cat-filters .filter-btn[data-filter="all"]{
-      grid-column: 1 / -1;
-    }
     .filter-btn{
       font-size:.78rem;
       padding:10px 14px;
-      justify-content: flex-start;
-      white-space: normal;
-    }
-    .filter-btn[data-filter="all"]{
-      justify-content: center;
-    }
-    .filter-btn .count{
-      margin-left: auto;
     }
   }
 
@@ -287,6 +291,18 @@
     cursor: grab;
   }
   .pv-stage.dragging{ cursor: grabbing; }
+  .pv-img-wrap{
+    width: 100%; height: 100%;
+    overflow: hidden;
+  }
+  .pv-img-wrap.kb-drift img{
+    animation: pvKenBurns 9s ease-in-out infinite;
+  }
+  @keyframes pvKenBurns{
+    0%   { transform: scale(1) translate(0, 0); }
+    50%  { transform: scale(1.09) translate(-1.4%, 1%); }
+    100% { transform: scale(1) translate(0, 0); }
+  }
   .pv-stage img{
     width: 100%; height: 100%;
     object-fit: cover;
@@ -509,359 +525,323 @@
         <div class="product-name">Banjara`s Aloe Vera Gel 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-30.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_21.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Bigen Hair Color Conditioner Natural Black</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-31.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_22.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Binaca Extra Clean Tooth Brush Soft</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-32.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_23.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Bioline Jelly 25GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-33.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_24.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Bioline Lip Care</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-34.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Bot X 28.8GM]</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-35.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_25.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Care Touch Paper Tissue 100`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-36.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_26.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cauvery Papaya Soap 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-37.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_27.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cauvery Sandal Soap 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-38.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_28.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cauvery Sandal Soap 3`S Pack</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-39.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_29.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Cleansing Liquid 250ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-40.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_30.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Dam 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-41.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_31.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Moisturising Cream 80GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-42.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_32.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Moist Cream 250GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-43.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_33.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Moisturising Lotion 250ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-44.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_34.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Bar</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-45.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_35.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Pro Urea Lotion 200ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-46.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_36.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Sun Cream SPF 50</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-47.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_37.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Oil Control Foam Wash 236ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-48.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_38.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Refresh Toner 150ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-49.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_39.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cetaphil Restoraderm 295ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-50.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_40.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cinthol Original Soap 150GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-51.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_41.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Cinthol Original Soap 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-52.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_42.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Chanthirika Soap 75GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-53.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_43.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Closeup Tooth Paste 90G</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-54.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_44.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Closeup Toothpaste 42GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-55.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_45.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Charcoal Clean Gel 120GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-56.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_46.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Active Salt 115GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-57.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_47.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Gentle Clean Tooth Brush</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-58.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_48.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Sensitive Tooth Brush</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-59.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_49.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Herbal Teeth Paste 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-60.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_50.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Max Fresh Peppermint Mouth Wash 250ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-61.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_51.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Plax Freshmint Mouth Wash 250ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-62.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_52.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Maxfresh Red Tooth Paste 38GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-63.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_53.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Visible White Daily Tooth Paste 120GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-64.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_53.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Visible Whith Tooth Paste 50GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-65.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_54.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Strong Teeth 38GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-66.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_55.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Strong Teeth Tooth Paste 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-67.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_57.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Maxfresh Tooth Paste 80GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-68.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_58.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Super Flexi Tooth Brush</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-69.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_59.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Total 12 Advance Health 150GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-70.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_60.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Total 12 Charcoal Deep Clean Tooth</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-71.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Paste 150GM</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-72.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_61.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Colgate Zig-zag Tooth Brush</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-73.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_62.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dabur Almond Hair Oil (100ML / 190ML)</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-75.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_63.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dabur Amla Hair Oil 180ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-76.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dabur Red Tooth Paste 100GM</div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_64.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-name">Dabur Red Tooth Paste (16GM / 36GM / 100GM / 200GM)</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-77.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dabur Red Tooth Paste 16GM</div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_65.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-name">Dettol Soap Cool (100GM / 150GM)</div>
+      </div>  
+      <div class="item-tag">
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_66.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-name">Dettol Soap Original (100GM / 150GM)</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-78.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dabur Red Tooth Paste 200GM</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-79.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dabur Red Toothpaste 36G</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-80.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dabur Special Hair Oil 100ML</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-81.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dettol Soap Cool 100GM</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-82.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dettol Soap Cool 150GM</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-83.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dettol Soap Original 100GM</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-84.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Dettol Soap Original 150GM</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-85.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_67.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dhathri Hair Oil 100ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-86.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_68.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.morepen Herbal Tooth Paste 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-87.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_69.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Aloe Vera Facial Kit</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-88.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_70.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Aloe Vera Foot Mask</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-89.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_71.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Aloevera Face &amp; Body Gel 380ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-90.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_72.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Aloe Vera Face &amp; Body Scrub 380ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-91.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_73.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel De-tan Face &amp; Body Scrub 380ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-92.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_74.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Multani Mitti Face &amp; Body Scrub 380ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-93.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_75.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Redwine Cream 380ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-94.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_76.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel De-tan Face Wash 100ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-95.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_77.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Neem Fresh Face Wash 100ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-96.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_78.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Ubtan Face Wash 100ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-97.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_79.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel De-tan Sunscreen Spf50 100GM</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-98.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_80.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Aloevera Face Serum 30ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-99.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_81.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Aloevera Wet Wipes 25`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-100.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_82.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel De-tan Wet Wipes 25`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-101.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_83.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Lavender Wet Wipes 25`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-102.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_84.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Lemon Wet Wipes 25`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-103.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_85.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Strawberry Wet Wipes 25`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-104.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_86.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Ice Fresh Wet Wipes 25`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-105.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_87.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Onion Black Seed Hair Oil 100 ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-106.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_88.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Onion Shampoo 250ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-107.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_89.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Papaya Facial Kit</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-108.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_90.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Strong Hold Hair Styling Spray 250ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-109.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_91.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashel Ultra Hold Hair Styling Spray 250ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-110.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_92.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.rashil VIT-C Body Lotion 200ML</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-111.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_93.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Dr.tooth Smile Tooth Brush 8`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-112.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_94.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Evereve Period Panties M-l [60CM-100CM]2</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-113.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_95.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Eye Brow Razor Tinkie 3`S</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-114.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_96.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Fair &amp; Handsome Insatant Face Wash</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-115.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_97.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Fair &amp; Handsome Oil Clear Face Wash</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-116.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Fair And Handsome 30GM</div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_98.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-name">Fair And Handsome (30GM / 60GM)</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-117.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
-        <div class="product-name">Fair And Handsome 60GM</div>
-      </div>
-      <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-118.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_99.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Faiza Whitening Soap</div>
       </div>
       <div class="item-tag">
-        <div class="product-img-wrap"><img src="img/products/product-119.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
+        <div class="product-img-wrap"><img src="img/personal_care/personal_care_100.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Fem Gold Bleach 8GM</div>
       </div>
       <div class="item-tag">
@@ -2571,7 +2551,9 @@
   <div class="pv-box">
     <button class="pv-close" id="pvClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
     <div class="pv-stage" id="pvStage">
-      <img id="pvImg" src="" alt="">
+      <div class="pv-img-wrap" id="pvImgWrap">
+        <img id="pvImg" src="" alt="">
+      </div>
     </div>
     <div class="pv-info">
       <h3 id="pvName"></h3>

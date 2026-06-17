@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ============================================ */
   const pvOverlay = document.getElementById('pvOverlay');
   const pvStage   = document.getElementById('pvStage');
+  const pvImgWrap = document.getElementById('pvImgWrap');
   const pvImg     = document.getElementById('pvImg');
   const pvName    = document.getElementById('pvName');
   const pvClose   = document.getElementById('pvClose');
@@ -90,6 +91,11 @@ document.addEventListener('DOMContentLoaded', () => {
     pvImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
   }
 
+  function setDrift(active) {
+    if (!pvImgWrap) return;
+    pvImgWrap.classList.toggle('kb-drift', !!active);
+  }
+
   function resetView() {
     scale = 1;
     posX = 0;
@@ -98,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pvStage.classList.remove('dragging');
     pvZoomOut.disabled = true;
     pvZoomIn.disabled = false;
+    setDrift(true);
   }
 
   function clampPos() {
@@ -115,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTransform();
     pvZoomOut.disabled = scale <= ZOOM_MIN;
     pvZoomIn.disabled = scale >= ZOOM_MAX;
+    setDrift(scale <= ZOOM_MIN);
   }
 
   function openViewer(tag) {
@@ -142,6 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeViewer() {
     pvOverlay.classList.remove('open');
     document.body.style.overflow = '';
+    setDrift(false);
   }
 
   document.querySelectorAll('.item-tag').forEach(tag => {

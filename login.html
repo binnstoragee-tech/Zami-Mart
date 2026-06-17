@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — Zami Mart</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+  .auth-section{
+    min-height: 100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 150px 6% 5rem;
+    background: var(--cream);
+    position:relative;
+    overflow:hidden;
+  }
+  .auth-section::before{
+    content:'';
+    position:absolute;
+    top:-10%; right:-10%;
+    width:50%; height:50%;
+    background: var(--teal);
+    opacity:.06;
+    border-radius:50%;
+    filter: blur(60px);
+  }
+
+  .auth-card{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width: 440px;
+    background: var(--paper);
+    border-radius: var(--radius);
+    border: 1px solid rgba(6,59,63,.06);
+    box-shadow: 0 24px 60px -20px rgba(6,59,63,.16);
+    padding: 2.6rem;
+  }
+
+  .auth-tabs{
+    display:flex;
+    background: var(--cream);
+    border-radius: 100px;
+    padding: 5px;
+    margin-bottom: 2rem;
+  }
+  .auth-tab{
+    flex:1;
+    text-align:center;
+    border:none;
+    background:transparent;
+    font-family: var(--font-display);
+    font-weight:700;
+    font-size:.88rem;
+    color: var(--teal);
+    padding: 11px 0;
+    border-radius:100px;
+    cursor:pointer;
+    transition: background .3s, color .3s;
+  }
+  .auth-tab.active{
+    background: var(--teal);
+    color:#fff;
+  }
+
+  .auth-card h2{
+    font-size:1.5rem;
+    margin-bottom:.3rem;
+  }
+  .auth-card > p.auth-sub{
+    margin-bottom: 1.8rem;
+    font-size:.92rem;
+  }
+
+  .form-group{ display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.1rem; }
+  label{
+    font-weight:600; font-size:.85rem; color:var(--teal);
+    letter-spacing:.02em;
+  }
+  .input-wrap{ position:relative; }
+  .input-wrap i{
+    position:absolute; left:16px; top:50%; transform:translateY(-50%);
+    color: #9db8b6; font-size:.92rem;
+  }
+  .input-wrap .toggle-pw{
+    position:absolute; right:16px; top:50%; transform:translateY(-50%);
+    color:#9db8b6; font-size:.92rem; cursor:pointer; background:none; border:none; padding:4px;
+  }
+  input{
+    width:100%;
+    font-family: var(--font-body);
+    padding: 13px 16px 13px 42px;
+    border-radius: 10px;
+    border: 1.5px solid rgba(6,59,63,.12);
+    background: var(--cream);
+    color: var(--ink);
+    font-size:.95rem;
+    transition: border-color .3s, box-shadow .3s, background .3s;
+  }
+  input:focus{
+    outline:none;
+    border-color: var(--orange);
+    background:#fff;
+    box-shadow: 0 0 0 4px rgba(253,77,2,.1);
+  }
+  .field-error{
+    font-size:.78rem;
+    color:#d6483a;
+    display:none;
+    margin-top:-2px;
+  }
+  .form-group.has-error input{ border-color:#d6483a; }
+  .form-group.has-error .field-error{ display:block; }
+
+  .auth-row{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 1.4rem; font-size:.85rem;
+  }
+  .remember{ display:flex; align-items:center; gap:8px; color:#5d7977; cursor:pointer; }
+  .remember input{ width:auto; padding:0; accent-color: var(--orange); }
+  .auth-row a{ color: var(--orange); font-weight:600; }
+
+  .auth-submit{ width:100%; justify-content:center; font-size:1rem; }
+
+  .auth-success{
+    display:none;
+    align-items:flex-start;
+    gap:12px;
+    background: var(--mint);
+    border-radius: 12px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 1.4rem;
+  }
+  .auth-success.show{ display:flex; }
+  .auth-success i{ color:#1f7a4d; font-size:1.1rem; margin-top:2px; }
+  .auth-success p{ margin:0; font-size:.88rem; color:#14201f; line-height:1.5; }
+  .auth-success strong{ display:block; margin-bottom:2px; color:#14201f; }
+
+  .auth-card form{ display:block; }
+  .auth-card form.hidden{ display:none; }
+
+  .auth-back{
+    display:inline-flex; align-items:center; gap:8px;
+    margin-bottom:1.4rem; font-size:.85rem; font-weight:600;
+    color: var(--teal);
+  }
+  .auth-back i{ font-size:.8rem; }
+</style>
+</head>
+<body>
+
+<!-- Page transition overlay -->
+<div class="page-transition">
+  <div class="pt-panel pt-1"></div>
+  <div class="pt-panel pt-2"></div>
+  <div class="pt-panel pt-3"></div>
+</div>
+
+<!-- Navbar -->
+<header class="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="img/logo.png" alt="Zami Mart logo">
+    <span class="nav-logo-text">zami<span>mart</span></span>
+  </a>
+  <nav class="nav-links">
+    <button class="nav-close" aria-label="Close menu">&times;</button>
+    <a href="index.html">Home</a>
+    <a href="categories.html">Categories</a>
+    <a href="contact.html">Contact</a>
+  </nav>
+  <button class="nav-toggle" aria-label="Toggle menu">
+    <span></span><span></span><span></span>
+  </button>
+</header>
+
+<section class="auth-section">
+  <div class="auth-card reveal">
+
+    <a href="index.html" class="auth-back"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" data-target="loginForm">Log In</button>
+      <button class="auth-tab" data-target="signupForm">Create Account</button>
+    </div>
+
+    <div class="auth-success" id="authSuccess">
+      <i class="fa-solid fa-circle-check"></i>
+      <p><strong id="authSuccessTitle">Success</strong><span id="authSuccessText"></span></p>
+    </div>
+
+    <!-- LOG IN -->
+    <form id="loginForm" novalidate>
+      <h2>Welcome back</h2>
+      <p class="auth-sub">Log in to track orders and your wholesale account.</p>
+
+      <div class="form-group" id="loginEmailGroup">
+        <label for="loginEmail">Email or phone number</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="loginEmail" placeholder="you@email.com">
+        </div>
+        <span class="field-error">Please enter your email or phone number.</span>
+      </div>
+
+      <div class="form-group" id="loginPwGroup">
+        <label for="loginPw">Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="loginPw" placeholder="••••••••">
+          <button type="button" class="toggle-pw" data-for="loginPw"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <span class="field-error">Please enter your password.</span>
+      </div>
+
+      <div class="auth-row">
+        <label class="remember"><input type="checkbox"> Remember me</label>
+        <a href="#">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-submit"><span>Log In</span></button>
+    </form>
+
+    <!-- SIGN UP -->
+    <form id="signupForm" class="hidden" novalidate>
+      <h2>Create your account</h2>
+      <p class="auth-sub">Sign up for faster checkout and wholesale pricing.</p>
+
+      <div class="form-group" id="signupNameGroup">
+        <label for="signupName">Full name</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-user"></i>
+          <input type="text" id="signupName" placeholder="Your name">
+        </div>
+        <span class="field-error">Please enter your full name.</span>
+      </div>
+
+      <div class="form-group" id="signupEmailGroup">
+        <label for="signupEmail">Email or phone number</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-envelope"></i>
+          <input type="text" id="signupEmail" placeholder="you@email.com">
+        </div>
+        <span class="field-error">Please enter a valid email or phone number.</span>
+      </div>
+
+      <div class="form-group" id="signupPwGroup">
+        <label for="signupPw">Password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="signupPw" placeholder="At least 8 characters">
+          <button type="button" class="toggle-pw" data-for="signupPw"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <span class="field-error">Password must be at least 8 characters.</span>
+      </div>
+
+      <div class="form-group" id="signupConfirmGroup">
+        <label for="signupConfirm">Confirm password</label>
+        <div class="input-wrap">
+          <i class="fa-solid fa-lock"></i>
+          <input type="password" id="signupConfirm" placeholder="Re-enter password">
+          <button type="button" class="toggle-pw" data-for="signupConfirm"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <span class="field-error">Passwords do not match.</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary auth-submit"><span>Create Account</span></button>
+    </form>
+
+  </div>
+</section>
+
+<script src="main.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+
+    const tabs = document.querySelectorAll('.auth-tab');
+    const forms = { loginForm: document.getElementById('loginForm'), signupForm: document.getElementById('signupForm') };
+    const successBox = document.getElementById('authSuccess');
+    const successTitle = document.getElementById('authSuccessTitle');
+    const successText = document.getElementById('authSuccessText');
+
+    function clearErrors(form) {
+      form.querySelectorAll('.form-group').forEach(g => g.classList.remove('has-error'));
+    }
+
+    function hideSuccess() {
+      successBox.classList.remove('show');
+    }
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        Object.values(forms).forEach(f => f.classList.add('hidden'));
+        forms[tab.dataset.target].classList.remove('hidden');
+        hideSuccess();
+      });
+    });
+
+    document.querySelectorAll('.toggle-pw').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.for);
+        const icon = btn.querySelector('i');
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        icon.classList.toggle('fa-eye', showing);
+        icon.classList.toggle('fa-eye-slash', !showing);
+      });
+    });
+
+    // ---- Login submit ----
+    forms.loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearErrors(forms.loginForm);
+      hideSuccess();
+
+      const email = document.getElementById('loginEmail');
+      const pw = document.getElementById('loginPw');
+      let valid = true;
+
+      if (!email.value.trim()) {
+        document.getElementById('loginEmailGroup').classList.add('has-error');
+        valid = false;
+      }
+      if (!pw.value.trim()) {
+        document.getElementById('loginPwGroup').classList.add('has-error');
+        valid = false;
+      }
+      if (!valid) return;
+
+      // NOTE: this is a frontend-only demo. Wire this up to your real
+      // authentication API/backend before going live — nothing is
+      // actually being checked or stored yet.
+      successTitle.textContent = 'Logged in';
+      successText.textContent = `Welcome back! (demo only — no account system connected yet)`;
+      successBox.classList.add('show');
+      forms.loginForm.reset();
+    });
+
+    // ---- Signup submit ----
+    forms.signupForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearErrors(forms.signupForm);
+      hideSuccess();
+
+      const name = document.getElementById('signupName');
+      const email = document.getElementById('signupEmail');
+      const pw = document.getElementById('signupPw');
+      const confirm = document.getElementById('signupConfirm');
+      let valid = true;
+
+      if (!name.value.trim()) {
+        document.getElementById('signupNameGroup').classList.add('has-error');
+        valid = false;
+      }
+      if (!email.value.trim()) {
+        document.getElementById('signupEmailGroup').classList.add('has-error');
+        valid = false;
+      }
+      if (pw.value.length < 8) {
+        document.getElementById('signupPwGroup').classList.add('has-error');
+        valid = false;
+      }
+      if (confirm.value !== pw.value || !confirm.value) {
+        document.getElementById('signupConfirmGroup').classList.add('has-error');
+        valid = false;
+      }
+      if (!valid) return;
+
+      // NOTE: frontend-only demo — connect to a real backend to actually
+      // create and store accounts.
+      successTitle.textContent = 'Account created';
+      successText.textContent = `Welcome, ${name.value.trim()}! (demo only — no account system connected yet)`;
+      successBox.classList.add('show');
+      forms.signupForm.reset();
+    });
+
+  });
+</script>
+</body>
+</html>

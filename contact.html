@@ -131,20 +131,77 @@
     font-size:1rem;
   }
 
-  .map-wrap{
-    margin-top: 3rem;
-    border-radius: var(--radius);
-    overflow:hidden;
-    aspect-ratio: 16/6;
-    border:1px solid rgba(6,59,63,.08);
-    position:relative;
+  .map-section{
+    margin-top: 4rem;
   }
-  .map-wrap iframe{ width:100%; height:100%; border:0; display:block; filter: grayscale(.15) contrast(1.05); }
-  .map-wrap::after{
-    content:'';
-    position:absolute; inset:0;
-    background: linear-gradient(135deg, rgba(6,59,63,.12), transparent 60%);
-    pointer-events:none;
+  .map-section-head{
+    margin-bottom: 1.4rem;
+  }
+  .map-section-head h3{
+    font-size: 1.3rem;
+    color: var(--teal);
+    margin-bottom: .3rem;
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .map-section-head h3 i{
+    color: var(--orange);
+    font-size: 1.1rem;
+  }
+  .map-section-head p{
+    font-size: .88rem;
+    color: #6e8a8a;
+    margin: 0;
+  }
+  .map-wrap{
+    border-radius: 20px;
+    overflow:hidden;
+    height: 380px;
+    border: 2px solid rgba(6,59,63,.08);
+    position:relative;
+    box-shadow: 0 16px 48px -12px rgba(6,59,63,.14);
+  }
+  .map-wrap iframe{ width:100%; height:100%; border:0; display:block; }
+  .map-pin-card{
+    position:absolute;
+    bottom: 1.6rem; left: 1.6rem;
+    background: #fff;
+    border-radius: 14px;
+    padding: .9rem 1.2rem;
+    display:flex; align-items:center; gap:.8rem;
+    box-shadow: 0 8px 24px -6px rgba(0,0,0,.18);
+    z-index: 10;
+    pointer-events: none;
+    border: 1px solid rgba(6,59,63,.06);
+    max-width: 240px;
+  }
+  .map-pin-icon{
+    width: 40px; height: 40px; min-width:40px;
+    border-radius: 10px;
+    background: var(--teal);
+    display:flex; align-items:center; justify-content:center;
+    color: #fff;
+    font-size: .95rem;
+  }
+  .map-pin-card h4{ font-size: .88rem; color: var(--teal); margin:0 0 .15rem; }
+  .map-pin-card p{ font-size: .75rem; color: #6e8a8a; margin:0; line-height:1.4; }
+  .map-directions-btn{
+    position:absolute;
+    top: 1.6rem; right: 1.6rem;
+    background: var(--orange);
+    color: #fff;
+    border-radius: 100px;
+    padding: .55rem 1.1rem;
+    font-size: .8rem;
+    font-weight: 700;
+    text-decoration: none;
+    display:inline-flex; align-items:center; gap:.5rem;
+    box-shadow: 0 4px 16px -4px rgba(253,77,2,.45);
+    z-index: 10;
+    transition: transform .25s, box-shadow .25s;
+  }
+  .map-directions-btn:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -6px rgba(253,77,2,.5);
   }
 
   @media (max-width: 980px){
@@ -274,13 +331,29 @@
     </div>
   </div>
 
-  <div class="map-wrap reveal">
-    <iframe
-      src="https://maps.google.com/maps?q=4.1749,73.5076&z=17&output=embed"
-      loading="lazy"
-      referrerpolicy="no-referrer-when-downgrade"
-      title="Zami Mart location map"
-      allowfullscreen></iframe>
+  <div class="map-section reveal">
+    <div class="map-section-head">
+      <h3><i class="fa-solid fa-location-dot"></i> Find Us</h3>
+      <p>Zami Mart · Ma. Motherland, Male', Maldives</p>
+    </div>
+    <div class="map-wrap">
+      <iframe
+        src="https://maps.google.com/maps?q=4.1749,73.5076&z=17&output=embed"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+        title="Zami Mart location map"
+        allowfullscreen></iframe>
+      <div class="map-pin-card">
+        <div class="map-pin-icon"><i class="fa-solid fa-store"></i></div>
+        <div>
+          <h4>Zami Mart</h4>
+          <p>Ma. Motherland, Male'<br>Republic of Maldives</p>
+        </div>
+      </div>
+      <a href="https://maps.google.com/?q=4.1749,73.5076" target="_blank" rel="noopener" class="map-directions-btn">
+        <i class="fa-solid fa-diamond-turn-right"></i> Get Directions
+      </a>
+    </div>
   </div>
 </section>
 

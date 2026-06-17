@@ -16,11 +16,13 @@
    HERO — full-viewport split
    ============================================= */
 .hero {
-  min-height: 100vh;
+  min-height: 80vh;
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
   background: var(--cream);
+  background-image: radial-gradient(rgba(6,59,63,.07) 1px, transparent 1px);
+  background-size: 22px 22px;
   overflow: hidden;
   position: relative;
 }
@@ -29,7 +31,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 140px 5% 80px 8%;
+  padding: 110px 4% 60px 7%;
   position: relative;
   z-index: 2;
 }
@@ -55,8 +57,75 @@
   flex-shrink: 0;
 }
 
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.8rem;
+}
+.hero-meta .hero-eyebrow { margin-bottom: 0; }
+
+.hero-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px 5px 10px;
+  border-radius: 100px;
+  background: rgba(6,59,63,.06);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  color: var(--teal);
+  opacity: 0;
+  animation: fadeUp .7s var(--ease-soft) .2s forwards;
+}
+.hero-status .status-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #2f9e6e;
+  flex-shrink: 0;
+  position: relative;
+}
+.hero-status .status-dot::after {
+  content: '';
+  position: absolute; inset: -4px;
+  border-radius: 50%;
+  background: #2f9e6e;
+  opacity: .4;
+  animation: statusPulse 2s ease-out infinite;
+}
+.hero-status.is-closed .status-dot,
+.hero-status.is-closed .status-dot::after { background: #c2492f; }
+@keyframes statusPulse {
+  0% { transform: scale(1); opacity: .5; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+
+
+.hero-scroll-cue {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin-top: 2.6rem;
+  font-size: .8rem;
+  font-weight: 600;
+  color: #8aa0a0;
+  cursor: pointer;
+  background: none;
+  width: fit-content;
+}
+.hero-scroll-cue i {
+  animation: scrollBounce 1.6s ease-in-out infinite;
+  color: var(--orange);
+}
+@keyframes scrollBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(6px); }
+}
+
 .hero-title {
-  font-size: clamp(2.8rem, 4.2vw, 5.2rem);
+  font-size: clamp(2rem, 3.2vw, 3.8rem);
   line-height: 1.04;
   letter-spacing: -.035em;
   color: var(--teal);
@@ -93,8 +162,8 @@
 @keyframes underlineGrow { to { transform: scaleX(1); } }
 
 .hero-sub {
-  font-size: 1.05rem;
-  line-height: 1.8;
+  font-size: 0.92rem;
+  line-height: 1.7;
   color: #5a6e6e;
   max-width: 440px;
   margin-bottom: 2.6rem;
@@ -104,7 +173,7 @@
 
 .hero-ctas {
   display: flex; gap: 1rem; flex-wrap: wrap;
-  margin-bottom: 3.5rem;
+  margin-bottom: 0;
   opacity: 0;
   animation: fadeUp .8s var(--ease-soft) .65s forwards;
 }
@@ -112,7 +181,8 @@
 .hero-divider {
   width: 48px; height: 2px;
   background: rgba(6,59,63,.12);
-  margin-bottom: 2rem;
+  margin-top: 1.4rem;
+  margin-bottom: 1.4rem;
   opacity: 0;
   animation: fadeUp .6s var(--ease-soft) .78s forwards;
 }
@@ -124,7 +194,7 @@
 }
 .hero-stat { display: flex; flex-direction: column; }
 .hero-stat-num {
-  font-size: 2rem; font-weight: 800;
+  font-size: 1.6rem; font-weight: 800;
   color: var(--teal); letter-spacing: -.04em; line-height: 1;
 }
 .hero-stat-num span { color: var(--orange); }
@@ -151,12 +221,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 60px 5%;
+  padding: 40px 4%;
 }
 .hero-slideshow-inner {
   position: relative;
   width: 100%;
-  max-width: 640px;
+  max-width: 440px;
   aspect-ratio: 1 / 1;
   border-radius: 24px;
   overflow: hidden;
@@ -215,7 +285,7 @@
   background: var(--orange); border-radius: 2px;
 }
 .slide-label h3 {
-  font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
   font-weight: 800; color: #fff;
   line-height: 1.12; letter-spacing: -.025em;
   text-shadow: 0 2px 16px rgba(0,0,0,.8), 0 1px 4px rgba(0,0,0,.6);
@@ -632,9 +702,16 @@
   .hero { grid-template-columns: 1fr; grid-template-rows: auto auto; min-height: auto; }
   .hero-copy { padding: 130px 6% 60px; }
   .hero-slideshow { padding: 40px 6% 60px; }
+  .hero-scroll-cue { display: flex; }
   .why-cards { grid-template-columns: 1fr 1fr; }
   .na-card { grid-template-columns: 1fr; grid-template-rows: auto 1px auto; }
   .na-divider { grid-column: 1; grid-row: 2; min-height: 1px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-status .status-dot::after,
+  .hero-scroll-cue i,
+  .marquee-track { animation: none !important; }
 }
 
 @media (max-width: 700px) {
@@ -682,7 +759,9 @@
 
   <!-- LEFT: Copy -->
   <div class="hero-copy">
-    <div class="hero-eyebrow">Convenience Store &amp; Wholesale</div>
+    <div class="hero-meta">
+      <div class="hero-eyebrow">Convenience Store &amp; Wholesale</div>
+    </div>
     <h1 class="hero-title">
       <span class="line"><span>Everyday</span></span>
       <span class="line"><span>essentials,</span></span>
@@ -693,16 +772,16 @@
     </p>
     <div class="hero-ctas">
       <a href="categories.html" class="btn btn-primary"><span>Browse Categories</span></a>
-      <a href="contact.html" class="btn btn-outline">Get a Wholesale Quote</a>
+      <a href="contact.html" class="btn btn-outline">Get a Wholesale Quote <i class="fa-solid fa-arrow-right"></i></a>
     </div>
     <div class="hero-divider"></div>
     <div class="hero-stat-row">
       <div class="hero-stat">
-        <span class="hero-stat-num">8<span>+</span></span>
+        <span class="hero-stat-num"><span class="count-num" data-count="8">0</span><span>+</span></span>
         <span class="hero-stat-label">Categories</span>
       </div>
       <div class="hero-stat">
-        <span class="hero-stat-num">200<span>+</span></span>
+        <span class="hero-stat-num"><span class="count-num" data-count="200">0</span><span>+</span></span>
         <span class="hero-stat-label">Products</span>
       </div>
       <div class="hero-stat">
@@ -710,6 +789,9 @@
         <span class="hero-stat-label">Retail &amp; Wholesale</span>
       </div>
     </div>
+    <button class="hero-scroll-cue" id="heroScrollCue" aria-label="Scroll to see categories">
+      See what we stock <i class="fa-solid fa-chevron-down"></i>
+    </button>
   </div>
 
   <!-- RIGHT: Slideshow -->
@@ -799,6 +881,16 @@
    </div>
   </div>
 
+</section>
+
+<!-- =============================================
+     BRAND STRIP
+     ============================================= -->
+<section class="marquee" aria-label="Brands we carry">
+  <div class="marquee-track">
+    <span>Colgate</span><span>Cetaphil</span><span>Himalaya</span><span>Dabur</span><span>Dettol</span><span>Harpic</span><span>Duracell</span><span>AXE</span><span>Boomer</span><span>Five Star</span><span>Bajaj</span><span>Cinthol</span><span>Comfort</span><span>Happydent</span>
+    <span>Colgate</span><span>Cetaphil</span><span>Himalaya</span><span>Dabur</span><span>Dettol</span><span>Harpic</span><span>Duracell</span><span>AXE</span><span>Boomer</span><span>Five Star</span><span>Bajaj</span><span>Cinthol</span><span>Comfort</span><span>Happydent</span>
+  </div>
 </section>
 
 <!-- =============================================

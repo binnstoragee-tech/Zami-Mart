@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zami Mart — Phone Preview</title>
+<style>
+  :root{
+    --teal:#063b3f;
+    --orange:#fd4d02;
+    --cream:#f6f1e7;
+  }
+  *{ box-sizing:border-box; }
+  html, body{ overflow-x:auto; }
+  body{
+    margin:0;
+    min-height:100vh;
+    width:100%;
+    background: #ffffff;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding: 36px 20px 60px;
+  }
+
+  h1{
+    color:#063b3f;
+    font-size: 1.1rem;
+    letter-spacing:.02em;
+    margin: 0 0 4px;
+  }
+  h1 span{ color: var(--orange); }
+  .sub{
+    color:#5d7977;
+    font-size:.82rem;
+    margin: 0 0 22px;
+    text-align:center;
+  }
+
+  /* Page switcher */
+  .tabs{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:8px;
+    background: #f1f1ee;
+    padding:6px;
+    border-radius:100px;
+    margin-bottom: 30px;
+  }
+  .tab{
+    border:none;
+    background:transparent;
+    color:#5d7977;
+    font-weight:600;
+    font-size:.82rem;
+    padding:9px 18px;
+    border-radius:100px;
+    cursor:pointer;
+    font-family:inherit;
+    transition: background .25s, color .25s;
+  }
+  .tab.active{
+    background: var(--orange);
+    color:#fff;
+  }
+  .tab:not(.active):hover{
+    background: rgba(0,0,0,.06);
+    color:#063b3f;
+  }
+
+  /* Phone frame — true-to-life size (iPhone 14/15 logical px) */
+  .phone-stage{
+    flex-shrink:0;
+  }
+  .phone{
+    position:relative;
+    width: 390px;
+    height: 844px;
+    background: #111;
+    border-radius: 55px;
+    padding: 14px;
+    box-shadow:
+      0 30px 70px -20px rgba(0,0,0,.35),
+      0 0 0 2px rgba(0,0,0,.04);
+  }
+  .phone::before{
+    /* side button accent */
+    content:'';
+    position:absolute;
+    left:-3px; top:170px;
+    width:3px; height:60px;
+    background:#1d1d1d;
+    border-radius:2px 0 0 2px;
+  }
+  .screen{
+    position:relative;
+    width:100%; height:100%;
+    background:#fff;
+    border-radius: 41px;
+    overflow:hidden;
+  }
+  .notch{
+    position:absolute;
+    top:0; left:50%;
+    transform:translateX(-50%);
+    width:120px; height:26px;
+    background:#111;
+    border-radius: 0 0 16px 16px;
+    z-index:5;
+  }
+  iframe{
+    width:100%;
+    height:100%;
+    border:0;
+    display:block;
+  }
+
+  .hint{
+    margin-top: 26px;
+    color:#8aa19f;
+    font-size:.76rem;
+    text-align:center;
+    max-width: 340px;
+  }
+</style>
+</head>
+<body>
+
+  <h1>zami<span>mart</span> — phone preview</h1>
+  <p class="sub">Pinepreview yung site mo sa loob ng phone frame, parang totoong cellphone.</p>
+
+  <div class="tabs">
+    <button class="tab active" data-src="index.html">Home</button>
+    <button class="tab" data-src="categories.html">Categories</button>
+    <button class="tab" data-src="contact.html">Contact</button>
+  </div>
+
+  <div class="phone-stage">
+    <div class="phone">
+      <div class="screen">
+        <div class="notch"></div>
+        <iframe id="previewFrame" src="index.html" title="Site preview"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <p class="hint">Tip: kung gumagamit ka ng Live Server, i-save lang ang HTML/CSS mo at mag-a-auto-reload din ang preview na ito sa loob ng frame.</p>
+
+<script>
+  const tabs = document.querySelectorAll('.tab');
+  const frame = document.getElementById('previewFrame');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      frame.src = tab.dataset.src;
+    });
+  });
+</script>
+
+</body>
+</html>

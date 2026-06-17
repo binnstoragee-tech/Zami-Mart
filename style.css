@@ -22,7 +22,7 @@
 
 *{ margin:0; padding:0; box-sizing:border-box; }
 
-html{ scroll-behavior:smooth; }
+html{ scroll-behavior:smooth; overflow-x:hidden; }
 
 body{
   font-family: var(--font-body);
@@ -50,8 +50,11 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .pt-panel{
   position:absolute; inset:0;
   background: var(--orange);
-  transform: translateX(-130%) skewX(-8deg);
+  transform: translate3d(-130%,0,0) skewX(-8deg);
   transform-origin: left;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 .pt-panel.pt-2{
   background: var(--teal);
@@ -62,11 +65,11 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   transition-delay:.16s;
 }
 body.is-leaving .pt-panel{
-  transform: translateX(0) skewX(-8deg);
+  transform: translate3d(0,0,0) skewX(-8deg);
   transition: transform .55s var(--ease);
 }
 body.is-entering .pt-panel{
-  transform: translateX(130%) skewX(-8deg);
+  transform: translate3d(130%,0,0) skewX(-8deg);
   transition: transform .6s var(--ease);
 }
 body.is-entering .pt-panel.pt-2{ transition-delay:0s; }
@@ -74,6 +77,22 @@ body.is-entering .pt-panel.pt-3{ transition-delay:.06s; }
 body.is-leaving .pt-panel.pt-1{ transition-delay:.12s; }
 body.is-leaving .pt-panel.pt-2{ transition-delay:.06s; }
 body.is-leaving .pt-panel.pt-3{ transition-delay:0s; }
+
+/* Lighter, snappier timing for phones — long staggered wipes feel
+   sluggish on smaller/lower-power screens */
+@media (max-width: 720px){
+  body.is-leaving .pt-panel{ transition: transform .36s var(--ease); }
+  body.is-entering .pt-panel{ transition: transform .4s var(--ease); }
+  body.is-leaving .pt-panel.pt-1{ transition-delay:.07s; }
+  body.is-leaving .pt-panel.pt-2{ transition-delay:.035s; }
+  body.is-leaving .pt-panel.pt-3{ transition-delay:0s; }
+  body.is-entering .pt-panel.pt-2{ transition-delay:0s; }
+  body.is-entering .pt-panel.pt-3{ transition-delay:.04s; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .pt-panel{ transition: none !important; }
+}
 
 /* ============================================
    Navigation
