@@ -147,7 +147,17 @@ const InquirySystem = (function() {
     });
   }
 
-  return { init, on, getInquiries, submitInquiry, getInquiriesByEmail, getCustomers, markRead, markAllRead, deleteInquiry };
+  // Called by admin after resolving/creating a chat session for an inquiry,
+  // so the customer's chat widget can find the correct session to display replies.
+  function updateLinkedSessionId(inquiryId, sessionId) {
+    const inq = _inquiries.find(i => i.id === inquiryId);
+    if (inq) inq.linkedSessionId = sessionId;
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'inquiries', inquiryId), { linkedSessionId: sessionId }).catch(() => {});
+    });
+  }
+
+  return { init, on, getInquiries, submitInquiry, getInquiriesByEmail, getCustomers, markRead, markAllRead, deleteInquiry, updateLinkedSessionId };
 })();
 
 if (document.readyState === 'loading') {

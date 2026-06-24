@@ -517,7 +517,7 @@
 
   .pv-box{
     position: relative;
-    width: min(480px, 100%);
+    width: min(360px, 100%);
     display: flex; flex-direction: column;
     background: #fff;
     border-radius: 24px;
@@ -562,14 +562,7 @@
   }
   .pv-stage img.pv-hidden{ display:none; }
 
-  /* Gradient fade bottom of image into card */
-  .pv-stage::after {
-    content: '';
-    position: absolute; bottom: 0; left: 0; right: 0;
-    height: 60px;
-    background: linear-gradient(to bottom, transparent, rgba(255,255,255,.7));
-    pointer-events: none;
-  }
+  /* gradient removed */
 
   .pv-info{
     padding: 1.2rem 1.5rem 1.4rem;
@@ -3235,14 +3228,108 @@ function goBackToAdmin() {
   });
 
   // ---- Expose global so catalog.js viewer can call addToCart ----
+  // ---- Login check helper ----
+  function isUserLoggedIn() {
+    try {
+      return !!localStorage.getItem('zamimart_user');
+    } catch(e) { return false; }
+  }
+
+  function showLoginPrompt() {
+    const existing = document.getElementById('zmLoginToast');
+    if (existing) existing.remove();
+
+    if (!document.getElementById('zmToastStyle')) {
+      const s = document.createElement('style');
+      s.id = 'zmToastStyle';
+      s.textContent = `
+        @keyframes zmToastIn {
+          from { opacity:0; transform:translate(-50%,-50%) scale(.92); }
+          to   { opacity:1; transform:translate(-50%,-50%) scale(1); }
+        }
+        @keyframes zmToastOut {
+          from { opacity:1; transform:translate(-50%,-50%) scale(1); }
+          to   { opacity:0; transform:translate(-50%,-50%) scale(.92); }
+        }
+        #zmLoginToast {
+          position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+          z-index:999999; width:max-content; max-width:min(440px,92vw);
+          background:#fff; border-radius:20px;
+          box-shadow:0 20px 60px rgba(6,59,63,.16), 0 4px 16px rgba(0,0,0,.08);
+          display:flex; align-items:stretch; overflow:hidden;
+          animation:zmToastIn .35s cubic-bezier(.34,1.56,.64,1) forwards;
+          font-family:'Poppins',sans-serif;
+        }
+        #zmLoginToast .zt-bar {
+          width:5px; flex-shrink:0;
+          background:linear-gradient(180deg,#FD4D02 0%,#c73a00 100%);
+        }
+        #zmLoginToast .zt-body {
+          display:flex; align-items:center; gap:14px; padding:16px 20px 16px 16px;
+        }
+        #zmLoginToast .zt-icon {
+          width:42px; height:42px; border-radius:12px; flex-shrink:0;
+          background:linear-gradient(135deg,#fff4f0,#ffe3d9);
+          display:flex; align-items:center; justify-content:center;
+        }
+        #zmLoginToast .zt-icon i { font-size:1.05rem; color:#FD4D02; }
+        #zmLoginToast .zt-copy { flex:1; min-width:0; }
+        #zmLoginToast .zt-title {
+          font-size:.85rem; font-weight:700; color:#063b3f;
+          line-height:1.3; margin-bottom:2px;
+        }
+        #zmLoginToast .zt-sub {
+          font-size:.72rem; color:#7a9090; line-height:1.4;
+        }
+        #zmLoginToast .zt-btn {
+          flex-shrink:0; margin-left:4px;
+          background:linear-gradient(135deg,#FD4D02,#d94000);
+          color:#fff; border:none; border-radius:11px;
+          padding:9px 16px; font-size:.78rem; font-weight:700;
+          text-decoration:none; cursor:pointer; white-space:nowrap;
+          display:flex; align-items:center; gap:6px;
+          box-shadow:0 4px 16px rgba(253,77,2,.32);
+          transition:transform .15s,box-shadow .15s;
+        }
+        #zmLoginToast .zt-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(253,77,2,.44); }
+
+      `;
+      document.head.appendChild(s);
+    }
+
+    const toast = document.createElement('div');
+    toast.id = 'zmLoginToast';
+    toast.innerHTML = `
+      <div class="zt-bar"></div>
+      <div class="zt-body">
+        <div class="zt-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+        <div class="zt-copy">
+          <div class="zt-title">Sign in to add items to your cart</div>
+          <div class="zt-sub">You need an account to start shopping.</div>
+        </div>
+        <a href="login.html" class="zt-btn">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Log In
+        </a>
+      </div>
+    `;
+    document.body.appendChild(toast);
+
+    const dismiss = () => {
+      toast.style.animation = 'zmToastOut .22s ease forwards';
+      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 230);
+    };
+    setTimeout(dismiss, 5000);
+  }
+
   window.ZMCart = {
     addItem: function(name, img) {
+      if (!isUserLoggedIn()) { showLoginPrompt(); return false; }
       const existing = cart.find(i => i.name === name);
       if (existing) { existing.qty++; } else { cart.push({ name, img, qty: 1 }); }
       saveCart(cart);
       updateBadge();
       renderCartItems();
-  
+      return true;
     },
     isInCart: function(name) {
       return !!cart.find(i => i.name === name);
@@ -3594,12 +3681,13 @@ function updateBadge(){
 }
 
 function restoreSession(){
+  // 1) Try the saved session from localStorage first
   try{
     const s=JSON.parse(localStorage.getItem('zm_cv_session')||'null');
     if(s&&s.id&&ChatSystem.getSession(s.id)){
       sessionId=s.id;
       visitorName=s.name;
-      visitorAvatar=s.avatar||null; // restored from session
+      visitorAvatar=s.avatar||null;
       visitorInitials=s.initials||'?';
       const user=getLoggedUser();
       if(user){visitorAvatar=user.avatarPhoto||null;}
@@ -3609,6 +3697,32 @@ function restoreSession(){
       return true;
     }
   }catch(e){}
+
+  // 2) Fallback: if the customer is logged in, check if any of their inquiries
+  //    have a linkedSessionId (set by admin when they opened the inquiry).
+  //    This is how admin replies reach a customer who had no chat session open
+  //    when they submitted their order inquiry.
+  try{
+    const user=getLoggedUser();
+    if(user&&user.email&&window.InquirySystem){
+      const inqs=InquirySystem.getInquiriesByEmail(user.email);
+      for(const inq of inqs){
+        if(inq.linkedSessionId&&ChatSystem.getSession(inq.linkedSessionId)){
+          sessionId=inq.linkedSessionId;
+          visitorName=user.name||'Guest';
+          visitorAvatar=user.avatarPhoto||null;
+          visitorInitials=(visitorName.charAt(0)||(user.email.charAt(0)||'?')).toUpperCase();
+          // Save so we don't need to look it up next time
+          localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name:visitorName,avatar:visitorAvatar}));
+          msgsEl.innerHTML='';
+          inputArea.style.display='flex';
+          renderMsgs();
+          return true;
+        }
+      }
+    }
+  }catch(e){}
+
   return false;
 }
 

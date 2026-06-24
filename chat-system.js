@@ -245,6 +245,16 @@ const ChatSystem = (function() {
   function getUnreadCount(sessionId) { return _unread[sessionId] || 0; }
   function getAdminUnreadCount()     { return _unread['admin']   || 0; }
 
+  // Count unread VISITOR messages per session (for admin notification panel)
+  // This is how many messages from the customer the admin hasn't read yet.
+  function getAdminUnreadBySession(sessionId) {
+    return _messages.filter(m =>
+      m.sessionId === sessionId &&
+      m.senderType === 'visitor' &&
+      m.read === false
+    ).length;
+  }
+
   // =============================================
   // UTILITY
   // =============================================
@@ -307,7 +317,7 @@ const ChatSystem = (function() {
     createSession, getSession, getSessions, updateSessionLastMessage, linkInquiryToSession, deleteSession,
     sendMessage, getSessionMessages, getMessages, deleteMessage,
     markSessionAsRead, markAdminRead,
-    getUnreadCount, getAdminUnreadCount,
+    getUnreadCount, getAdminUnreadCount, getAdminUnreadBySession,
     clearAllChats
   };
 })();

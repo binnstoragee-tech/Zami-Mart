@@ -1440,6 +1440,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <div class="card">
         <div class="card-header">
           <span class="card-title"><i class="fa-solid fa-comments" style="color:var(--orange);margin-right:8px;"></i>Live Chat Sessions</span>
+          <button class="btn btn-sm" onclick="deleteAllChats()" style="background:#fff0f0;color:#d63030;border:1.5px solid #d63030;font-weight:600;"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Delete All</button>
         </div>
         <div class="card-body" style="padding:0;">
           <div class="table-wrap">
@@ -1492,7 +1493,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <div class="card" id="inqListCard">
         <div class="card-header">
           <span class="card-title"><i class="fa-solid fa-cart-shopping" style="color:var(--orange);margin-right:8px;"></i>Customer Inquiries</span>
-          <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-outline btn-sm" id="inqViewToggleBtn" onclick="toggleInqView()" style="min-width:120px;"><i class="fa-solid fa-clock-rotate-left" style="margin-right:5px;"></i>History View</button><button class="btn btn-outline btn-sm" onclick="clearNewInquiryBadge()">Mark all read</button></div>
+          <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-outline btn-sm" id="inqViewToggleBtn" onclick="toggleInqView()" style="min-width:120px;"><i class="fa-solid fa-clock-rotate-left" style="margin-right:5px;"></i>History View</button><button class="btn btn-outline btn-sm" onclick="clearNewInquiryBadge()">Mark all read</button><button class="btn btn-sm" onclick="deleteAllInquiries()" style="background:#fff0f0;color:#d63030;border:1.5px solid #d63030;font-weight:600;"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Delete All</button></div>
         </div>
         <div class="card-body" style="padding:0;">
           <div class="table-wrap">
@@ -2166,7 +2167,7 @@ function updateNavBadges() {
   try {
     const sessions = ChatSystem.getSessions();
     let totalUnread = 0;
-    sessions.forEach(s => { totalUnread += ChatSystem.getUnreadCount(s.id); });
+    sessions.forEach(s => { totalUnread += ChatSystem.getAdminUnreadBySession(s.id); });
     _setBadge('navChatBadge', totalUnread);
   } catch(e) {}
 }
@@ -2670,7 +2671,7 @@ function updateChatBadge() {
   const sessions = ChatSystem.getSessions();
   let totalUnread = 0;
   sessions.forEach(s => {
-    totalUnread += ChatSystem.getUnreadCount(s.id);
+    totalUnread += ChatSystem.getAdminUnreadBySession(s.id);
   });
   _setBadge('navChatBadge', totalUnread);
   // Also refresh the notif dot
@@ -2755,7 +2756,7 @@ function _checkAndPlaySounds() {
   try {
     const sessions = ChatSystem.getSessions();
     let total = 0;
-    sessions.forEach(s => { total += ChatSystem.getUnreadCount(s.id); });
+    sessions.forEach(s => { total += ChatSystem.getAdminUnreadBySession(s.id); });
     if (total > _prevChatUnread) NotifSound.playBlip();
     _prevChatUnread = total;
   } catch(e) {}
@@ -2785,10 +2786,10 @@ function buildNotifPanel() {
   if (!body) return;
   const items = [];
 
-  // Chat unread
+  // Chat unread (only count messages FROM visitors that admin hasn't read)
   const sessions = ChatSystem.getSessions();
   sessions.forEach(s => {
-    const count = ChatSystem.getUnreadCount(s.id);
+    const count = ChatSystem.getAdminUnreadBySession(s.id);
     if (count > 0) {
       items.push({
         type: 'chat',
@@ -3065,6 +3066,13 @@ function viewInquiry(idx) {
   }
   _inqSessionId = sessionId;
 
+  // Always write the resolved sessionId back to the inquiry in Firestore.
+  // This ensures the customer's chat widget can find the correct session
+  // even if they didn't have one open when they submitted the inquiry.
+  if (sessionId && inq.id) {
+    InquirySystem.updateLinkedSessionId(inq.id, sessionId);
+  }
+
   // Populate UI
   const date = new Date(inq.sentAt).toLocaleString('en-US', { month:'long', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
 
@@ -3186,6 +3194,46 @@ function closeInqDetail() {
   clearInqImg();
   document.getElementById('inqChatPanel').style.display = 'none';
   document.getElementById('inqListCard').style.display = 'block';
+}
+
+function deleteAllInquiries() {
+  const inqs = _getInqs();
+  if (!inqs.length) { showToast('No inquiries to delete.', 'info'); return; }
+  showConfirm(
+    'Delete All Inquiries?',
+    'This will permanently delete all ' + inqs.length + ' inquiries and their linked chat histories. This cannot be undone.',
+    () => {
+      const ids = inqs.map(i => i.id);
+      ids.forEach(id => {
+        // Also delete linked chat session
+        const inq = InquirySystem.getInquiries().find(i => i.id === id);
+        if (inq) {
+          const linked = ChatSystem.getSessions().find(s => s.inquiryId === id || s.id === inq.linkedSessionId);
+          if (linked) ChatSystem.deleteSession(linked.id);
+        }
+        InquirySystem.deleteInquiry(id);
+      });
+      showToast('All inquiries deleted.', 'success');
+      renderInquiries();
+      updateDashboard();
+    }
+  );
+}
+
+function deleteAllChats() {
+  const sessions = ChatSystem.getSessions();
+  if (!sessions.length) { showToast('No chat sessions to delete.', 'info'); return; }
+  showConfirm(
+    'Delete All Chats?',
+    'This will permanently delete all ' + sessions.length + ' chat session(s) and their messages. This cannot be undone.',
+    () => {
+      ChatSystem.clearAllChats();
+      if (currentChatSessionId) closeChatDetail();
+      showToast('All chat sessions deleted.', 'success');
+      renderChatSessions();
+      updateChatBadge();
+    }
+  );
 }
 
 function deleteInquiry(idx) {

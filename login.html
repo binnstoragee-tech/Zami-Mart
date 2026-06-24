@@ -11,49 +11,93 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="style.css">
 <style>
+  /* ── PAGE BACKGROUND ── */
   .fb-page{
     min-height:100vh;
     display:flex;
-    flex-direction:column;
     align-items:center;
     justify-content:center;
     background: var(--cream);
-    padding: 2.4rem 6%;
+    padding: 2rem 1rem;
+    position: relative;
   }
-  .fb-back{
+
+  /* subtle teal blobs for depth */
+  .fb-page::before,
+  .fb-page::after{
+    content:'';
     position:absolute;
-    top: 1.6rem; left: 6%;
+    border-radius:50%;
+    filter: blur(90px);
+    pointer-events:none;
+    z-index:0;
+  }
+  .fb-page::before{
+    width:420px; height:420px;
+    background: rgba(6,59,63,.08);
+    top:-80px; left:-80px;
+  }
+  .fb-page::after{
+    width:340px; height:340px;
+    background: rgba(253,77,2,.07);
+    bottom:-60px; right:-60px;
+  }
+
+  /* ── BACK LINK ── */
+  .fb-back{
+    position:fixed;
+    top: 1.4rem; left: 1.4rem;
     display:inline-flex; align-items:center; gap:7px;
-    font-size:.85rem; font-weight:600;
+    font-size:.82rem; font-weight:600;
     color: var(--teal);
+    z-index: 10;
+    background: rgba(246,241,231,.85);
+    backdrop-filter: blur(6px);
+    padding: 6px 14px 6px 10px;
+    border-radius: 100px;
+    box-shadow: 0 2px 8px rgba(6,59,63,.1);
+    transition: background .2s;
   }
-  .fb-back i{ font-size:.75rem; }
+  .fb-back:hover{ background: rgba(246,241,231,1); }
+  .fb-back i{ font-size:.72rem; }
 
+  /* ── BUBBLE WRAPPER ── */
   .fb-grid{
-    width:100%;
-    max-width: 980px;
-    display:flex;
-    align-items:center;
-    gap: 60px;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 400px;
   }
 
-  .fb-left{ flex:1; }
-  .fb-logo-row{ display:flex; align-items:center; gap:14px; margin-bottom: 1.1rem; }
-  .fb-logo-row img{ width:260px; }
-  .fb-left p{
-    font-size: 1.2rem;
-    color: var(--ink);
-    max-width: 420px;
-    line-height:1.45;
-  }
+  /* hide fb-left entirely */
+  .fb-left{ display: none; }
 
-  .fb-right{ flex: 0 0 396px; max-width:396px; }
+  /* ── CARD ── */
+  .fb-right{ width:100%; }
   .fb-card{
-    background:#fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(6,59,63,.14);
-    padding: 1.5rem;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    border-radius: 20px;
+    box-shadow:
+      0 2px 0 rgba(255,255,255,.8) inset,
+      0 12px 48px rgba(6,59,63,.18),
+      0 2px 8px rgba(6,59,63,.06);
+    padding: 2.2rem 2rem;
+    border: 1px solid rgba(255,255,255,.7);
+    animation: bubble-in .4s cubic-bezier(.34,1.4,.64,1) both;
   }
+  @keyframes bubble-in{
+    from{ transform: scale(.92) translateY(14px); opacity:0; }
+    to{   transform: scale(1)   translateY(0);    opacity:1; }
+  }
+
+  /* logo INSIDE the card */
+  .fb-logo-row{
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom: 1.6rem;
+  }
+  .fb-logo-row img{ width: 150px; }
 
   .fb-success{
     display:none;
@@ -309,19 +353,10 @@
   .fp-back-link:hover{ color: var(--teal); }
   .fp-back-link i{ font-size:.7rem; }
 
-  @media (max-width: 900px){
-    .fb-grid{ flex-direction:column; gap: 30px; }
-    .fb-left{ text-align:center; }
-    .fb-logo-row{ justify-content:center; }
-    .fb-left p{ margin: 0 auto; }
-    .fb-right{ flex: 0 0 100%; width:100%; max-width:396px; }
-  }
   @media (max-width: 480px){
-    .fb-page{ padding: 4rem 5% 2rem; }
-    .fb-back{ top:1rem; }
-    .fb-logo-row img{ width:180px; }
-    .fb-left p{ font-size: 1rem; }
-    .fb-card{ padding: 1.2rem; }
+    .fb-page{ padding: 5rem 1rem 2rem; }
+    .fb-card{ padding: 1.5rem 1.2rem; border-radius:16px; }
+    .fb-logo-row img{ width: 160px; }
   }
 </style>
 </head>
@@ -371,15 +406,11 @@
 <section class="fb-page">
   <div class="fb-grid">
 
-    <div class="fb-left reveal">
-      <div class="fb-logo-row">
-        <img src="img/logo.png" alt="Zami Mart logo">
-      </div>
-      <p>Log in to track your orders, save favorites, and get faster checkout on everyday essentials in Male'.</p>
-    </div>
-
     <div class="fb-right reveal">
       <div class="fb-card">
+        <div class="fb-logo-row">
+          <img src="img/logo.png" alt="Zami Mart logo">
+        </div>
 
         <div class="fb-success" id="fbSuccess">
           <i class="fa-solid fa-circle-check"></i>

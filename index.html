@@ -1789,12 +1789,13 @@ function updateBadge(){
 }
 
 function restoreSession(){
+  // 1) Try saved session from localStorage
   try{
     const s=JSON.parse(localStorage.getItem('zm_cv_session')||'null');
     if(s&&s.id&&ChatSystem.getSession(s.id)){
       sessionId=s.id;
       visitorName=s.name;
-      visitorAvatar=s.avatar||null; // restored from session
+      visitorAvatar=s.avatar||null;
       visitorInitials=s.initials||'?';
       const user=getLoggedUser();
       if(user){visitorAvatar=user.avatarPhoto||null;}
@@ -1804,6 +1805,28 @@ function restoreSession(){
       return true;
     }
   }catch(e){}
+
+  // 2) Fallback: check inquiry linkedSessionId for logged-in customers
+  try{
+    const user=getLoggedUser();
+    if(user&&user.email&&window.InquirySystem){
+      const inqs=InquirySystem.getInquiriesByEmail(user.email);
+      for(const inq of inqs){
+        if(inq.linkedSessionId&&ChatSystem.getSession(inq.linkedSessionId)){
+          sessionId=inq.linkedSessionId;
+          visitorName=user.name||'Guest';
+          visitorAvatar=user.avatarPhoto||null;
+          visitorInitials=(visitorName.charAt(0)||(user.email.charAt(0)||'?')).toUpperCase();
+          localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name:visitorName,avatar:visitorAvatar}));
+          msgsEl.innerHTML='';
+          inputArea.style.display='flex';
+          renderMsgs();
+          return true;
+        }
+      }
+    }
+  }catch(e){}
+
   return false;
 }
 

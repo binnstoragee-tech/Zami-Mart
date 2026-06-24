@@ -157,6 +157,14 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!window.ZMCart || !pvCurrentProduct.name) return;
       if (pvAddCartBtn.classList.contains('pv-loading') || pvAddCartBtn.classList.contains('pv-added')) return;
 
+      // Check login first before showing loading animation
+      const loggedIn = (() => { try { return !!localStorage.getItem('zamimart_user'); } catch(e) { return false; } })();
+      if (!loggedIn) {
+        // Let ZMCart.addItem handle the toast (it checks too), but call it to trigger the toast
+        window.ZMCart.addItem(pvCurrentProduct.name, pvCurrentProduct.img);
+        return;
+      }
+
       // Step 1: Loading
       pvAddCartBtn.classList.add('pv-loading');
       pvAddCartBtn.innerHTML = '<div class="pv-btn-spinner"></div> Adding...';

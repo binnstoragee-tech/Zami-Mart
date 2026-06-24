@@ -52,7 +52,9 @@ body { background: var(--cream); color: var(--text); font-size: 14px; }
   box-shadow: 0 12px 40px -8px rgba(253,77,2,.5);
 }
 .chat-widget-btn.open {
-  background: var(--teal);
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
 }
 .chat-unread-badge {
   position: absolute;
@@ -79,8 +81,8 @@ body { background: var(--cream); color: var(--text); font-size: 14px; }
   position: fixed;
   bottom: 100px;
   right: 28px;
-  width: 100%;
-  max-width: 400px;
+  width: 400px;
+  max-width: calc(100vw - 40px);
   height: 600px;
   background: #fff;
   border-radius: 20px;
@@ -164,78 +166,89 @@ body { background: var(--cream); color: var(--text); font-size: 14px; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Admin Messages - Left aligned with avatar */
-.chat-message.admin {
-  justify-content: flex-start;
-}
-
-.chat-message.admin .chat-message-avatar {
-  width: 32px;
-  height: 32px;
+/* ── Shared avatar style ── */
+.chat-message-avatar {
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
-  background: var(--teal);
-  color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: .7rem;
+  font-size: .68rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-bottom: 20px;
+}
+
+/* ── Shared bubble style ── */
+.chat-message-bubble {
+  padding: 9px 13px;
+  font-size: .82rem;
+  line-height: 1.5;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  display: inline-block;
+  max-width: 100%;
+  width: fit-content;
   flex-shrink: 0;
 }
 
-.chat-message.admin .chat-message-content {
+/* ── Visitor (Customer) — LEFT side, orange bubble, orange avatar ── */
+.chat-message.visitor {
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+.chat-message.visitor .chat-message-avatar {
+  background: #FD4D02;
+  color: #fff;
+}
+.chat-message.visitor .chat-message-content {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 3px;
-  max-width: 75%;
+  max-width: 82%;
+  min-width: 0;
 }
-
-.chat-message.admin .chat-message-bubble {
+.chat-message.visitor .chat-message-bubble {
   background: #FD4D02;
   color: #fff;
-  border-radius: 18px;
-  padding: 10px 14px;
-  word-break: break-word;
-  white-space: normal;
-  font-size: .82rem;
-  line-height: 1.4;
+  border-radius: 18px 18px 18px 4px;
 }
-
-.chat-message.admin .chat-message-time {
-  font-size: .65rem;
+.chat-message.visitor .chat-message-time {
+  font-size: .63rem;
   color: var(--text-muted);
-  padding: 0 12px;
+  padding-left: 4px;
 }
 
-/* Visitor (Customer) Messages - Right aligned */
-.chat-message.visitor {
+/* ── Admin (Customer Service) — RIGHT side, dark teal bubble, no avatar ── */
+.chat-message.admin {
   justify-content: flex-end;
+  align-items: flex-end;
 }
-
-.chat-message.visitor .chat-message-content {
+.chat-message.admin .chat-message-avatar {
+  display: none;
+}
+.chat-message.admin .chat-message-content {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 3px;
-  max-width: 75%;
+  max-width: 82%;
+  min-width: 0;
 }
-
-.chat-message.visitor .chat-message-bubble {
-  background: #fff;
-  color: #1a2e2e;
-  border-radius: 18px;
-  padding: 10px 14px;
-  word-break: break-word;
-  white-space: normal;
-  font-size: .82rem;
-  line-height: 1.4;
-  box-shadow: 0 1px 3px rgba(0,0,0,.1);
+.chat-message.admin .chat-message-bubble {
+  background: #1a2e2e;
+  color: #fff;
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.12);
 }
-
-.chat-message.visitor .chat-message-time {
-  font-size: .65rem;
+.chat-message.admin .chat-message-time {
+  font-size: .63rem;
   color: var(--text-muted);
-  padding: 0 12px;
+  padding-right: 4px;
 }
 
 /* Input Area */
@@ -461,6 +474,45 @@ const unreadBadge = document.getElementById('chatUnreadBadge');
 let currentSessionId = null;
 let visitorName = null;
 
+// ── SOUND EFFECTS ──
+function _playSendSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(600, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.1);
+    g.gain.setValueAtTime(0.12, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
+    o.start(ctx.currentTime);
+    o.stop(ctx.currentTime + 0.22);
+  } catch(e) {}
+}
+
+function _playCustomerNotifSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // Two-tone ding for received message
+    [880, 1100].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type = 'sine';
+      o.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
+      g.gain.setValueAtTime(0, ctx.currentTime + i * 0.12);
+      g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.12 + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.25);
+      o.start(ctx.currentTime + i * 0.12);
+      o.stop(ctx.currentTime + i * 0.12 + 0.25);
+    });
+  } catch(e) {}
+}
+
+// Track how many admin messages the customer has already seen
+let _lastSeenAdminMsgCount = 0;
+
 // Toggle chat window
 chatBtn.addEventListener('click', () => {
   chatWindow.classList.toggle('open');
@@ -468,6 +520,10 @@ chatBtn.addEventListener('click', () => {
   if (chatWindow.classList.contains('open') && currentSessionId) {
     chatInput.focus();
     ChatSystem.markSessionAsRead(currentSessionId);
+    unreadBadge.style.display = 'none';
+    // Sync seen count so no false notifications after opening
+    const msgs = ChatSystem.getSessionMessages(currentSessionId);
+    _lastSeenAdminMsgCount = msgs.filter(m => m.senderType === 'admin').length;
   }
 });
 
@@ -516,6 +572,7 @@ function sendMessage() {
   if (!text || !currentSessionId) return;
 
   ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, text);
+  _playSendSound();
   chatInput.value = '';
   chatInput.style.height = 'auto';
   renderMessages();
@@ -533,7 +590,6 @@ function renderMessages() {
     if (isAdmin) {
       return `
         <div class="chat-message admin">
-          <div class="chat-message-avatar"><i class="fa-solid fa-headset"></i></div>
           <div class="chat-message-content">
             <div class="chat-message-bubble">${escapeHtml(msg.text)}</div>
             <div class="chat-message-time">${time}</div>
@@ -541,8 +597,10 @@ function renderMessages() {
         </div>
       `;
     } else {
+      const initials = (visitorName || 'V').charAt(0).toUpperCase();
       return `
         <div class="chat-message visitor">
+          <div class="chat-message-avatar">${initials}</div>
           <div class="chat-message-content">
             <div class="chat-message-bubble">${escapeHtml(msg.text)}</div>
             <div class="chat-message-time">${time}</div>
@@ -584,6 +642,9 @@ function restoreSession() {
         chatWelcomeForm.style.display = 'none';
         
         renderMessages();
+        // Treat all existing admin messages as already seen on restore
+        const existingMsgs = ChatSystem.getSessionMessages(currentSessionId);
+        _lastSeenAdminMsgCount = existingMsgs.filter(m => m.senderType === 'admin').length;
         return true;
       }
     } catch (e) {
@@ -618,9 +679,28 @@ ChatSystem.onReady(() => {
   
   // Listen for updates
   ChatSystem.on('messages-updated', () => {
-    if (currentSessionId) {
-      renderMessages();
-      updateUnreadBadge();
+    if (!currentSessionId) return;
+
+    const messages = ChatSystem.getSessionMessages(currentSessionId);
+    const isOpen = chatWindow.classList.contains('open');
+
+    // Count total admin messages in this session
+    const totalAdminMsgs = messages.filter(m => m.senderType === 'admin').length;
+    const newAdminMsgs = totalAdminMsgs - _lastSeenAdminMsgCount;
+
+    renderMessages();
+
+    if (isOpen) {
+      // Window open — update seen count, hide badge
+      _lastSeenAdminMsgCount = totalAdminMsgs;
+      ChatSystem.markSessionAsRead(currentSessionId);
+      unreadBadge.style.display = 'none';
+    } else if (newAdminMsgs > 0) {
+      // Window closed and admin sent new messages — notify customer
+      const unseen = totalAdminMsgs - _lastSeenAdminMsgCount;
+      unreadBadge.textContent = unseen;
+      unreadBadge.style.display = 'flex';
+      _playCustomerNotifSound();
     }
   });
 });
