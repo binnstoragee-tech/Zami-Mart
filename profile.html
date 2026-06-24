@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile — Zami Mart</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+<style>
+
+/* =============================================
+   PROFILE PAGE LAYOUT
+   ============================================= */
+.profile-page {
+  min-height: 100vh;
+  background: var(--cream);
+  padding-top: 131px;
+  padding-bottom: 60px;
+}
+
+.profile-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 6%;
+}
+
+/* =============================================
+   HEADER STRIP
+   ============================================= */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  margin-bottom: 2.4rem;
+  margin-top: 2rem;
+}
+
+.profile-header-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 16px rgba(6,59,63,.18);
+}
+.profile-header-avatar img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+
+.profile-header-info h1 {
+  font-size: 1.35rem;
+  color: var(--teal);
+  font-weight: 700;
+  margin-bottom: .15rem;
+  line-height: 1.2;
+}
+.profile-header-info p {
+  font-size: .88rem;
+  color: #5d7977;
+  margin: 0;
+}
+
+/* =============================================
+   CARDS
+   ============================================= */
+.profile-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(6,59,63,.08);
+  margin-bottom: 1.4rem;
+  overflow: hidden;
+}
+
+.profile-card-header {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: 1.2rem 1.6rem;
+  border-bottom: 1px solid rgba(6,59,63,.07);
+}
+.profile-card-header .card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(6,59,63,.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+  font-size: .9rem;
+  flex-shrink: 0;
+}
+.profile-card-header h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin: 0;
+  flex: 1;
+}
+.profile-card-header .card-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--teal);
+  background: var(--cream);
+  border: 1.5px solid rgba(6,59,63,.12);
+  border-radius: 100px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: background .25s, border-color .25s, color .25s;
+}
+.profile-card-header .card-edit-btn:hover {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+}
+.profile-card-header .card-edit-btn i {
+  font-size: .75rem;
+}
+
+.profile-card-body {
+  padding: 1.4rem 1.6rem;
+}
+
+/* =============================================
+   MERGED VIEW: avatar + fields side by side
+   ============================================= */
+.pf-view-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4rem;
+}
+.pf-view-fields {
+  flex: 1;
+  min-width: 0;
+}
+.pf-edit-avatar-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4rem;
+  margin-bottom: 1rem;
+}
+.pf-divider {
+  height: 1px;
+  background: rgba(6,59,63,.07);
+  margin: 1rem 0;
+}
+@media (max-width: 600px) {
+  .pf-view-top { flex-direction: column; align-items: center; text-align: center; }
+  .pf-view-fields .field-row { text-align: left; }
+  .pf-edit-avatar-row { flex-direction: column; align-items: flex-start; }
+}
+
+/* =============================================
+   AVATAR SECTION (kept for edit mode)
+   ============================================= */
+.avatar-section {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 1.4rem 1.6rem;
+}
+.avatar-big {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 3px solid #fff;
+  box-shadow: 0 4px 20px rgba(6,59,63,.15);
+}
+.avatar-big img { width: 100%; height: 100%; object-fit: cover; }
+
+.avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+.avatar-actions p {
+  font-size: .82rem;
+  color: #5d7977;
+  margin: 0 0 .3rem;
+  line-height: 1.4;
+}
+.avatar-btn-row {
+  display: flex;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+.avatar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .8rem;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: background .25s, border-color .25s, color .25s;
+}
+.avatar-btn-upload {
+  color: var(--teal);
+  background: var(--cream);
+  border: 1.5px solid rgba(6,59,63,.14);
+}
+.avatar-btn-upload:hover { background: #eee6d6; border-color: var(--teal); }
+.avatar-btn-remove {
+  color: #b8392c;
+  background: #fff;
+  border: 1.5px solid rgba(214,72,58,.2);
+}
+.avatar-btn-remove:hover { background: #fbeceb; border-color: #d6483a; }
+
+/* Color swatches */
+.color-label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--teal);
+  margin-bottom: .4rem;
+  display: block;
+}
+.color-swatch-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.color-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform .2s, box-shadow .2s;
+}
+.color-swatch:hover { transform: scale(1.15); }
+.color-swatch.active {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ink);
+}
+
+/* =============================================
+   FORM FIELDS (view + edit mode)
+   ============================================= */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.field-row.full { grid-template-columns: 1fr; }
+
+.field-group { display: flex; flex-direction: column; gap: .3rem; }
+.field-label {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #8aa0a0;
+}
+.field-value {
+  font-size: .97rem;
+  font-weight: 500;
+  color: var(--ink);
+  padding: 3px 0;
+}
+.field-value.empty { color: #b0c4c4; font-style: italic; }
+
+/* Edit mode inputs */
+.pf-input {
+  width: 100%;
+  font-family: var(--font-body);
+  font-size: .97rem;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 1.5px solid #d8dad9;
+  background: #fff;
+  color: var(--ink);
+  transition: border-color .25s, box-shadow .25s;
+  box-sizing: border-box;
+}
+.pf-input:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px rgba(253,77,2,.1);
+}
+.pf-input.has-error {
+  border-color: #d6483a;
+}
+.pf-input.has-error:focus {
+  box-shadow: 0 0 0 3px rgba(214,72,58,.1);
+}
+.field-error {
+  font-size: .74rem;
+  color: #d6483a;
+  display: none;
+  margin-top: 2px;
+}
+.field-error.show { display: block; }
+
+/* Password input wrapper (eye toggle) */
+.pw-wrap {
+  position: relative;
+}
+.pw-wrap .pf-input {
+  padding-right: 44px;
+}
+.pw-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #8aa0a0;
+  font-size: .9rem;
+  padding: 4px;
+  transition: color .2s;
+}
+.pw-toggle:hover { color: var(--teal); }
+
+/* Password strength bar */
+.pw-strength-wrap {
+  margin-top: .5rem;
+  display: none;
+}
+.pw-strength-wrap.show { display: block; }
+.pw-strength-bar {
+  height: 4px;
+  border-radius: 4px;
+  background: #e3e5e4;
+  overflow: hidden;
+  margin-bottom: .3rem;
+}
+.pw-strength-fill {
+  height: 100%;
+  border-radius: 4px;
+  width: 0%;
+  transition: width .35s var(--ease-soft), background .35s;
+}
+.pw-strength-text {
+  font-size: .72rem;
+  font-weight: 600;
+  color: #8aa0a0;
+}
+
+/* =============================================
+   EDIT / SAVE BUTTONS
+   ============================================= */
+.card-actions {
+  display: flex;
+  gap: .7rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(6,59,63,.06);
+  margin-top: 1rem;
+}
+.btn-cancel {
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--teal);
+  background: var(--cream);
+  border: 1.5px solid rgba(6,59,63,.12);
+  cursor: pointer;
+  transition: background .25s, border-color .25s;
+}
+.btn-cancel:hover { background: #eee6d6; border-color: var(--teal); }
+.btn-save {
+  padding: 10px 26px;
+  border-radius: 8px;
+  font-size: .9rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--teal);
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: background .25s, transform .2s;
+}
+.btn-save:hover { background: #052e31; }
+.btn-save:active { transform: scale(.97); }
+.btn-save.loading { pointer-events: none; opacity: .7; }
+
+/* =============================================
+   TOAST / ALERT
+   ============================================= */
+.pf-toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--teal);
+  color: #fff;
+  font-size: .9rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 100px;
+  box-shadow: 0 8px 28px -6px rgba(6,59,63,.4);
+  z-index: 9000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s, transform .3s var(--ease-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+.pf-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.pf-toast.error { background: #c2492f; }
+.pf-toast.success { background: #1f7a4d; }
+
+/* =============================================
+   DANGER ZONE (logout)
+   ============================================= */
+.danger-zone {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(6,59,63,.08);
+  padding: 1.2rem 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.danger-zone-info h3 {
+  font-size: .97rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: .15rem;
+}
+.danger-zone-info p {
+  font-size: .82rem;
+  color: #5d7977;
+  margin: 0;
+}
+.btn-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: .9rem;
+  font-weight: 700;
+  color: #b8392c;
+  background: #fff;
+  border: 1.5px solid rgba(214,72,58,.25);
+  cursor: pointer;
+  transition: background .25s, border-color .25s;
+  white-space: nowrap;
+}
+.btn-logout:hover { background: #fbeceb; border-color: #d6483a; }
+
+/* =============================================
+   NOT LOGGED IN GATE
+   ============================================= */
+.pf-gate {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 1rem;
+}
+.pf-gate.show { display: flex; }
+.pf-gate-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(6,59,63,.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  color: var(--teal);
+  margin-bottom: .5rem;
+}
+.pf-gate h2 {
+  font-size: 1.3rem;
+  color: var(--teal);
+  margin-bottom: .3rem;
+}
+.pf-gate p {
+  font-size: .92rem;
+  color: #5d7977;
+  max-width: 320px;
+  line-height: 1.55;
+}
+.btn-go-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: .5rem;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: .95rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--teal);
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background .25s;
+}
+.btn-go-login:hover { background: #052e31; }
+
+/* =============================================
+   HIDDEN UTILITY
+   ============================================= */
+.pf-hidden { display: none !important; }
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 600px) {
+  .profile-page { padding-top: 131px; }
+  .profile-header { margin-top: 1rem; }
+  .field-row { grid-template-columns: 1fr; }
+  .avatar-section { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .profile-header { gap: 1rem; }
+  .profile-header-avatar { width: 56px; height: 56px; font-size: 1.4rem; }
+  .profile-header-info h1 { font-size: 1.1rem; }
+  .profile-card-body { padding: 1.2rem; }
+  .profile-card-header { padding: 1rem 1.2rem; }
+  .avatar-section { padding: 1.2rem; }
+  .card-actions { flex-direction: column-reverse; }
+  .btn-cancel, .btn-save { width: 100%; justify-content: center; }
+  .danger-zone { flex-direction: column; align-items: flex-start; }
+  .btn-logout { width: 100%; justify-content: center; }
+  .pf-toast { width: 90%; white-space: normal; text-align: center; }
+}
+
+.nav-account-active {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  color: var(--orange);
+  font-weight: 700;
+  font-size: inherit;
+  cursor: default;
+  pointer-events: none;
+  opacity: .75;
+}
+</style>
+</head>
+<body>
+
+<!-- Page transition overlay -->
+<div class="page-transition">
+  <div class="pt-panel pt-1"></div>
+  <div class="pt-panel pt-2"></div>
+  <div class="pt-panel pt-3"></div>
+</div>
+
+<!-- Toast notification -->
+<div class="pf-toast" id="pfToast">
+  <i class="fa-solid fa-circle-check" id="pfToastIcon"></i>
+  <span id="pfToastText"></span>
+</div>
+
+<!-- =============================================
+     NAVBAR
+     ============================================= -->
+<nav class="navbar" id="navbar">
+  <a href="index.html" class="nav-logo">
+    <img src="img/logo.png" alt="Zami Mart">
+  </a>
+  <div class="nav-links" id="navLinks">
+    <a href="index.html">Home</a>
+    <a href="categories.html">Categories</a>
+    <a href="contact.html">Contact</a>
+    <span class="nav-account-active">
+      <i class="fa-solid fa-circle-user"></i> Account
+    </span>
+  </div>
+  <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- =============================================
+     MAIN CONTENT
+     ============================================= -->
+<main class="profile-page">
+  <div class="profile-container">
+
+    <!-- NOT LOGGED IN GATE -->
+    <div class="pf-gate" id="pfGate">
+      <div class="pf-gate-icon"><i class="fa-solid fa-user-lock"></i></div>
+      <h2>Sign in to view your profile</h2>
+      <p>You need to be logged in to access your profile and account settings.</p>
+      <a href="login.html" class="btn-go-login"><i class="fa-solid fa-arrow-right-to-bracket"></i> Go to Login</a>
+    </div>
+
+    <!-- PROFILE CONTENT (shown when logged in) -->
+    <div id="pfContent" class="pf-hidden">
+
+      <!-- Header -->
+      <div class="profile-header reveal">
+        <div class="profile-header-avatar" id="headerAvatar"></div>
+        <div class="profile-header-info">
+          <h1 id="headerName">My Profile</h1>
+          <p id="headerEmail"></p>
+        </div>
+      </div>
+
+      <!-- =============================================
+           CARD 1: PROFILE — PHOTO + PERSONAL DETAILS
+           ============================================= -->
+      <div class="profile-card reveal">
+        <div class="profile-card-header">
+          <div class="card-icon"><i class="fa-solid fa-user"></i></div>
+          <h2>Profile Details</h2>
+          <button type="button" class="card-edit-btn" id="detailsEditBtn">
+            <i class="fa-solid fa-pen"></i> Edit
+          </button>
+        </div>
+        <div class="profile-card-body">
+
+          <!-- VIEW MODE -->
+          <div id="detailsView">
+            <div class="pf-view-top">
+              <div class="avatar-big" id="avatarBig"></div>
+              <div class="pf-view-fields">
+                <div class="field-row">
+                  <div class="field-group">
+                    <span class="field-label">Full Name</span>
+                    <span class="field-value" id="viewName">—</span>
+                  </div>
+                  <div class="field-group">
+                    <span class="field-label">Email / Phone</span>
+                    <span class="field-value" id="viewEmail">—</span>
+                  </div>
+                </div>
+                <div class="field-row">
+                  <div class="field-group">
+                    <span class="field-label">Phone Number</span>
+                    <span class="field-value" id="viewPhone">Not set</span>
+                  </div>
+                  <div class="field-group">
+                    <span class="field-label">Address</span>
+                    <span class="field-value" id="viewAddress">Not set</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EDIT MODE -->
+          <div id="detailsEdit" class="pf-hidden">
+            <!-- Avatar row inside edit -->
+            <div class="pf-edit-avatar-row">
+              <div class="avatar-big" id="avatarBigEdit"></div>
+              <div class="avatar-actions">
+                <p>Upload a photo or pick an avatar color.</p>
+                <div class="avatar-btn-row">
+                  <label class="avatar-btn avatar-btn-upload" for="avatarFileInput">
+                    <i class="fa-solid fa-camera"></i> Upload photo
+                  </label>
+                  <button type="button" class="avatar-btn avatar-btn-remove" id="removeAvatarBtn">
+                    <i class="fa-solid fa-trash"></i> Remove
+                  </button>
+                  <input type="file" accept="image/*" id="avatarFileInput" hidden>
+                </div>
+                <div style="margin-top:.5rem;">
+                  <span class="color-label">Avatar color</span>
+                  <div class="color-swatch-row" id="colorSwatchRow">
+                    <button type="button" class="color-swatch" data-color="#063b3f" style="background:#063b3f" aria-label="Teal"></button>
+                    <button type="button" class="color-swatch" data-color="#fd4d02" style="background:#fd4d02" aria-label="Orange"></button>
+                    <button type="button" class="color-swatch" data-color="#2563eb" style="background:#2563eb" aria-label="Blue"></button>
+                    <button type="button" class="color-swatch" data-color="#16a34a" style="background:#16a34a" aria-label="Green"></button>
+                    <button type="button" class="color-swatch" data-color="#7c3aed" style="background:#7c3aed" aria-label="Purple"></button>
+                    <button type="button" class="color-swatch" data-color="#db2777" style="background:#db2777" aria-label="Pink"></button>
+                    <button type="button" class="color-swatch" data-color="#b45309" style="background:#b45309" aria-label="Amber"></button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="pf-divider"></div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" for="editName">Full Name</label>
+                <input type="text" class="pf-input" id="editName" placeholder="Your full name">
+                <span class="field-error" id="editNameErr">Please enter your name.</span>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="editEmail">Email / Phone</label>
+                <input type="text" class="pf-input" id="editEmail" placeholder="Email or phone number">
+                <span class="field-error" id="editEmailErr">Please enter a valid email or phone.</span>
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" for="editPhone">Phone Number <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#b0c4c4">(optional)</span></label>
+                <input type="text" class="pf-input" id="editPhone" placeholder="+960 XXX XXXX">
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="editAddress">Delivery Address <span style="font-weight:400;text-transform:none;letter-spacing:0;color:#b0c4c4">(optional)</span></label>
+                <input type="text" class="pf-input" id="editAddress" placeholder="Street, Flat, Male'">
+              </div>
+            </div>
+            <div class="card-actions">
+              <button type="button" class="btn-cancel" id="detailsCancelBtn">Cancel</button>
+              <button type="button" class="btn-save" id="detailsSaveBtn">
+                <i class="fa-solid fa-floppy-disk"></i> Save Changes
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =============================================
+           CARD 3: CHANGE PASSWORD
+           ============================================= -->
+      <div class="profile-card reveal">
+        <div class="profile-card-header">
+          <div class="card-icon"><i class="fa-solid fa-lock"></i></div>
+          <h2>Change Password</h2>
+          <button type="button" class="card-edit-btn" id="pwEditBtn">
+            <i class="fa-solid fa-pen"></i> Change
+          </button>
+        </div>
+
+        <!-- VIEW MODE -->
+        <div class="profile-card-body" id="pwView">
+          <div class="field-row">
+            <div class="field-group">
+              <span class="field-label">Password</span>
+              <span class="field-value">••••••••••</span>
+            </div>
+            <div class="field-group">
+              <span class="field-label">Last changed</span>
+              <span class="field-value" id="pwLastChanged">Not changed yet</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- EDIT MODE -->
+        <div class="profile-card-body pf-hidden" id="pwEdit">
+          <div class="field-row full">
+            <div class="field-group">
+              <label class="field-label" for="currentPw">Current Password</label>
+              <div class="pw-wrap">
+                <input type="password" class="pf-input" id="currentPw" placeholder="Enter current password" autocomplete="current-password">
+                <button type="button" class="pw-toggle" data-target="currentPw" aria-label="Toggle visibility">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <span class="field-error" id="currentPwErr">Incorrect current password.</span>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label class="field-label" for="newPw">New Password</label>
+              <div class="pw-wrap">
+                <input type="password" class="pf-input" id="newPw" placeholder="At least 8 characters" autocomplete="new-password">
+                <button type="button" class="pw-toggle" data-target="newPw" aria-label="Toggle visibility">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <div class="pw-strength-wrap" id="pwStrengthWrap">
+                <div class="pw-strength-bar">
+                  <div class="pw-strength-fill" id="pwStrengthFill"></div>
+                </div>
+                <span class="pw-strength-text" id="pwStrengthText"></span>
+              </div>
+              <span class="field-error" id="newPwErr">Password must be at least 8 characters.</span>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="confirmPw">Confirm New Password</label>
+              <div class="pw-wrap">
+                <input type="password" class="pf-input" id="confirmPw" placeholder="Repeat new password" autocomplete="new-password">
+                <button type="button" class="pw-toggle" data-target="confirmPw" aria-label="Toggle visibility">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+              <span class="field-error" id="confirmPwErr">Passwords do not match.</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button type="button" class="btn-cancel" id="pwCancelBtn">Cancel</button>
+            <button type="button" class="btn-save" id="pwSaveBtn">
+              <i class="fa-solid fa-key"></i> Update Password
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- =============================================
+           DANGER ZONE — LOGOUT
+           ============================================= -->
+      <div class="danger-zone reveal">
+        <div class="danger-zone-info">
+          <h3>Sign out of your account</h3>
+          <p>You will be returned to the login page.</p>
+        </div>
+        <button type="button" class="btn-logout" id="pfLogoutBtn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out
+        </button>
+      </div>
+
+    </div><!-- /#pfContent -->
+  </div><!-- /.profile-container -->
+</main>
+
+<script src="main.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // =============================================
+  // STORAGE HELPERS — uses localStorage so state
+  // persists across pages (same as login.html)
+  // =============================================
+  const STORAGE_KEY = 'zamimart_user';
+
+  function loadUser() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
+  }
+
+  function saveUser(user) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+  }
+
+  let currentUser = loadUser();
+
+  // =============================================
+  // TOAST
+  // =============================================
+  const pfToast = document.getElementById('pfToast');
+  const pfToastText = document.getElementById('pfToastText');
+  const pfToastIcon = document.getElementById('pfToastIcon');
+  let toastTimer = null;
+
+  function showToast(msg, type = 'success') {
+    pfToastText.textContent = msg;
+    pfToast.className = 'pf-toast ' + type;
+    pfToastIcon.className = type === 'success'
+      ? 'fa-solid fa-circle-check'
+      : type === 'error'
+        ? 'fa-solid fa-circle-xmark'
+        : 'fa-solid fa-circle-info';
+    pfToast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => pfToast.classList.remove('show'), 3200);
+  }
+
+  // =============================================
+  // AVATAR HELPERS
+  // =============================================
+  function renderAvatar(el, user, overrides) {
+    if (!el || !user) return;
+    const u = overrides ? { ...user, ...overrides } : user;
+    if (u.avatarPhoto) {
+      el.style.background = 'transparent';
+      el.innerHTML = `<img src="${u.avatarPhoto}" alt="${u.name || ''}" style="width:100%;height:100%;object-fit:cover;">`;
+    } else {
+      el.style.background = u.avatarColor || '#063b3f';
+      el.innerHTML = '';
+      el.textContent = ((u.name || 'Z').trim().charAt(0)).toUpperCase();
+    }
+  }
+
+  function setActiveSwatch(color) {
+    document.querySelectorAll('.color-swatch').forEach(sw => {
+      sw.classList.toggle('active', !!color && sw.dataset.color === color);
+    });
+  }
+
+  // =============================================
+  // POPULATE PAGE
+  // =============================================
+  function populatePage() {
+    const u = currentUser;
+
+    // Header
+    renderAvatar(document.getElementById('headerAvatar'), u);
+    document.getElementById('headerName').textContent = u.name || 'My Profile';
+    document.getElementById('headerEmail').textContent = u.email || '';
+
+    // Avatar in view mode
+    renderAvatar(document.getElementById('avatarBig'), u);
+    setActiveSwatch(u.avatarPhoto ? null : (u.avatarColor || '#063b3f'));
+
+    // Details view
+    document.getElementById('viewName').textContent    = u.name  || '—';
+    document.getElementById('viewEmail').textContent   = u.email || '—';
+    const phoneEl   = document.getElementById('viewPhone');
+    const addressEl = document.getElementById('viewAddress');
+    phoneEl.textContent   = u.phone   || 'Not set';
+    addressEl.textContent = u.address || 'Not set';
+    phoneEl.classList.toggle('empty',   !u.phone);
+    addressEl.classList.toggle('empty', !u.address);
+
+    // Password last changed
+    document.getElementById('pwLastChanged').textContent = u.pwChangedAt
+      ? new Date(u.pwChangedAt).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' })
+      : 'Not changed yet';
+  }
+
+  // =============================================
+  // GATE: show profile or login prompt
+  // =============================================
+  const pfGate    = document.getElementById('pfGate');
+  const pfContent = document.getElementById('pfContent');
+
+  if (!currentUser) {
+    pfGate.classList.add('show');
+  } else {
+    pfContent.classList.remove('pf-hidden');
+    populatePage();
+  }
+
+  // =============================================
+  // PROFILE DETAILS CARD — staged avatar + fields
+  // =============================================
+  const avatarFileInput = document.getElementById('avatarFileInput');
+  const removeAvatarBtn = document.getElementById('removeAvatarBtn');
+  const detailsEditBtn   = document.getElementById('detailsEditBtn');
+  const detailsCancelBtn = document.getElementById('detailsCancelBtn');
+  const detailsSaveBtn   = document.getElementById('detailsSaveBtn');
+  const detailsView      = document.getElementById('detailsView');
+  const detailsEdit      = document.getElementById('detailsEdit');
+
+  // Staged (pending) avatar changes — only committed on Save
+  let stagedAvatar = null; // { avatarPhoto, avatarColor }
+
+  function renderEditAvatar() {
+    const el = document.getElementById('avatarBigEdit');
+    const merged = stagedAvatar ? { ...currentUser, ...stagedAvatar } : currentUser;
+    renderAvatar(el, merged);
+    setActiveSwatch(merged.avatarPhoto ? null : (merged.avatarColor || '#063b3f'));
+  }
+
+  function openDetailsEdit() {
+    stagedAvatar = null;
+    document.getElementById('editName').value    = currentUser.name    || '';
+    document.getElementById('editEmail').value   = currentUser.email   || '';
+    document.getElementById('editPhone').value   = currentUser.phone   || '';
+    document.getElementById('editAddress').value = currentUser.address || '';
+    clearFieldError('editName');
+    clearFieldError('editEmail');
+    detailsView.classList.add('pf-hidden');
+    detailsEdit.classList.remove('pf-hidden');
+    detailsEditBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
+    renderEditAvatar();
+  }
+
+  function closeDetailsEdit() {
+    stagedAvatar = null;
+    detailsView.classList.remove('pf-hidden');
+    detailsEdit.classList.add('pf-hidden');
+    detailsEditBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Edit';
+  }
+
+  detailsEditBtn.addEventListener('click', () => {
+    if (!detailsEdit.classList.contains('pf-hidden')) {
+      closeDetailsEdit();
+    } else {
+      openDetailsEdit();
+    }
+  });
+
+  detailsCancelBtn.addEventListener('click', closeDetailsEdit);
+
+  // Avatar upload — stage only, preview immediately
+  avatarFileInput.addEventListener('change', () => {
+    const file = avatarFileInput.files && avatarFileInput.files[0];
+    if (!file) return;
+    if (file.size > 4 * 1024 * 1024) { showToast('Image too large (max 4 MB).', 'error'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      stagedAvatar = { avatarPhoto: reader.result, avatarColor: currentUser.avatarColor };
+      renderEditAvatar();
+    };
+    reader.readAsDataURL(file);
+    avatarFileInput.value = '';
+  });
+
+  // Remove photo — stage
+  removeAvatarBtn.addEventListener('click', () => {
+    stagedAvatar = { avatarPhoto: null, avatarColor: currentUser.avatarColor || '#063b3f' };
+    renderEditAvatar();
+  });
+
+  // Color swatch — stage
+  document.querySelectorAll('.color-swatch').forEach(sw => {
+    sw.addEventListener('click', () => {
+      stagedAvatar = { avatarPhoto: null, avatarColor: sw.dataset.color };
+      renderEditAvatar();
+    });
+  });
+
+  // SAVE — commit everything (avatar + fields)
+  detailsSaveBtn.addEventListener('click', () => {
+    const name    = document.getElementById('editName').value.trim();
+    const email   = document.getElementById('editEmail').value.trim();
+    const phone   = document.getElementById('editPhone').value.trim();
+    const address = document.getElementById('editAddress').value.trim();
+
+    let valid = true;
+    clearFieldError('editName');
+    clearFieldError('editEmail');
+
+    if (!name) {
+      showFieldError('editName', 'editNameErr', 'Please enter your name.');
+      valid = false;
+    }
+    if (!email) {
+      showFieldError('editEmail', 'editEmailErr', 'Please enter your email or phone.');
+      valid = false;
+    }
+    if (!valid) return;
+
+    currentUser.name    = name;
+    currentUser.email   = email;
+    currentUser.phone   = phone;
+    currentUser.address = address;
+
+    // Commit staged avatar changes
+    if (stagedAvatar !== null) {
+      currentUser.avatarPhoto = stagedAvatar.avatarPhoto;
+      currentUser.avatarColor = stagedAvatar.avatarColor;
+    }
+
+    saveUser(currentUser);
+    stagedAvatar = null;
+    populatePage();
+    closeDetailsEdit();
+    showToast('Profile saved successfully!');
+  });
+
+  // =============================================
+  // CHANGE PASSWORD CARD
+  // =============================================
+  const pwEditBtn   = document.getElementById('pwEditBtn');
+  const pwCancelBtn = document.getElementById('pwCancelBtn');
+  const pwSaveBtn   = document.getElementById('pwSaveBtn');
+  const pwView      = document.getElementById('pwView');
+  const pwEdit      = document.getElementById('pwEdit');
+
+  function openPwEdit() {
+    document.getElementById('currentPw').value = '';
+    document.getElementById('newPw').value     = '';
+    document.getElementById('confirmPw').value = '';
+    clearFieldError('currentPw');
+    clearFieldError('newPw');
+    clearFieldError('confirmPw');
+    document.getElementById('pwStrengthWrap').classList.remove('show');
+    pwView.classList.add('pf-hidden');
+    pwEdit.classList.remove('pf-hidden');
+    pwEditBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
+  }
+
+  function closePwEdit() {
+    pwView.classList.remove('pf-hidden');
+    pwEdit.classList.add('pf-hidden');
+    pwEditBtn.innerHTML = '<i class="fa-solid fa-pen"></i> Change';
+  }
+
+  pwEditBtn.addEventListener('click', () => {
+    if (!pwEdit.classList.contains('pf-hidden')) {
+      closePwEdit();
+    } else {
+      openPwEdit();
+    }
+  });
+
+  pwCancelBtn.addEventListener('click', closePwEdit);
+
+  // Password strength meter
+  const newPwInput = document.getElementById('newPw');
+  newPwInput.addEventListener('input', () => {
+    const val = newPwInput.value;
+    const wrap = document.getElementById('pwStrengthWrap');
+    const fill = document.getElementById('pwStrengthFill');
+    const text = document.getElementById('pwStrengthText');
+
+    if (!val) { wrap.classList.remove('show'); return; }
+    wrap.classList.add('show');
+
+    let score = 0;
+    if (val.length >= 8)  score++;
+    if (val.length >= 12) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+
+    const levels = [
+      { pct: '20%', color: '#d6483a', label: 'Very weak' },
+      { pct: '40%', color: '#e07a2f', label: 'Weak' },
+      { pct: '60%', color: '#d4a017', label: 'Fair' },
+      { pct: '80%', color: '#2f9e6e', label: 'Strong' },
+      { pct: '100%',color: '#1f7a4d', label: 'Very strong' },
+    ];
+    const lvl = levels[Math.min(score - 1, 4)] || levels[0];
+    fill.style.width = lvl.pct;
+    fill.style.background = lvl.color;
+    text.textContent = lvl.label;
+    text.style.color = lvl.color;
+  });
+
+  pwSaveBtn.addEventListener('click', () => {
+    const current = document.getElementById('currentPw').value;
+    const newPw   = document.getElementById('newPw').value;
+    const confirm = document.getElementById('confirmPw').value;
+
+    let valid = true;
+    clearFieldError('currentPw');
+    clearFieldError('newPw');
+    clearFieldError('confirmPw');
+
+    if (!current) {
+      showFieldError('currentPw', 'currentPwErr', 'Please enter your current password.');
+      valid = false;
+    } else if (current !== currentUser.password) {
+      showFieldError('currentPw', 'currentPwErr', 'Incorrect current password.');
+      valid = false;
+    }
+    if (!newPw || newPw.length < 8) {
+      showFieldError('newPw', 'newPwErr', 'Password must be at least 8 characters.');
+      valid = false;
+    }
+    if (newPw && confirm !== newPw) {
+      showFieldError('confirmPw', 'confirmPwErr', 'Passwords do not match.');
+      valid = false;
+    }
+    if (!valid) return;
+
+    currentUser.password    = newPw;
+    currentUser.pwChangedAt = new Date().toISOString();
+    saveUser(currentUser);
+    populatePage();
+    closePwEdit();
+    showToast('Password updated successfully!');
+  });
+
+  // =============================================
+  // PASSWORD VISIBILITY TOGGLES
+  // =============================================
+  document.querySelectorAll('.pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (!input) return;
+      const isText = input.type === 'text';
+      input.type = isText ? 'password' : 'text';
+      btn.querySelector('i').className = isText ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash';
+    });
+  });
+
+  // =============================================
+  // LOGOUT
+  // =============================================
+  document.getElementById('pfLogoutBtn').addEventListener('click', () => {
+    localStorage.removeItem(STORAGE_KEY);
+    currentUser = null;
+    // Page transition then redirect
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) { window.location.href = 'login.html'; return; }
+    document.body.classList.add('is-leaving');
+    let navigated = false;
+    const go = () => { if (navigated) return; navigated = true; window.location.href = 'login.html'; };
+    const lastPanel = document.querySelector('.pt-panel.pt-1');
+    if (lastPanel) lastPanel.addEventListener('transitionend', go, { once: true });
+    setTimeout(go, 900);
+  });
+
+  // =============================================
+  // FIELD ERROR HELPERS
+  // =============================================
+  function showFieldError(inputId, errId, msg) {
+    const input = document.getElementById(inputId);
+    const err   = document.getElementById(errId);
+    if (input) input.classList.add('has-error');
+    if (err)   { err.textContent = msg; err.classList.add('show'); }
+  }
+
+  function clearFieldError(inputId) {
+    const input = document.getElementById(inputId);
+    if (input) {
+      input.classList.remove('has-error');
+      // find sibling error span
+      const err = input.closest('.field-group')
+        ? input.closest('.field-group').querySelector('.field-error')
+        : null;
+      if (err) err.classList.remove('show');
+    }
+  }
+
+  // Clear error on input
+  document.querySelectorAll('.pf-input').forEach(input => {
+    input.addEventListener('input', () => clearFieldError(input.id));
+  });
+
+});
+</script>
+<!-- ============================================
+     ZAMI MART — LIVE CHAT WIDGET
+     ============================================ -->
+<script src="chat-system.js"></script>
+<style>
+.zm-chat-btn{position:fixed;bottom:28px;right:28px;width:60px;height:60px;border-radius:50%;background:#FD4D02;border:none;color:#fff;font-size:1.4rem;cursor:pointer;box-shadow:0 8px 32px -8px rgba(253,77,2,.4);display:flex;align-items:center;justify-content:center;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:9999;}
+.zm-chat-btn:hover{transform:scale(1.1);box-shadow:0 12px 40px -8px rgba(253,77,2,.5);}
+.zm-chat-btn.open{background:#063b3f;}
+.zm-chat-unread{position:absolute;top:-6px;right:-6px;background:#d6483a;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);}
+.zm-chat-win{position:fixed;bottom:100px;right:28px;width:100%;max-width:380px;height:560px;background:#fff;border-radius:20px;box-shadow:0 24px 80px -16px rgba(6,59,63,.3);display:none;flex-direction:column;z-index:9998;animation:zmChatUp .3s cubic-bezier(.4,0,.2,1);}
+.zm-chat-win.open{display:flex;}
+@keyframes zmChatUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.zm-chat-head{padding:18px 20px;background:#063b3f;color:#fff;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.zm-chat-head-avatar{width:38px;height:38px;border-radius:50%;background:#FD4D02;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.zm-chat-head-info{flex:1;}
+.zm-chat-head-title{font-size:.92rem;font-weight:700;font-family:'Poppins',sans-serif;}
+.zm-chat-head-sub{font-size:.68rem;opacity:.75;font-family:'Poppins',sans-serif;}
+.zm-chat-head-close{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.zm-chat-head-close:hover{background:rgba(255,255,255,.28);}
+.zm-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;font-family:'Poppins',sans-serif;}
+.zm-chat-msgs::-webkit-scrollbar{width:5px;}
+.zm-chat-msgs::-webkit-scrollbar-thumb{background:rgba(6,59,63,.15);border-radius:3px;}
+.zm-chat-msg{display:flex;animation:zmMsgIn .22s cubic-bezier(.4,0,.2,1);}
+@keyframes zmMsgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.zm-chat-msg.visitor{justify-content:flex-start;}
+.zm-chat-msg.admin{justify-content:flex-end;}
+.zm-chat-bubble{max-width:76%;padding:9px 13px;border-radius:13px;font-size:.8rem;line-height:1.5;word-break:break-word;}
+.zm-chat-msg.visitor .zm-chat-bubble{background:#f6f5f0;color:#1a2e2e;border-bottom-left-radius:4px;}
+.zm-chat-msg.admin .zm-chat-bubble{background:#FD4D02;color:#fff;border-bottom-right-radius:4px;}
+.zm-chat-time{font-size:.62rem;color:#6a8080;margin-top:3px;}
+.zm-chat-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center;font-family:'Poppins',sans-serif;}
+.zm-chat-welcome-icon{width:52px;height:52px;border-radius:50%;background:#FD4D02;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:14px;}
+.zm-chat-welcome h3{font-size:.92rem;color:#063b3f;margin-bottom:6px;font-weight:700;}
+.zm-chat-welcome p{font-size:.78rem;color:#6a8080;margin-bottom:18px;line-height:1.6;}
+.zm-chat-form{width:100%;display:flex;flex-direction:column;gap:9px;}
+.zm-chat-form input{padding:9px 12px;border:1px solid rgba(6,59,63,.12);border-radius:8px;font-size:.8rem;font-family:'Poppins',sans-serif;outline:none;transition:border-color .2s;}
+.zm-chat-form input:focus{border-color:#063b3f;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
+.zm-chat-form button{padding:9px 16px;background:#FD4D02;color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .2s;}
+.zm-chat-form button:hover{background:#e34602;}
+.zm-chat-input-area{padding:10px 14px;border-top:1px solid rgba(6,59,63,.1);display:flex;gap:8px;}
+.zm-chat-input{flex:1;padding:9px 12px;border:1px solid rgba(6,59,63,.12);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;outline:none;resize:none;}
+.zm-chat-input:focus{border-color:#063b3f;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
+.zm-chat-send{width:36px;height:36px;border-radius:9px;background:#FD4D02;border:none;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.zm-chat-send:hover{background:#e34602;transform:translateY(-2px);}
+.zm-chat-img-btn{width:34px;height:34px;border-radius:9px;background:rgba(6,59,63,.07);border:1px solid rgba(6,59,63,.12);color:#6a8080;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.zm-chat-img-btn:hover{background:rgba(6,59,63,.12);color:#063b3f;}
+.zm-chat-img-preview{display:none;padding:6px 14px 0;position:relative;width:fit-content;}
+.zm-chat-img-preview img{max-height:60px;border-radius:8px;border:1px solid rgba(6,59,63,.12);}
+.zm-chat-img-preview-close{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#d63030;color:#fff;border:none;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.zm-chat-bubble img{max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:4px;}
+@media(max-width:480px){.zm-chat-win{max-width:calc(100% - 20px);height:480px;bottom:88px;right:10px;}.zm-chat-btn{bottom:20px;right:20px;}}
+</style>
+
+<!-- Chat Button -->
+<button class="zm-chat-btn" id="zmChatBtn" title="Chat with us">
+  <i class="fa-solid fa-message"></i>
+  <div class="zm-chat-unread" id="zmChatUnread" style="display:none">0</div>
+</button>
+
+<!-- Chat Window -->
+<div class="zm-chat-win" id="zmChatWin">
+  <div class="zm-chat-head">
+    <div class="zm-chat-head-avatar"><i class="fa-solid fa-headset"></i></div>
+    <div class="zm-chat-head-info">
+      <div class="zm-chat-head-title">Zami Mart Support</div>
+      <div class="zm-chat-head-sub">Usually replies quickly</div>
+    </div>
+    <button class="zm-chat-head-close" id="zmChatClose"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="zm-chat-msgs" id="zmChatMsgs"></div>
+  <!-- image preview strip -->
+  <div class="zm-chat-img-preview" id="zmImgPreview">
+    <img id="zmImgPreviewImg" src="">
+    <button class="zm-chat-img-preview-close" onclick="zmClearImg()"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="zm-chat-input-area" id="zmChatInputArea" style="display:none">
+    <label for="zmImgUpload" class="zm-chat-img-btn" title="Attach image"><i class="fa-solid fa-image"></i></label>
+    <input type="file" id="zmImgUpload" accept="image/*" style="display:none">
+    <textarea class="zm-chat-input" id="zmChatInput" placeholder="Type a message…" rows="1"></textarea>
+    <button class="zm-chat-send" id="zmChatSend"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const btn=document.getElementById('zmChatBtn');
+const win=document.getElementById('zmChatWin');
+const closeBtn=document.getElementById('zmChatClose');
+const msgsEl=document.getElementById('zmChatMsgs');
+const inputArea=document.getElementById('zmChatInputArea');
+const input=document.getElementById('zmChatInput');
+const sendBtn=document.getElementById('zmChatSend');
+const unreadBadge=document.getElementById('zmChatUnread');
+let sessionId=null,visitorName=null,visitorAvatar=null,visitorInitials='?';
+
+function escH(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+
+function getLoggedUser(){
+  try{return JSON.parse(localStorage.getItem('zamimart_user')||'null');}catch(e){return null;}
+}
+
+function avatarHtml(){
+  if(visitorAvatar){
+    return`<img src="${escH(visitorAvatar)}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(255,255,255,.6);box-shadow:0 1px 4px rgba(0,0,0,.18);">`;
+  }
+  return`<div style="width:28px;height:28px;border-radius:50%;background:#063b3f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.63rem;font-weight:700;flex-shrink:0;border:2px solid rgba(255,255,255,.5);box-shadow:0 1px 4px rgba(0,0,0,.18);">${escH(visitorInitials)}</div>`;
+}
+
+function startChat(name,phone){
+  visitorName=name;
+  const parts=name.trim().split(' ');
+  visitorInitials=(parts[0][0]+(parts[1]?parts[1][0]:'')).toUpperCase();
+  sessionId=ChatSystem.createSession(name,phone);
+  localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name,avatar:visitorAvatar,initials:visitorInitials}));
+  msgsEl.innerHTML='';
+  inputArea.style.display='flex';
+  setTimeout(()=>{
+    ChatSystem.sendMessage(sessionId,'admin','Zami Mart','Hi '+name+'! \u{1F44B} Thanks for reaching out. How can we help you today?');
+  },600);
+  renderMsgs();
+  input.focus();
+}
+
+function showWelcome(){
+  const user=getLoggedUser();
+  if(user&&user.name){
+    visitorAvatar=user.avatar||user.photo||null;
+    startChat(user.name,user.phone||user.email||'');
+    return;
+  }
+  msgsEl.innerHTML=`
+    <div class="zm-chat-welcome">
+      <div class="zm-chat-welcome-icon"><i class="fa-solid fa-comment-dots"></i></div>
+      <h3>Hello there! \u{1F44B}</h3>
+      <p>Have a question about our products? We're here to help.</p>
+      <div class="zm-chat-form" id="zmChatForm">
+        <input type="text" id="zmVisitorName" placeholder="Your name" required>
+        <input type="tel" id="zmVisitorPhone" placeholder="Phone number" required>
+        <button id="zmStartChat">Start Chat</button>
+      </div>
+    </div>`;
+  document.getElementById('zmStartChat').addEventListener('click',()=>{
+    const name=document.getElementById('zmVisitorName').value.trim();
+    const phone=document.getElementById('zmVisitorPhone').value.trim();
+    if(!name){document.getElementById('zmVisitorName').focus();return;}
+    if(!phone){document.getElementById('zmVisitorPhone').focus();return;}
+    visitorAvatar=null;
+    startChat(name,phone);
+  });
+}
+
+function renderMsgs(){
+  if(!sessionId)return;
+  const msgs=ChatSystem.getSessionMessages(sessionId);
+  if(msgs.length===0){msgsEl.innerHTML='';return;}
+  msgsEl.innerHTML=msgs.map(m=>{
+    const t=new Date(m.timestamp).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+    const isAdmin=m.senderType==='admin';
+    const imgH=m.imageData
+      ?`<img src="${m.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${m.text?'6px':'0'};" data-src="${m.imageData}">`
+      :'';
+    const txtH=m.text?`<div>${escH(m.text)}</div>`:'';
+    if(isAdmin){
+      return`<div class="zm-chat-msg admin"><div><div class="zm-chat-bubble">${txtH}${imgH}</div><div class="zm-chat-time" style="text-align:right;">${t}</div></div></div>`;
+    }else{
+      return`<div class="zm-chat-msg visitor" style="align-items:flex-end;gap:8px;">${avatarHtml()}<div><div class="zm-chat-bubble">${txtH}${imgH}</div><div class="zm-chat-time">${t}</div></div></div>`;
+    }
+  }).join('');
+  msgsEl.scrollTop=msgsEl.scrollHeight;
+}
+
+let zmPendingImg=null;
+function zmClearImg(){zmPendingImg=null;document.getElementById('zmImgPreview').style.display='none';document.getElementById('zmImgPreviewImg').src='';}
+document.addEventListener('change',function(e){
+  if(e.target.id!=='zmImgUpload')return;
+  const file=e.target.files[0];if(!file)return;
+  if(file.size>3*1024*1024){alert('Image too large (max 3 MB)');return;}
+  const r=new FileReader();
+  r.onload=ev=>{zmPendingImg=ev.target.result;document.getElementById('zmImgPreviewImg').src=zmPendingImg;document.getElementById('zmImgPreview').style.display='block';};
+  r.readAsDataURL(file);e.target.value='';
+});
+
+function doSend(){
+  const txt=input.value.trim();
+  if((!txt&&!zmPendingImg)||!sessionId)return;
+  ChatSystem.sendMessage(sessionId,'visitor',visitorName,txt,zmPendingImg);
+  input.value='';input.style.height='auto';
+  zmClearImg();
+  renderMsgs();
+  input.focus();
+}
+
+function updateBadge(){
+  if(!sessionId)return;
+  const c=ChatSystem.getUnreadCount(sessionId);
+  if(c>0&&!win.classList.contains('open')){unreadBadge.textContent=c;unreadBadge.style.display='flex';}
+  else{unreadBadge.style.display='none';}
+}
+
+function restoreSession(){
+  try{
+    const s=JSON.parse(localStorage.getItem('zm_cv_session')||'null');
+    if(s&&s.id&&ChatSystem.getSession(s.id)){
+      sessionId=s.id;
+      visitorName=s.name;
+      visitorAvatar=s.avatar||null;
+      visitorInitials=s.initials||'?';
+      const user=getLoggedUser();
+      if(user&&user.name===s.name){visitorAvatar=user.avatar||user.photo||null;}
+      msgsEl.innerHTML='';
+      inputArea.style.display='flex';
+      renderMsgs();
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+btn.addEventListener('click',()=>{
+  win.classList.toggle('open');
+  btn.classList.toggle('open');
+  if(win.classList.contains('open')){
+    if(sessionId){ChatSystem.markSessionAsRead(sessionId);renderMsgs();input.focus();}
+    unreadBadge.style.display='none';
+  }
+});
+closeBtn.addEventListener('click',()=>{win.classList.remove('open');btn.classList.remove('open');});
+sendBtn.addEventListener('click',doSend);
+input.addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
+input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,80)+'px';});
+
+ChatSystem.on('messages-updated',()=>{if(sessionId&&win.classList.contains('open'))renderMsgs();updateBadge();});
+
+ChatSystem.onReady(() => { if(!restoreSession()) showWelcome(); });
+updateBadge();
+})();
+</script>
+
+
+<script>
+/* zm-chat-img lightbox */
+document.addEventListener('click', function(e) {
+  var img = e.target.closest('.zm-chat-img');
+  if (!img) return;
+  var src = img.dataset.src || img.src;
+  var o = document.getElementById('zmLightbox');
+  if (!o) {
+    o = document.createElement('div');
+    o.id = 'zmLightbox';
+    o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+    o.onclick = function(){ o.remove(); };
+    document.body.appendChild(o);
+  }
+  o.innerHTML = '<img src="' + src + '" style="max-width:90vw;max-height:90vh;border-radius:10px;">';
+});
+</script>
+</body>
+</html>

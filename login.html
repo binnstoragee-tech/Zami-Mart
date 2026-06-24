@@ -11,147 +11,318 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="style.css">
 <style>
-  .auth-section{
-    min-height: 100vh;
+  .fb-page{
+    min-height:100vh;
     display:flex;
+    flex-direction:column;
     align-items:center;
     justify-content:center;
-    padding: 150px 6% 5rem;
     background: var(--cream);
-    position:relative;
-    overflow:hidden;
+    padding: 2.4rem 6%;
   }
-  .auth-section::before{
-    content:'';
+  .fb-back{
     position:absolute;
-    top:-10%; right:-10%;
-    width:50%; height:50%;
-    background: var(--teal);
-    opacity:.06;
-    border-radius:50%;
-    filter: blur(60px);
-  }
-
-  .auth-card{
-    position:relative;
-    z-index:1;
-    width:100%;
-    max-width: 440px;
-    background: var(--paper);
-    border-radius: var(--radius);
-    border: 1px solid rgba(6,59,63,.06);
-    box-shadow: 0 24px 60px -20px rgba(6,59,63,.16);
-    padding: 2.6rem;
-  }
-
-  .auth-tabs{
-    display:flex;
-    background: var(--cream);
-    border-radius: 100px;
-    padding: 5px;
-    margin-bottom: 2rem;
-  }
-  .auth-tab{
-    flex:1;
-    text-align:center;
-    border:none;
-    background:transparent;
-    font-family: var(--font-display);
-    font-weight:700;
-    font-size:.88rem;
+    top: 1.6rem; left: 6%;
+    display:inline-flex; align-items:center; gap:7px;
+    font-size:.85rem; font-weight:600;
     color: var(--teal);
-    padding: 11px 0;
-    border-radius:100px;
-    cursor:pointer;
-    transition: background .3s, color .3s;
   }
-  .auth-tab.active{
-    background: var(--teal);
-    color:#fff;
-  }
+  .fb-back i{ font-size:.75rem; }
 
-  .auth-card h2{
-    font-size:1.5rem;
-    margin-bottom:.3rem;
-  }
-  .auth-card > p.auth-sub{
-    margin-bottom: 1.8rem;
-    font-size:.92rem;
-  }
-
-  .form-group{ display:flex; flex-direction:column; gap:.5rem; margin-bottom:1.1rem; }
-  label{
-    font-weight:600; font-size:.85rem; color:var(--teal);
-    letter-spacing:.02em;
-  }
-  .input-wrap{ position:relative; }
-  .input-wrap i{
-    position:absolute; left:16px; top:50%; transform:translateY(-50%);
-    color: #9db8b6; font-size:.92rem;
-  }
-  .input-wrap .toggle-pw{
-    position:absolute; right:16px; top:50%; transform:translateY(-50%);
-    color:#9db8b6; font-size:.92rem; cursor:pointer; background:none; border:none; padding:4px;
-  }
-  input{
+  .fb-grid{
     width:100%;
-    font-family: var(--font-body);
-    padding: 13px 16px 13px 42px;
-    border-radius: 10px;
-    border: 1.5px solid rgba(6,59,63,.12);
-    background: var(--cream);
+    max-width: 980px;
+    display:flex;
+    align-items:center;
+    gap: 60px;
+  }
+
+  .fb-left{ flex:1; }
+  .fb-logo-row{ display:flex; align-items:center; gap:14px; margin-bottom: 1.1rem; }
+  .fb-logo-row img{ width:260px; }
+  .fb-left p{
+    font-size: 1.2rem;
     color: var(--ink);
-    font-size:.95rem;
-    transition: border-color .3s, box-shadow .3s, background .3s;
+    max-width: 420px;
+    line-height:1.45;
   }
-  input:focus{
-    outline:none;
-    border-color: var(--orange);
+
+  .fb-right{ flex: 0 0 396px; max-width:396px; }
+  .fb-card{
     background:#fff;
-    box-shadow: 0 0 0 4px rgba(253,77,2,.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(6,59,63,.14);
+    padding: 1.5rem;
   }
-  .field-error{
-    font-size:.78rem;
-    color:#d6483a;
-    display:none;
-    margin-top:-2px;
-  }
-  .form-group.has-error input{ border-color:#d6483a; }
-  .form-group.has-error .field-error{ display:block; }
 
-  .auth-row{
-    display:flex; align-items:center; justify-content:space-between;
-    margin-bottom: 1.4rem; font-size:.85rem;
-  }
-  .remember{ display:flex; align-items:center; gap:8px; color:#5d7977; cursor:pointer; }
-  .remember input{ width:auto; padding:0; accent-color: var(--orange); }
-  .auth-row a{ color: var(--orange); font-weight:600; }
-
-  .auth-submit{ width:100%; justify-content:center; font-size:1rem; }
-
-  .auth-success{
+  .fb-success{
     display:none;
     align-items:flex-start;
-    gap:12px;
+    gap:10px;
     background: var(--mint);
-    border-radius: 12px;
-    padding: 1rem 1.1rem;
-    margin-bottom: 1.4rem;
+    border-radius: 8px;
+    padding: .85rem 1rem;
+    margin-bottom: 1.1rem;
   }
-  .auth-success.show{ display:flex; }
-  .auth-success i{ color:#1f7a4d; font-size:1.1rem; margin-top:2px; }
-  .auth-success p{ margin:0; font-size:.88rem; color:#14201f; line-height:1.5; }
-  .auth-success strong{ display:block; margin-bottom:2px; color:#14201f; }
+  .fb-success.show{ display:flex; }
+  .fb-success i{ color:#1f7a4d; font-size:1rem; margin-top:2px; }
+  .fb-success p{ margin:0; font-size:.82rem; color:#14201f; line-height:1.5; }
+  .fb-success strong{ display:block; margin-bottom:2px; color:#14201f; }
 
-  .auth-card form{ display:block; }
-  .auth-card form.hidden{ display:none; }
+  .fb-form-group{ margin-bottom: .75rem; }
+  .fb-input{
+    width:100%;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    padding: 14px 16px;
+    border-radius: 6px;
+    border: 1px solid #d8dad9;
+    background:#fff;
+    color: var(--ink);
+    transition: border-color .25s, box-shadow .25s;
+    box-sizing: border-box;
+  }
+  .fb-input:focus{
+    outline:none;
+    border-color: var(--orange);
+    box-shadow: 0 0 0 3px rgba(253,77,2,.12);
+  }
+  .fb-form-group.has-error .fb-input{ border-color:#d6483a; }
+  .fb-field-error{
+    display:none;
+    font-size:.74rem; color:#d6483a;
+    margin-top:5px;
+  }
+  .fb-form-group.has-error .fb-field-error{ display:block; }
 
-  .auth-back{
-    display:inline-flex; align-items:center; gap:8px;
-    margin-bottom:1.4rem; font-size:.85rem; font-weight:600;
+  .fb-btn-primary{
+    display:block; width:100%;
+    background: var(--teal);
+    color:#fff;
+    font-family: var(--font-display);
+    font-weight:700;
+    font-size: 1.08rem;
+    padding: 12px 0;
+    border-radius: 6px;
+    border:none;
+    cursor:pointer;
+    margin: .6rem 0 1rem;
+    transition: background .25s;
+  }
+  .fb-btn-primary:hover{ background:#052e31; }
+
+  .fb-forgot{
+    display:block;
+    text-align:center;
     color: var(--teal);
+    font-size: .9rem;
+    font-weight:600;
+    margin-bottom: 1.2rem;
+    cursor: pointer;
   }
-  .auth-back i{ font-size:.8rem; }
+  .fb-forgot:hover{ text-decoration: underline; }
+
+  .fb-divider{
+    border:none;
+    border-top: 1px solid #e3e5e4;
+    margin: 1.1rem 0;
+  }
+
+  .fb-btn-secondary{
+    display:block;
+    width: fit-content;
+    margin: 0 auto;
+    background: var(--orange);
+    color:#fff;
+    font-family: var(--font-display);
+    font-weight:700;
+    font-size: 1rem;
+    padding: 12px 26px;
+    border-radius: 6px;
+    border:none;
+    cursor:pointer;
+    transition: background .25s;
+  }
+  .fb-btn-secondary:hover{ background:#e34602; }
+
+  .fb-switch{
+    text-align:center;
+    font-size:.85rem;
+    color:#5d7977;
+    margin-top: 1.1rem;
+  }
+  .fb-switch a{ color: var(--orange); font-weight:600; cursor:pointer; }
+
+  .fb-card form{ display:block; }
+  .fb-card form.hidden{ display:none; }
+
+  .fb-card h2{
+    font-size: 1.15rem;
+    color: var(--teal);
+    margin-bottom: 1rem;
+    text-align:center;
+  }
+
+  /* ==============================
+     LOGGED-IN ACCOUNT PANEL
+  ============================== */
+  .fb-account{ display:none; }
+  .fb-account.show{ display:block; }
+
+  .fb-account-top{
+    text-align:center;
+    padding: .6rem 0 1rem;
+  }
+  .fb-account-avatar{
+    width:64px; height:64px;
+    border-radius:50%;
+    background: var(--teal);
+    color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.4rem; font-weight:700;
+    margin: 0 auto .9rem;
+    font-family: var(--font-display);
+    overflow:hidden;
+  }
+  .fb-account-avatar img{ width:100%; height:100%; object-fit:cover; }
+  .fb-account-top h3{ font-size:1.05rem; color: var(--ink); margin: 0 0 .2rem; }
+  .fb-account-top p{ font-size:.85rem; color:#5d7977; margin: 0 0 1.3rem; }
+  .fb-account-actions{ display:flex; flex-direction:column; gap:.65rem; }
+
+  /* Profile button */
+  .fb-profile-btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    width:100%;
+    background: var(--teal);
+    color:#fff;
+    font-family: var(--font-display);
+    font-weight:700;
+    font-size:.95rem;
+    padding: 11px 0;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+    transition: background .25s;
+    text-decoration:none;
+  }
+  .fb-profile-btn:hover{ background:#052e31; }
+
+  .fb-logout-btn{
+    display:block; width:100%;
+    background: transparent;
+    color: var(--teal);
+    font-family: var(--font-display);
+    font-weight:700;
+    font-size: .95rem;
+    padding: 11px 0;
+    border-radius: 6px;
+    border: 1.5px solid rgba(6,59,63,.18);
+    cursor:pointer;
+    transition: background .25s, border-color .25s;
+  }
+  .fb-logout-btn:hover{ background: var(--cream); border-color: var(--teal); }
+
+  /* ==============================
+     FORGOT PASSWORD MODAL
+  ============================== */
+  .fp-overlay{
+    display:none;
+    position:fixed; inset:0; z-index:1000;
+    background: rgba(6,59,63,.45);
+    backdrop-filter: blur(4px);
+    align-items:center; justify-content:center;
+    padding: 1rem;
+  }
+  .fp-overlay.show{ display:flex; }
+
+  .fp-modal{
+    background:#fff;
+    border-radius: 14px;
+    padding: 2rem;
+    width:100%;
+    max-width: 380px;
+    box-shadow: 0 24px 60px -12px rgba(6,59,63,.3);
+    animation: fp-in .28s cubic-bezier(.34,1.4,.64,1);
+  }
+  @keyframes fp-in{
+    from{ transform: scale(.88) translateY(12px); opacity:0; }
+    to{ transform: scale(1) translateY(0); opacity:1; }
+  }
+  .fp-modal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom: 1.2rem;
+  }
+  .fp-modal-head h3{
+    font-size:1.1rem; color: var(--teal); margin:0;
+    display:flex; align-items:center; gap:.5rem;
+  }
+  .fp-modal-head h3 i{ color: var(--orange); }
+  .fp-close-btn{
+    width:32px; height:32px;
+    border-radius:50%;
+    background: var(--cream);
+    border: none;
+    cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    color:#5d7977; font-size:.85rem;
+    transition: background .2s;
+  }
+  .fp-close-btn:hover{ background:#eee6d6; }
+
+  .fp-step{ display:none; }
+  .fp-step.active{ display:block; }
+
+  .fp-desc{ font-size:.88rem; color:#5d7977; margin-bottom:1.2rem; line-height:1.55; }
+
+  .fp-sent-icon{ text-align:center; margin-bottom:1rem; }
+  .fp-sent-icon i{ font-size:2.8rem; color: var(--orange); }
+  .fp-sent-msg{
+    text-align:center;
+    font-size:.88rem; color:#5d7977;
+    line-height:1.6; margin-bottom:1.4rem;
+  }
+  .fp-sent-msg strong{ color: var(--teal); display:block; font-size:1rem; margin-bottom:.3rem; }
+  .fp-sent-email{
+    display:inline-block;
+    background: var(--cream);
+    color: var(--teal);
+    font-weight:700;
+    font-size:.85rem;
+    padding: 4px 12px;
+    border-radius:100px;
+    margin: .3rem 0 .8rem;
+  }
+  .fp-resend-row{ text-align:center; font-size:.8rem; color:#8aa19f; }
+  .fp-resend-row button{
+    background:none; border:none; cursor:pointer;
+    color: var(--orange); font-weight:600; font-family:inherit;
+    font-size:.8rem; padding:0;
+  }
+  .fp-resend-row button:hover{ text-decoration:underline; }
+
+  .fp-back-link{
+    display:inline-flex; align-items:center; gap:6px;
+    font-size:.8rem; font-weight:600; color:#5d7977;
+    cursor:pointer; margin-top:.5rem;
+    background:none; border:none; font-family:inherit;
+  }
+  .fp-back-link:hover{ color: var(--teal); }
+  .fp-back-link i{ font-size:.7rem; }
+
+  @media (max-width: 900px){
+    .fb-grid{ flex-direction:column; gap: 30px; }
+    .fb-left{ text-align:center; }
+    .fb-logo-row{ justify-content:center; }
+    .fb-left p{ margin: 0 auto; }
+    .fb-right{ flex: 0 0 100%; width:100%; max-width:396px; }
+  }
+  @media (max-width: 480px){
+    .fb-page{ padding: 4rem 5% 2rem; }
+    .fb-back{ top:1rem; }
+    .fb-logo-row img{ width:180px; }
+    .fb-left p{ font-size: 1rem; }
+    .fb-card{ padding: 1.2rem; }
+  }
 </style>
 </head>
 <body>
@@ -163,115 +334,114 @@
   <div class="pt-panel pt-3"></div>
 </div>
 
-<!-- Navbar -->
-<header class="navbar">
-  <a href="index.html" class="nav-logo">
-    <img src="img/logo.png" alt="Zami Mart logo">
-    <span class="nav-logo-text">zami<span>mart</span></span>
-  </a>
-  <nav class="nav-links">
-    <button class="nav-close" aria-label="Close menu">&times;</button>
-    <a href="index.html">Home</a>
-    <a href="categories.html">Categories</a>
-    <a href="contact.html">Contact</a>
-  </nav>
-  <button class="nav-toggle" aria-label="Toggle menu">
-    <span></span><span></span><span></span>
-  </button>
-</header>
+<!-- Forgot Password Modal -->
+<div class="fp-overlay" id="fpOverlay">
+  <div class="fp-modal">
+    <div class="fp-modal-head">
+      <h3><i class="fa-solid fa-key"></i> Reset Password</h3>
+      <button class="fp-close-btn" id="fpCloseBtn" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="fp-step active" id="fpStep1">
+      <p class="fp-desc">Enter the email or phone number linked to your account and we'll send you a reset link.</p>
+      <div class="fb-form-group" id="fpEmailGroup">
+        <input type="text" class="fb-input" id="fpEmailInput" placeholder="Email or phone number">
+        <span class="fb-field-error">Please enter your email or phone number.</span>
+      </div>
+      <button type="button" class="fb-btn-primary" id="fpSendBtn" style="margin-bottom:.4rem;">Send Reset Link</button>
+      <button class="fp-back-link" id="fpBackBtn1"><i class="fa-solid fa-arrow-left"></i> Back to login</button>
+    </div>
+    <div class="fp-step" id="fpStep2">
+      <div class="fp-sent-icon"><i class="fa-solid fa-paper-plane"></i></div>
+      <div class="fp-sent-msg">
+        <strong>Check your inbox!</strong>
+        We sent a password reset link to:
+        <span class="fp-sent-email" id="fpSentEmail"></span>
+        If you don't see it, check your spam folder.
+      </div>
+      <button type="button" class="fb-btn-primary" id="fpDoneBtn" style="margin-bottom:.4rem;">Back to Login</button>
+      <div class="fp-resend-row">
+        Didn't receive it? <button id="fpResendBtn">Resend link</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-<section class="auth-section">
-  <div class="auth-card reveal">
+<a href="index.html" class="fb-back"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
 
-    <a href="index.html" class="auth-back"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+<section class="fb-page">
+  <div class="fb-grid">
 
-    <div class="auth-tabs">
-      <button class="auth-tab active" data-target="loginForm">Log In</button>
-      <button class="auth-tab" data-target="signupForm">Create Account</button>
+    <div class="fb-left reveal">
+      <div class="fb-logo-row">
+        <img src="img/logo.png" alt="Zami Mart logo">
+      </div>
+      <p>Log in to track your orders, save favorites, and get faster checkout on everyday essentials in Male'.</p>
     </div>
 
-    <div class="auth-success" id="authSuccess">
-      <i class="fa-solid fa-circle-check"></i>
-      <p><strong id="authSuccessTitle">Success</strong><span id="authSuccessText"></span></p>
+    <div class="fb-right reveal">
+      <div class="fb-card">
+
+        <div class="fb-success" id="fbSuccess">
+          <i class="fa-solid fa-circle-check"></i>
+          <p><strong id="fbSuccessTitle">Success</strong><span id="fbSuccessText"></span></p>
+        </div>
+
+        <!-- LOGGED IN PANEL -->
+        <div class="fb-account" id="accountPanel">
+          <div class="fb-account-top">
+            <div class="fb-account-avatar" id="accountAvatar"></div>
+            <h3 id="accountName"></h3>
+            <p id="accountEmail"></p>
+          </div>
+          <div class="fb-account-actions">
+            <a href="profile.html" class="fb-profile-btn">
+              <i class="fa-solid fa-user-pen"></i> My Profile &amp; Settings
+            </a>
+            <button type="button" class="fb-logout-btn" id="logoutBtn">Log Out</button>
+          </div>
+        </div>
+
+        <!-- LOG IN FORM -->
+        <form id="loginForm" novalidate>
+          <div class="fb-form-group" id="loginEmailGroup">
+            <input type="text" class="fb-input" id="loginEmail" placeholder="Email or phone number">
+            <span class="fb-field-error">Please enter your email or phone number.</span>
+          </div>
+          <div class="fb-form-group" id="loginPwGroup">
+            <input type="password" class="fb-input" id="loginPw" placeholder="Password">
+            <span class="fb-field-error">Please enter your password.</span>
+          </div>
+          <button type="submit" class="fb-btn-primary">Log In</button>
+          <a class="fb-forgot" id="forgotPasswordLink">Forgotten password?</a>
+          <hr class="fb-divider">
+          <button type="button" class="fb-btn-secondary" id="showSignup">Create new account</button>
+        </form>
+
+        <!-- SIGN UP FORM -->
+        <form id="signupForm" class="hidden" novalidate>
+          <h2>Create your account</h2>
+          <div class="fb-form-group" id="signupNameGroup">
+            <input type="text" class="fb-input" id="signupName" placeholder="Full name">
+            <span class="fb-field-error">Please enter your full name.</span>
+          </div>
+          <div class="fb-form-group" id="signupEmailGroup">
+            <input type="text" class="fb-input" id="signupEmail" placeholder="Email or phone number">
+            <span class="fb-field-error">Please enter a valid email or phone number.</span>
+          </div>
+          <div class="fb-form-group" id="signupPwGroup">
+            <input type="password" class="fb-input" id="signupPw" placeholder="New password">
+            <span class="fb-field-error">Password must be at least 8 characters.</span>
+          </div>
+          <div class="fb-form-group" id="signupConfirmGroup">
+            <input type="password" class="fb-input" id="signupConfirm" placeholder="Confirm password">
+            <span class="fb-field-error">Passwords do not match.</span>
+          </div>
+          <button type="submit" class="fb-btn-primary">Sign Up</button>
+          <p class="fb-switch">Already have an account? <a id="showLogin">Log in</a></p>
+        </form>
+
+      </div>
     </div>
-
-    <!-- LOG IN -->
-    <form id="loginForm" novalidate>
-      <h2>Welcome back</h2>
-      <p class="auth-sub">Log in to track orders and your wholesale account.</p>
-
-      <div class="form-group" id="loginEmailGroup">
-        <label for="loginEmail">Email or phone number</label>
-        <div class="input-wrap">
-          <i class="fa-solid fa-user"></i>
-          <input type="text" id="loginEmail" placeholder="you@email.com">
-        </div>
-        <span class="field-error">Please enter your email or phone number.</span>
-      </div>
-
-      <div class="form-group" id="loginPwGroup">
-        <label for="loginPw">Password</label>
-        <div class="input-wrap">
-          <i class="fa-solid fa-lock"></i>
-          <input type="password" id="loginPw" placeholder="••••••••">
-          <button type="button" class="toggle-pw" data-for="loginPw"><i class="fa-solid fa-eye"></i></button>
-        </div>
-        <span class="field-error">Please enter your password.</span>
-      </div>
-
-      <div class="auth-row">
-        <label class="remember"><input type="checkbox"> Remember me</label>
-        <a href="#">Forgot password?</a>
-      </div>
-
-      <button type="submit" class="btn btn-primary auth-submit"><span>Log In</span></button>
-    </form>
-
-    <!-- SIGN UP -->
-    <form id="signupForm" class="hidden" novalidate>
-      <h2>Create your account</h2>
-      <p class="auth-sub">Sign up for faster checkout and wholesale pricing.</p>
-
-      <div class="form-group" id="signupNameGroup">
-        <label for="signupName">Full name</label>
-        <div class="input-wrap">
-          <i class="fa-solid fa-user"></i>
-          <input type="text" id="signupName" placeholder="Your name">
-        </div>
-        <span class="field-error">Please enter your full name.</span>
-      </div>
-
-      <div class="form-group" id="signupEmailGroup">
-        <label for="signupEmail">Email or phone number</label>
-        <div class="input-wrap">
-          <i class="fa-solid fa-envelope"></i>
-          <input type="text" id="signupEmail" placeholder="you@email.com">
-        </div>
-        <span class="field-error">Please enter a valid email or phone number.</span>
-      </div>
-
-      <div class="form-group" id="signupPwGroup">
-        <label for="signupPw">Password</label>
-        <div class="input-wrap">
-          <i class="fa-solid fa-lock"></i>
-          <input type="password" id="signupPw" placeholder="At least 8 characters">
-          <button type="button" class="toggle-pw" data-for="signupPw"><i class="fa-solid fa-eye"></i></button>
-        </div>
-        <span class="field-error">Password must be at least 8 characters.</span>
-      </div>
-
-      <div class="form-group" id="signupConfirmGroup">
-        <label for="signupConfirm">Confirm password</label>
-        <div class="input-wrap">
-          <i class="fa-solid fa-lock"></i>
-          <input type="password" id="signupConfirm" placeholder="Re-enter password">
-          <button type="button" class="toggle-pw" data-for="signupConfirm"><i class="fa-solid fa-eye"></i></button>
-        </div>
-        <span class="field-error">Passwords do not match.</span>
-      </div>
-
-      <button type="submit" class="btn btn-primary auth-submit"><span>Create Account</span></button>
-    </form>
 
   </div>
 </section>
@@ -280,107 +450,237 @@
 <script>
   document.addEventListener('DOMContentLoaded', () => {
 
-    const tabs = document.querySelectorAll('.auth-tab');
-    const forms = { loginForm: document.getElementById('loginForm'), signupForm: document.getElementById('signupForm') };
-    const successBox = document.getElementById('authSuccess');
-    const successTitle = document.getElementById('authSuccessTitle');
-    const successText = document.getElementById('authSuccessText');
+    const STORAGE_KEY = 'zamimart_user';
+
+    function loadUser() {
+      try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; }
+      catch(e) { return null; }
+    }
+    function saveUser(u) { localStorage.setItem(STORAGE_KEY, JSON.stringify(u)); }
+    function removeUser() { localStorage.removeItem(STORAGE_KEY); }
+
+    const accounts = [];
+    let currentUser = loadUser();
+    if (currentUser) accounts.push(currentUser);
+
+    const loginForm    = document.getElementById('loginForm');
+    const signupForm   = document.getElementById('signupForm');
+    const accountPanel = document.getElementById('accountPanel');
+    const successBox   = document.getElementById('fbSuccess');
+    const successTitle = document.getElementById('fbSuccessTitle');
+    const successText  = document.getElementById('fbSuccessText');
+
+    const fpOverlay    = document.getElementById('fpOverlay');
+    const fpCloseBtn   = document.getElementById('fpCloseBtn');
+    const fpBackBtn1   = document.getElementById('fpBackBtn1');
+    const fpSendBtn    = document.getElementById('fpSendBtn');
+    const fpDoneBtn    = document.getElementById('fpDoneBtn');
+    const fpResendBtn  = document.getElementById('fpResendBtn');
+    const fpEmailInput = document.getElementById('fpEmailInput');
+    const fpEmailGroup = document.getElementById('fpEmailGroup');
+    const fpSentEmail  = document.getElementById('fpSentEmail');
+    const fpStep1      = document.getElementById('fpStep1');
+    const fpStep2      = document.getElementById('fpStep2');
+    const forgotLink   = document.getElementById('forgotPasswordLink');
 
     function clearErrors(form) {
-      form.querySelectorAll('.form-group').forEach(g => g.classList.remove('has-error'));
+      form.querySelectorAll('.fb-form-group').forEach(g => g.classList.remove('has-error'));
+    }
+    function hideSuccess() { successBox.classList.remove('show'); }
+    function showForm(form) {
+      [loginForm, signupForm].forEach(f => f.classList.add('hidden'));
+      accountPanel.classList.remove('show');
+      form.classList.remove('hidden');
+      hideSuccess();
+    }
+    function setFieldError(groupId, message) {
+      const group = document.getElementById(groupId);
+      group.classList.add('has-error');
+      if (message) group.querySelector('.fb-field-error').textContent = message;
+    }
+    function findAccount(identifier) {
+      const key = identifier.trim().toLowerCase();
+      return accounts.find(a => a.email.toLowerCase() === key);
+    }
+    function goHome() {
+      const href = 'index.html';
+      const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (noMotion) { window.location.href = href; return; }
+      document.body.classList.add('is-leaving');
+      let navigated = false;
+      const go = () => { if (navigated) return; navigated = true; window.location.href = href; };
+      const lastPanel = document.querySelector('.pt-panel.pt-1');
+      if (lastPanel) lastPanel.addEventListener('transitionend', go, { once: true });
+      setTimeout(go, 900);
+    }
+    function renderAvatar(el, user) {
+      if (user.avatarPhoto) {
+        el.style.background = 'transparent';
+        el.innerHTML = `<img src="${user.avatarPhoto}" alt="${user.name}">`;
+      } else {
+        el.style.background = user.avatarColor || '#063b3f';
+        el.innerHTML = '';
+        el.textContent = (user.name.trim().charAt(0) || 'Z').toUpperCase();
+      }
     }
 
-    function hideSuccess() {
-      successBox.classList.remove('show');
+    function showAccountPanel(user) {
+      [loginForm, signupForm].forEach(f => f.classList.add('hidden'));
+      hideSuccess();
+      renderAvatar(document.getElementById('accountAvatar'), user);
+      document.getElementById('accountName').textContent = `Welcome, ${user.name}!`;
+      document.getElementById('accountEmail').textContent = `Logged in as ${user.email}`;
+      accountPanel.classList.add('show');
     }
 
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        tabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        Object.values(forms).forEach(f => f.classList.add('hidden'));
-        forms[tab.dataset.target].classList.remove('hidden');
-        hideSuccess();
-      });
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      removeUser();
+      currentUser = null;
+      showForm(loginForm);
     });
 
-    document.querySelectorAll('.toggle-pw').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const input = document.getElementById(btn.dataset.for);
-        const icon = btn.querySelector('i');
-        const showing = input.type === 'text';
-        input.type = showing ? 'password' : 'text';
-        icon.classList.toggle('fa-eye', showing);
-        icon.classList.toggle('fa-eye-slash', !showing);
-      });
-    });
-
-    // ---- Login submit ----
-    forms.loginForm.addEventListener('submit', (e) => {
+    document.getElementById('showSignup').addEventListener('click', () => showForm(signupForm));
+    document.getElementById('showLogin').addEventListener('click', (e) => {
       e.preventDefault();
-      clearErrors(forms.loginForm);
+      showForm(loginForm);
+    });
+
+    function showFpStep(n) {
+      fpStep1.classList.toggle('active', n === 1);
+      fpStep2.classList.toggle('active', n === 2);
+    }
+    function openFp() {
+      fpEmailInput.value = '';
+      fpEmailGroup.classList.remove('has-error');
+      showFpStep(1);
+      fpOverlay.classList.add('show');
+    }
+    function closeFp() { fpOverlay.classList.remove('show'); }
+
+    forgotLink.addEventListener('click', (e) => { e.preventDefault(); openFp(); });
+    fpCloseBtn.addEventListener('click', closeFp);
+    fpBackBtn1.addEventListener('click', closeFp);
+    fpDoneBtn.addEventListener('click', closeFp);
+    fpOverlay.addEventListener('click', (e) => { if (e.target === fpOverlay) closeFp(); });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && fpOverlay.classList.contains('show')) closeFp();
+    });
+
+    fpSendBtn.addEventListener('click', () => {
+      const val = fpEmailInput.value.trim();
+      if (!val) {
+        fpEmailGroup.classList.add('has-error');
+        fpEmailGroup.querySelector('.fb-field-error').textContent = 'Please enter your email or phone number.';
+        return;
+      }
+      fpEmailGroup.classList.remove('has-error');
+      fpSentEmail.textContent = val;
+      showFpStep(2);
+    });
+
+    fpResendBtn.addEventListener('click', () => {
+      fpResendBtn.textContent = 'Sent!';
+      fpResendBtn.disabled = true;
+      setTimeout(() => { fpResendBtn.textContent = 'Resend link'; fpResendBtn.disabled = false; }, 4000);
+    });
+
+    loginForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      clearErrors(loginForm);
       hideSuccess();
 
       const email = document.getElementById('loginEmail');
-      const pw = document.getElementById('loginPw');
+      const pw    = document.getElementById('loginPw');
       let valid = true;
 
       if (!email.value.trim()) {
-        document.getElementById('loginEmailGroup').classList.add('has-error');
+        setFieldError('loginEmailGroup', 'Please enter your email or phone number.');
         valid = false;
       }
       if (!pw.value.trim()) {
-        document.getElementById('loginPwGroup').classList.add('has-error');
+        setFieldError('loginPwGroup', 'Please enter your password.');
         valid = false;
       }
       if (!valid) return;
 
-      // NOTE: this is a frontend-only demo. Wire this up to your real
-      // authentication API/backend before going live — nothing is
-      // actually being checked or stored yet.
-      successTitle.textContent = 'Logged in';
-      successText.textContent = `Welcome back! (demo only — no account system connected yet)`;
+      const account = findAccount(email.value);
+      if (!account) {
+        setFieldError('loginEmailGroup', 'No account found with that email or phone number. Try creating one.');
+        return;
+      }
+      if (account.password !== pw.value) {
+        setFieldError('loginPwGroup', 'Incorrect password.');
+        return;
+      }
+
+      currentUser = account;
+      saveUser(currentUser);
+      loginForm.reset();
+
+      successTitle.textContent = 'Login successful!';
+      successText.textContent = ` Welcome back, ${account.name}. Taking you to the homepage...`;
       successBox.classList.add('show');
-      forms.loginForm.reset();
+      loginForm.querySelectorAll('button, a').forEach(el => el.style.pointerEvents = 'none');
+      setTimeout(goHome, 750);
     });
 
-    // ---- Signup submit ----
-    forms.signupForm.addEventListener('submit', (e) => {
+    signupForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      clearErrors(forms.signupForm);
+      clearErrors(signupForm);
       hideSuccess();
 
-      const name = document.getElementById('signupName');
-      const email = document.getElementById('signupEmail');
-      const pw = document.getElementById('signupPw');
+      const name    = document.getElementById('signupName');
+      const email   = document.getElementById('signupEmail');
+      const pw      = document.getElementById('signupPw');
       const confirm = document.getElementById('signupConfirm');
       let valid = true;
 
       if (!name.value.trim()) {
-        document.getElementById('signupNameGroup').classList.add('has-error');
+        setFieldError('signupNameGroup', 'Please enter your full name.');
         valid = false;
       }
       if (!email.value.trim()) {
-        document.getElementById('signupEmailGroup').classList.add('has-error');
+        setFieldError('signupEmailGroup', 'Please enter a valid email or phone number.');
+        valid = false;
+      } else if (findAccount(email.value)) {
+        setFieldError('signupEmailGroup', 'An account with this email or phone number already exists.');
         valid = false;
       }
       if (pw.value.length < 8) {
-        document.getElementById('signupPwGroup').classList.add('has-error');
+        setFieldError('signupPwGroup', 'Password must be at least 8 characters.');
         valid = false;
       }
       if (confirm.value !== pw.value || !confirm.value) {
-        document.getElementById('signupConfirmGroup').classList.add('has-error');
+        setFieldError('signupConfirmGroup', 'Passwords do not match.');
         valid = false;
       }
       if (!valid) return;
 
-      // NOTE: frontend-only demo — connect to a real backend to actually
-      // create and store accounts.
-      successTitle.textContent = 'Account created';
-      successText.textContent = `Welcome, ${name.value.trim()}! (demo only — no account system connected yet)`;
+      const newAccount = {
+        name: name.value.trim(),
+        email: email.value.trim(),
+        password: pw.value,
+        avatarColor: '#063b3f',
+        avatarPhoto: null,
+        phone: '',
+        address: ''
+      };
+      accounts.push(newAccount);
+      currentUser = newAccount;
+      saveUser(currentUser);
+      signupForm.reset();
+
+      successTitle.textContent = 'Account created!';
+      successText.textContent = `Welcome, ${newAccount.name}! Taking you to the homepage...`;
       successBox.classList.add('show');
-      forms.signupForm.reset();
+      signupForm.querySelectorAll('button, a').forEach(el => el.style.pointerEvents = 'none');
+      setTimeout(goHome, 750);
     });
+
+    // On load: if already logged in, go straight to homepage
+    if (currentUser) {
+      goHome();
+    }
 
   });
 </script>

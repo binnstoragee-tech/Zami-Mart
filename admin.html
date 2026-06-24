@@ -1,0 +1,3381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zami Mart — Admin Panel</title>
+<script type="module" src="firebase-init.js"></script>
+<script src="inquiry-system.js"></script>
+<script src="chat-system.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* =============================================
+   CSS VARIABLES & RESETS
+   ============================================= */
+:root {
+  --teal:       #063b3f;
+  --teal-mid:   #0a5560;
+  --teal-soft:  #d4eaec;
+  --orange:     #FD4D02;
+  --orange-soft:#fff0ea;
+  --cream:      #f6f5f0;
+  --white:      #ffffff;
+  --text:       #1a2e2e;
+  --text-muted: #6a8080;
+  --border:     rgba(6,59,63,.1);
+  --sidebar-w:  260px;
+  --radius:     16px;
+  --radius-sm:  10px;
+  --shadow:     0 4px 24px -6px rgba(6,59,63,.12);
+  --shadow-lg:  0 12px 48px -12px rgba(6,59,63,.18);
+  --ease:       cubic-bezier(.4,0,.2,1);
+  font-family: 'Poppins', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--cream);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; border: none; }
+input, textarea, select { font-family: inherit; }
+ul { list-style: none; }
+
+/* =============================================
+   SIDEBAR
+   ============================================= */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--teal);
+  min-height: 100vh;
+  position: fixed;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+  transition: transform .3s var(--ease);
+}
+
+.sidebar-logo {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-logo-icon {
+  width: 40px; height: 40px;
+  background: var(--orange);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; color: #fff;
+  flex-shrink: 0;
+}
+.sidebar-logo-text { display: flex; flex-direction: column; }
+.sidebar-logo-text strong {
+  font-size: .95rem; font-weight: 700;
+  color: #fff; letter-spacing: -.01em;
+}
+.sidebar-logo-text span {
+  font-size: .65rem; font-weight: 500;
+  color: rgba(255,255,255,.45);
+  letter-spacing: .12em; text-transform: uppercase;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 14px;
+  overflow-y: auto;
+}
+
+.nav-section-label {
+  font-size: .6rem; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: rgba(255,255,255,.3);
+  padding: 14px 10px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: rgba(255,255,255,.6);
+  font-size: .84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  margin-bottom: 2px;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item i {
+  width: 18px; text-align: center;
+  font-size: .9rem; flex-shrink: 0;
+}
+.nav-item:hover {
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.9);
+  transform: translateX(3px);
+}
+.nav-item.active {
+  background: var(--orange);
+  color: #fff;
+  font-weight: 600;
+}
+.nav-item .nav-badge {
+  margin-left: auto;
+  background: var(--orange);
+  color: #fff;
+  font-size: .6rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 100px;
+  min-width: 20px;
+  text-align: center;
+  display: none;
+}
+.nav-item .nav-badge.badge-visible {
+  display: inline-block;
+}
+.nav-item.active .nav-badge.badge-visible {
+  display: inline-block;
+  background: rgba(255,255,255,.25);
+}
+
+.sidebar-footer {
+  padding: 16px 14px 24px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.sidebar-user:hover { 
+  background: rgba(255,255,255,.06);
+  transform: translateX(2px);
+}
+.sidebar-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.sidebar-user-info { flex: 1; min-width: 0; }
+.sidebar-user-info strong {
+  display: block; font-size: .8rem; color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sidebar-user-info span {
+  font-size: .65rem; color: rgba(255,255,255,.4);
+}
+.sidebar-user i { color: rgba(255,255,255,.3); font-size: .75rem; }
+
+/* =============================================
+   MAIN CONTENT
+   ============================================= */
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOPBAR */
+.topbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 32px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky; top: 0;
+  z-index: 50;
+  transition: box-shadow .2s var(--ease);
+}
+.topbar.scrolled {
+  box-shadow: 0 2px 12px rgba(6,59,63,.08);
+}
+.topbar-left {
+  display: flex; align-items: center; gap: 16px;
+}
+.menu-toggle {
+  display: none;
+  background: none;
+  font-size: 1.2rem; color: var(--teal);
+  cursor: pointer;
+  transition: transform .2s var(--ease);
+}
+.menu-toggle:hover { transform: scale(1.1); }
+.page-title {
+  font-size: 1.05rem; font-weight: 700;
+  color: var(--teal); letter-spacing: -.01em;
+}
+.page-breadcrumb {
+  font-size: .75rem; color: var(--text-muted);
+  margin-top: 1px;
+}
+
+.topbar-right {
+  display: flex; align-items: center; gap: 16px;
+}
+.topbar-btn {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; color: var(--text-muted);
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  position: relative;
+}
+.topbar-btn:hover {
+  background: var(--cream);
+  color: var(--teal);
+  border-color: rgba(6,59,63,.15);
+  transform: translateY(-2px);
+}
+.topbar-btn .notif-dot {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px;
+  border-radius: 50%; background: var(--orange);
+  border: 2px solid #fff;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .6; }
+}
+/* Notification panel */
+.notif-wrapper {
+  position: relative;
+}
+.notif-panel {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  width: 320px; background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 16px 48px -8px rgba(6,59,63,.18), 0 0 0 1px rgba(6,59,63,.07);
+  z-index: 9999;
+  overflow: hidden;
+  animation: notifFadeIn .18s ease;
+}
+@keyframes notifFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.notif-panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 16px 10px;
+  font-size: .8rem; font-weight: 700; color: var(--teal);
+  border-bottom: 1px solid rgba(6,59,63,.08);
+}
+.notif-clear-btn {
+  font-size: .7rem; color: var(--text-muted); background: none;
+  border: none; cursor: pointer; padding: 2px 6px; border-radius: 6px;
+  transition: background .15s;
+}
+.notif-clear-btn:hover { background: rgba(6,59,63,.07); color: var(--teal); }
+.notif-panel-body { max-height: 320px; overflow-y: auto; }
+.notif-empty {
+  padding: 28px 16px; text-align: center;
+  font-size: .78rem; color: var(--text-muted);
+}
+.notif-item {
+  display: flex; gap: 10px; align-items: flex-start;
+  padding: 11px 16px; cursor: pointer;
+  transition: background .15s;
+  border-bottom: 1px solid rgba(6,59,63,.05);
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: rgba(6,59,63,.04); }
+.notif-item.unread { background: rgba(253,77,2,.04); }
+.notif-icon {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; flex-shrink: 0;
+}
+.notif-icon.chat  { background: #e8f7ef; color: #2a9d5c; }
+.notif-icon.inq   { background: var(--teal-soft); color: var(--teal); }
+.notif-icon.stock { background: #fef3c7; color: #b45309; }
+.notif-text { flex: 1; }
+.notif-text-title { font-size: .78rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.notif-text-sub   { font-size: .7rem; color: var(--text-muted); line-height: 1.4; }
+.notif-badge-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--orange); flex-shrink: 0; margin-top: 5px;
+}
+.topbar-date {
+  font-size: .75rem; color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* PROFILE DROPDOWN IN TOPBAR */
+.topbar-profile {
+  position: relative;
+}
+.profile-trigger {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all .2s var(--ease);
+  font-size: .82rem;
+  font-weight: 500;
+  color: var(--teal);
+}
+.profile-trigger:hover {
+  background: var(--orange);
+  color: #fff;
+  border-color: var(--orange);
+  transform: translateY(-2px);
+}
+.profile-trigger i {
+  font-size: .8rem;
+}
+.profile-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: var(--white);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 40px -8px rgba(6,59,63,.2);
+  min-width: 240px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all .25s var(--ease);
+  z-index: 1000;
+}
+.profile-dropdown.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+.profile-dropdown-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.profile-avatar-sm {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: var(--orange);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .9rem; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.profile-info {
+  flex: 1;
+}
+.profile-name {
+  font-size: .85rem; font-weight: 700;
+  color: var(--teal);
+}
+.profile-email {
+  font-size: .7rem; color: var(--text-muted);
+  margin-top: 2px;
+}
+.profile-dropdown-menu {
+  padding: 8px 0;
+}
+.profile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  color: var(--text);
+  font-size: .82rem;
+  cursor: pointer;
+  transition: all .15s var(--ease);
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.profile-menu-item:hover {
+  background: var(--cream);
+  color: var(--orange);
+  padding-left: 24px;
+}
+.profile-menu-item i {
+  font-size: .8rem;
+  width: 16px;
+  text-align: center;
+  color: var(--orange);
+}
+.profile-dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 8px 0;
+}
+
+/* PAGE CONTENT */
+.page-content {
+  padding: 32px;
+  flex: 1;
+  animation: fadeIn .3s var(--ease);
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION (view) */
+.section { display: none; }
+.section.active { display: block; animation: fadeIn .3s var(--ease); }
+
+/* stat cards moved to dashboard redesign section below */
+
+/* =============================================
+   CARDS / PANELS
+   ============================================= */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  transition: all .3s var(--ease);
+}
+.card:hover {
+  box-shadow: var(--shadow);
+}
+
+.card-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.card-title {
+  font-size: .9rem; font-weight: 700;
+  color: var(--teal); letter-spacing: -.01em;
+}
+.card-body { padding: 24px; }
+
+/* =============================================
+   BUTTONS
+   ============================================= */
+.btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px;
+  border-radius: 10px;
+  font-size: .82rem; font-weight: 600;
+  border: none; cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+  background: var(--teal); color: #fff;
+}
+.btn-primary:hover {
+  background: var(--teal-mid);
+  box-shadow: 0 8px 24px -6px rgba(6,59,63,.3);
+}
+.btn-orange {
+  background: var(--orange); color: #fff;
+}
+.btn-orange:hover {
+  background: #e04300;
+  box-shadow: 0 8px 24px -6px rgba(253,77,2,.35);
+}
+.btn-outline {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.btn-outline:hover {
+  border-color: var(--teal);
+  color: var(--teal);
+  background: var(--teal-soft);
+}
+.btn-danger {
+  background: #fff0f0; color: #c0392b;
+  border: 1px solid #ffd5d5;
+}
+.btn-danger:hover {
+  background: #c0392b; color: #fff;
+}
+.btn-sm {
+  padding: 6px 12px;
+  font-size: .76rem;
+  border-radius: 8px;
+}
+.btn-icon {
+  width: 34px; height: 34px;
+  padding: 0;
+  border-radius: 9px;
+  justify-content: center;
+}
+
+/* =============================================
+   TABLE
+   ============================================= */
+.table-wrap { overflow-x: auto; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  padding: 12px 16px;
+  font-size: .7rem; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--cream);
+  text-align: left;
+  white-space: nowrap;
+}
+thead th:first-child { border-radius: 10px 0 0 10px; }
+thead th:last-child  { border-radius: 0 10px 10px 0; }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: all .15s var(--ease);
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #fafcfc; }
+tbody td {
+  padding: 14px 16px;
+  font-size: .83rem;
+  color: var(--text);
+  vertical-align: middle;
+}
+.td-actions { display: flex; gap: 6px; }
+
+/* =============================================
+   BADGE / PILL
+   ============================================= */
+.badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px;
+  border-radius: 100px;
+  font-size: .68rem; font-weight: 700;
+  letter-spacing: .04em;
+}
+.badge-green  { background: #e8f7ef; color: #2a9d5c; }
+.badge-orange { background: var(--orange-soft); color: var(--orange); }
+.badge-teal   { background: var(--teal-soft); color: var(--teal); }
+.badge-gray   { background: #f0f0f0; color: #888; }
+.badge-purple { background: #f0eeff; color: #7360f2; }
+
+/* =============================================
+   FORM
+   ============================================= */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+.form-grid.cols-1 { grid-template-columns: 1fr; }
+.form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group.full { grid-column: 1 / -1; }
+
+label {
+  font-size: .76rem; font-weight: 600;
+  color: var(--teal); letter-spacing: .02em;
+}
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+select,
+textarea {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: .84rem;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: all .2s var(--ease);
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(6,59,63,.08);
+}
+textarea { resize: vertical; min-height: 90px; }
+select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236a8080' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+.form-hint { font-size: .72rem; color: var(--text-muted); }
+
+/* =============================================
+   MODAL
+   ============================================= */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,20,20,.55);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s var(--ease);
+}
+.modal-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+.modal {
+  background: var(--white);
+  border-radius: 20px;
+  width: 100%; max-width: 540px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 32px 80px -16px rgba(0,0,0,.35);
+  transform: translateY(20px) scale(.97);
+  transition: transform .3s var(--ease);
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+.modal-header {
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.modal-title {
+  font-size: .95rem; font-weight: 700; color: var(--teal);
+}
+.modal-close {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: var(--cream); color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; cursor: pointer;
+  transition: all .2s var(--ease);
+}
+.modal-close:hover { background: #ffd5d5; color: #c0392b; }
+.modal-body { padding: 24px; }
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: flex-end; gap: 10px;
+}
+
+/* =============================================
+   TOAST
+   ============================================= */
+.toast-container {
+  position: fixed; bottom: 28px; right: 28px;
+  z-index: 999;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.toast {
+  background: var(--teal);
+  color: #fff;
+  padding: 13px 18px;
+  border-radius: 12px;
+  font-size: .82rem; font-weight: 500;
+  display: flex; align-items: center; gap: 10px;
+  box-shadow: 0 8px 28px -6px rgba(6,59,63,.35);
+  animation: toastIn .3s var(--ease) forwards;
+  max-width: 320px;
+}
+.toast.success { background: #1a7a4a; }
+.toast.error   { background: #c0392b; }
+.toast i { font-size: .9rem; flex-shrink: 0; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* =============================================
+   CONFIRM DIALOG
+   ============================================= */
+.confirm-overlay {
+  position: fixed; inset: 0;
+  background: rgba(6,20,20,.55);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s var(--ease);
+}
+.confirm-overlay.open { opacity: 1; pointer-events: all; }
+.confirm-box {
+  background: var(--white);
+  border-radius: 18px;
+  padding: 28px;
+  width: 100%; max-width: 380px;
+  text-align: center;
+  box-shadow: 0 32px 80px -16px rgba(0,0,0,.3);
+  transform: scale(.95);
+  transition: transform .25s var(--ease);
+}
+.confirm-overlay.open .confirm-box { transform: scale(1); }
+.confirm-icon {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: #fff0f0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem; color: #c0392b;
+  margin: 0 auto 16px;
+}
+.confirm-box h3 {
+  font-size: 1rem; font-weight: 700;
+  color: var(--teal); margin-bottom: 8px;
+}
+.confirm-box p {
+  font-size: .83rem; color: var(--text-muted);
+  margin-bottom: 22px; line-height: 1.6;
+}
+.confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+/* =============================================
+   SEARCH & FILTER BAR
+   ============================================= */
+.filter-bar {
+  display: flex; align-items: center; gap: 10px;
+  flex-wrap: wrap;
+}
+.search-input-wrap {
+  position: relative; flex: 1; min-width: 200px;
+}
+.search-input-wrap i {
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted); font-size: .85rem;
+  pointer-events: none;
+}
+.search-input-wrap input {
+  padding-left: 36px;
+}
+
+/* =============================================
+   EMPTY STATE
+   ============================================= */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+}
+.empty-icon {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: var(--cream);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.8rem; color: var(--text-muted);
+  margin: 0 auto 16px;
+}
+.empty-state h3 {
+  font-size: .95rem; font-weight: 700;
+  color: var(--teal); margin-bottom: 6px;
+}
+.empty-state p {
+  font-size: .82rem; color: var(--text-muted);
+  max-width: 280px; margin: 0 auto 20px;
+}
+
+/* dashboard grid and activity styles moved to dashboard redesign section below */
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+@media (max-width: 1100px) {
+  .dashboard-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 32px rgba(0,0,0,.2);
+  }
+  .main { margin-left: 0; }
+  .menu-toggle { display: flex; }
+  .page-content { padding: 20px 16px; }
+  .topbar { padding: 0 16px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid.cols-3 { grid-template-columns: 1fr; }
+  .topbar-date { display: none; }
+  .profile-dropdown {
+    right: auto;
+    left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .topbar-right { gap: 8px; }
+  .profile-trigger { padding: 6px 10px; }
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 99;
+}
+.sidebar-overlay.open { display: block; }
+
+/* =============================================
+   DASHBOARD REDESIGN
+   ============================================= */
+
+/* Stat cards - new style */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 22px 22px 18px;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  transition: all .25s var(--ease);
+  box-shadow: 0 1px 4px rgba(6,59,63,.04);
+}
+.stat-card:hover {
+  box-shadow: 0 8px 28px -8px rgba(6,59,63,.14);
+  transform: translateY(-3px);
+}
+.stat-card-warn:hover { border-color: #f59e0b; }
+.stat-card-danger:hover { border-color: #ef4444; }
+.stat-card-green:hover { border-color: #2a9d5c; }
+
+.stat-icon-wrap {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.stat-icon-wrap.teal   { background: #e0f4f5; color: #0a8a96; }
+.stat-icon-wrap.yellow { background: #fef9c3; color: #ca8a04; }
+.stat-icon-wrap.red    { background: #fee2e2; color: #dc2626; }
+.stat-icon-wrap.green  { background: #dcfce7; color: #16a34a; }
+
+.stat-info { flex: 1; min-width: 0; }
+.stat-label {
+  font-size: .72rem; font-weight: 600;
+  color: var(--text-muted); letter-spacing: .04em;
+  text-transform: uppercase; margin-bottom: 4px;
+}
+.stat-num {
+  font-size: 2rem; font-weight: 800;
+  color: var(--teal); line-height: 1;
+  letter-spacing: -.04em; margin-bottom: 8px;
+}
+.stat-link {
+  font-size: .72rem; color: var(--text-muted);
+  font-weight: 500; cursor: pointer;
+  transition: color .15s;
+}
+.stat-card:hover .stat-link { color: var(--orange); }
+
+/* Dashboard body layout */
+.dash-body {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+  align-items: start;
+}
+.dash-main { min-width: 0; }
+.dash-side { display: flex; flex-direction: column; gap: 18px; }
+
+/* Low stock table product cell */
+.prod-cell {
+  display: flex; align-items: center; gap: 10px;
+}
+.prod-thumb {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  background: var(--cream);
+  object-fit: contain;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted); font-size: .8rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.prod-thumb img { width: 100%; height: 100%; object-fit: contain; }
+.prod-name { font-weight: 600; color: var(--teal); font-size: .83rem; }
+
+/* Status badges */
+.badge-lowstock  { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.badge-outstock  { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+.badge-instock   { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+
+/* Stock number colors */
+.stock-low  { color: #ca8a04; font-weight: 700; }
+.stock-out  { color: #dc2626; font-weight: 700; }
+.stock-ok   { color: #16a34a; font-weight: 700; }
+
+/* Activity - new style */
+.activity-item-new {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.activity-item-new:last-child { border-bottom: none; }
+.act-icon-wrap {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .75rem; flex-shrink: 0; margin-top: 1px;
+}
+.act-icon-wrap.teal   { background: var(--teal-soft); color: var(--teal); }
+.act-icon-wrap.orange { background: var(--orange-soft); color: var(--orange); }
+.act-icon-wrap.green  { background: #dcfce7; color: #16a34a; }
+.act-icon-wrap.purple { background: #f0eeff; color: #7360f2; }
+.act-content { flex: 1; min-width: 0; }
+.act-title { font-size: .8rem; font-weight: 600; color: var(--teal); line-height: 1.3; }
+.act-sub { font-size: .72rem; color: var(--text-muted); margin-top: 1px; }
+.act-time { font-size: .67rem; color: var(--text-muted); white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+
+/* Tip bar */
+.dash-tip {
+  background: var(--teal-soft);
+  border: 1px solid rgba(6,59,63,.12);
+  border-radius: 10px;
+  padding: 11px 16px;
+  display: flex; align-items: center; gap: 10px;
+  font-size: .78rem; color: var(--teal);
+  margin-top: 20px;
+}
+.dash-tip i { color: var(--teal-mid); flex-shrink: 0; }
+.dash-tip button { margin-left: auto; background: none; color: var(--text-muted); font-size: .85rem; }
+
+@media (max-width: 1100px) {
+  .dash-body { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+}
+
+/* ── Messenger-style chat bubbles (admin panel) ── */
+.zm-chat-msg {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+/* Admin messages → right side, white bubble */
+.zm-chat-msg.admin {
+  flex-direction: row-reverse;
+}
+.zm-chat-msg.admin .zm-chat-bubble {
+  background: #fff;
+  color: var(--text, #1a2e2e);
+  border-radius: 18px 18px 4px 18px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+}
+/* Customer messages → left side, orange bubble */
+.zm-chat-msg.visitor .zm-chat-bubble {
+  background: #FD4D02;
+  color: #fff;
+  border-radius: 18px 18px 18px 4px;
+}
+.zm-chat-bubble {
+  max-width: 72%;
+  padding: 9px 14px;
+  font-size: .82rem;
+  line-height: 1.5;
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.zm-chat-bubble.deleted {
+  font-style: italic;
+  opacity: .55;
+  font-size: .74rem;
+  background: #ddd !important;
+  color: #666 !important;
+}
+.zm-ctx-menu{position:fixed;background:#1a2e2e;color:#fff;border-radius:10px;padding:4px 0;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:999999;font-family:'Poppins',sans-serif;font-size:.78rem;}
+.zm-ctx-item{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;transition:background .15s;}
+.zm-ctx-item:hover{background:rgba(255,255,255,.1);}
+.zm-ctx-item.danger{color:#ff6b6b;}
+.zm-ctx-item.danger:hover{background:rgba(255,107,107,.15);}
+.zm-chat-bubble img {
+  max-width: 180px;
+  max-height: 140px;
+  border-radius: 8px;
+  display: block;
+  cursor: zoom-in;
+  margin-top: 4px;
+}
+.zm-chat-time {
+  font-size: .65rem;
+  color: var(--text-muted, #888);
+  margin-top: 3px;
+  padding: 0 4px;
+}
+.zm-chat-msg.admin .zm-chat-time { text-align: right; }
+.zm-chat-msg.visitor .zm-chat-time { text-align: left; }
+.zm-chat-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #1a2e2e;
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 18px;
+}
+</style>
+</head>
+<body>
+
+<!-- =============================================
+     SIDEBAR
+     ============================================= -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon"><i class="fa-solid fa-store"></i></div>
+    <div class="sidebar-logo-text">
+      <strong>Zami Mart</strong>
+      <span>Admin Panel</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <button class="nav-item active" data-section="dashboard">
+      <i class="fa-solid fa-gauge-high"></i> Dashboard
+    </button>
+    <button class="nav-item" data-section="products">
+      <i class="fa-solid fa-boxes-stacked"></i> Products
+      <span class="nav-badge" id="navProductsBadge">0</span>
+    </button>
+    <button class="nav-item" data-section="arrivals">
+      <i class="fa-solid fa-box-open"></i> New Arrivals
+      <span class="nav-badge" id="navArrivalsBadge">0</span>
+    </button>
+
+    <div class="nav-section-label" style="margin-top:8px;">Communication</div>
+    <button class="nav-item" data-section="inquiries">
+      <i class="fa-solid fa-cart-shopping"></i> Inquiries
+      <span class="nav-badge" id="navInqBadge">0</span>
+    </button>
+    <button class="nav-item" data-section="chat">
+      <i class="fa-solid fa-comments"></i> Live Chat
+      <span class="nav-badge" id="navChatBadge">0</span>
+    </button>
+
+    <div class="nav-section-label" style="margin-top:8px;">Users</div>
+    <button class="nav-item" data-section="users">
+      <i class="fa-solid fa-users"></i> Registered Users
+    </button>
+    <button class="nav-item" data-section="loginlogs">
+      <i class="fa-solid fa-clock-rotate-left"></i> Login Records
+    </button>
+
+    <div class="nav-section-label" style="margin-top:8px;">Settings</div>
+    <button class="nav-item" data-section="settings">
+      <i class="fa-solid fa-gear"></i> Store Settings
+    </button>
+  </nav>
+
+</aside>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- =============================================
+     MAIN
+     ============================================= -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <header class="topbar" id="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" id="menuToggle">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard</div>
+        <div class="page-breadcrumb" id="pageBreadcrumb">Zami Mart / Dashboard</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-date" id="topbarDate"></span>
+      <!-- Notification Bell -->
+      <div class="notif-wrapper" id="notifWrapper">
+        <button class="topbar-btn" title="Notifications" id="notifBtn" onclick="toggleNotifPanel()">
+          <i class="fa-regular fa-bell"></i>
+          <span class="notif-dot" id="notifDot" style="display:none;"></span>
+        </button>
+        <!-- Notification Dropdown Panel -->
+        <div class="notif-panel" id="notifPanel" style="display:none;">
+          <div class="notif-panel-header">
+            <span>Notifications</span>
+            <button class="notif-clear-btn" onclick="clearAllNotifs()">Clear all</button>
+          </div>
+          <div class="notif-panel-body" id="notifPanelBody">
+            <div class="notif-empty">No new notifications</div>
+          </div>
+        </div>
+      </div>
+      <!-- View Store -->
+      <button class="topbar-btn" title="View Store" onclick="openStore()">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </button>
+      
+      <!-- Profile Dropdown in Topbar -->
+      <div class="topbar-profile">
+        <button class="profile-trigger" id="profileTrigger" onclick="toggleProfileDropdown()">
+          <i class="fa-solid fa-user"></i>
+          <span id="profileName">Admin</span>
+          <i class="fa-solid fa-chevron-down" style="font-size:.7rem;margin-left:4px;"></i>
+        </button>
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dropdown-header">
+            <div class="profile-avatar-sm" id="profileAvatar">A</div>
+            <div class="profile-info">
+              <div class="profile-name" id="profileDisplayName">Admin User</div>
+              <div class="profile-email" id="profileDisplayEmail">admin@zamimart.mv</div>
+            </div>
+          </div>
+          <div class="profile-dropdown-menu">
+            <button class="profile-menu-item" onclick="openEditProfileModal()">
+              <i class="fa-solid fa-pen"></i> Edit Profile
+            </button>
+            <button class="profile-menu-item" onclick="changePassword()">
+              <i class="fa-solid fa-key"></i> Change Password
+            </button>
+            <div class="profile-dropdown-divider"></div>
+            <button class="profile-menu-item" onclick="logout()">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- PAGE CONTENT -->
+  <div class="page-content">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <section class="section active" id="sec-dashboard">
+
+      <!-- Stat Cards -->
+      <div class="stats-grid">
+        <!-- Total Products -->
+        <div class="stat-card" onclick="navigate('products')" style="cursor:pointer;">
+          <div class="stat-icon-wrap teal">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Total Products</div>
+            <div class="stat-num" id="statProducts">0</div>
+            <a class="stat-link">View all products →</a>
+          </div>
+        </div>
+
+        <!-- Low Stock -->
+        <div class="stat-card stat-card-warn" onclick="navigate('products')" style="cursor:pointer;">
+          <div class="stat-icon-wrap yellow">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Low Stock Items</div>
+            <div class="stat-num" id="statLowStock">0</div>
+            <a class="stat-link">View low stock →</a>
+          </div>
+        </div>
+
+        <!-- Out of Stock -->
+        <div class="stat-card stat-card-danger" onclick="navigate('products')" style="cursor:pointer;">
+          <div class="stat-icon-wrap red">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Out of Stock</div>
+            <div class="stat-num" id="statOutOfStock">0</div>
+            <a class="stat-link">View out of stock →</a>
+          </div>
+        </div>
+
+        <div class="stat-card" onclick="navigate('inquiries')" style="cursor:pointer;border-color:rgba(253,77,2,.15);">
+          <div class="stat-icon-wrap" style="background:rgba(253,77,2,.1);">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FD4D02" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 001.95 1.61h9.72a2 2 0 001.95-1.61L23 6H6"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Inquiries</div>
+            <div class="stat-num" id="statInquiries">0</div>
+            <a class="stat-link" style="color:#FD4D02;">View inquiries →</a>
+          </div>
+        </div>
+
+        <div class="stat-card" onclick="navigate('users')" style="cursor:pointer;border-color:rgba(6,59,63,.15);">
+          <div class="stat-icon-wrap teal">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Registered Users</div>
+            <div class="stat-num" id="statUsers">0</div>
+            <a class="stat-link">View users →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Body: Low Stock Table + Right Panel -->
+      <div class="dash-body">
+
+        <!-- Low Stock Items Table -->
+        <div class="card dash-main">
+          <div class="card-header">
+            <span class="card-title">Low Stock Items</span>
+            <button class="btn btn-outline btn-sm" onclick="navigate('products')">View all</button>
+          </div>
+          <div style="padding:0;">
+            <div class="table-wrap">
+              <table id="lowStockTable">
+                <thead>
+                  <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="lowStockTableBody">
+                  <tr><td colspan="5" style="text-align:center;padding:32px;color:var(--text-muted);font-size:.82rem;">No low stock items</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Sales + Recent Activities -->
+        <div class="dash-side">
+
+          <!-- Today's Sales -->
+          <div class="card dash-sales">
+            <div class="card-header">
+              <span class="card-title">Today's Sales</span>
+              <button class="topbar-btn" title="Calendar" style="width:32px;height:32px;border-radius:8px;">
+                <i class="fa-regular fa-calendar"></i>
+              </button>
+            </div>
+            <div class="card-body" style="padding:20px 24px;">
+              <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;">Total Sales</div>
+              <div style="font-size:2rem;font-weight:800;color:#2a9d5c;letter-spacing:-.04em;line-height:1.1;">MVR 0</div>
+              <div style="display:flex;gap:32px;margin-top:14px;">
+                <div>
+                  <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Transactions</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:var(--teal);" id="dashTransactions">0</div>
+                </div>
+                <div>
+                  <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Avg. Sale</div>
+                  <div style="font-size:1.1rem;font-weight:800;color:var(--teal);" id="dashAvgSale">—</div>
+                </div>
+              </div>
+              <!-- Mini chart (decorative) -->
+              <div style="margin-top:18px;height:60px;position:relative;overflow:hidden;">
+                <svg viewBox="0 0 280 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+                  <defs>
+                    <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#2a9d5c" stop-opacity="0.2"/>
+                      <stop offset="100%" stop-color="#2a9d5c" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+                  <path d="M0,45 C20,40 35,20 55,25 C75,30 90,50 110,42 C130,34 145,15 165,20 C185,25 200,45 220,35 C240,25 260,30 280,22" stroke="#2a9d5c" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <path d="M0,45 C20,40 35,20 55,25 C75,30 90,50 110,42 C130,34 145,15 165,20 C185,25 200,45 220,35 C240,25 260,30 280,22 L280,60 L0,60 Z" fill="url(#salesGrad)"/>
+                </svg>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-top:4px;">
+                <span style="font-size:.65rem;color:var(--text-muted);">12 AM</span>
+                <span style="font-size:.65rem;color:var(--text-muted);">6 AM</span>
+                <span style="font-size:.65rem;color:var(--text-muted);">12 PM</span>
+                <span style="font-size:.65rem;color:var(--text-muted);">6 PM</span>
+                <span style="font-size:.65rem;color:var(--text-muted);">11 PM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activities -->
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Recent Activities</span>
+            </div>
+            <div class="card-body" style="padding:12px 20px;">
+              <div class="activity-list" id="activityList">
+                <div class="activity-item-new">
+                  <div class="act-icon-wrap teal"><i class="fa-solid fa-store"></i></div>
+                  <div class="act-content">
+                    <div class="act-title">Admin panel initialized</div>
+                    <div class="act-sub">Welcome to Zami Mart!</div>
+                  </div>
+                  <div class="act-time">Just now</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /dash-side -->
+      </div><!-- /dash-body -->
+
+    </section>
+
+    <!-- ==================== PRODUCTS ==================== -->
+    <section class="section" id="sec-products">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fa-solid fa-boxes-stacked" style="color:var(--orange);margin-right:8px;"></i>Products</span>
+          <div class="filter-bar">
+            <div class="search-input-wrap">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="productSearch" placeholder="Search products..." oninput="renderProducts()">
+            </div>
+            <select id="productCatFilter" onchange="renderProducts()" style="width:auto;min-width:140px;">
+              <option value="">All Categories</option>
+            </select>
+            <button class="btn btn-orange" onclick="openProductModal()">
+              <i class="fa-solid fa-plus"></i> Add Product
+            </button>
+          </div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Product Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="productsTableBody"></tbody>
+            </table>
+          </div>
+          <div id="productsEmpty" class="empty-state" style="display:none;">
+            <div class="empty-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <h3>No products yet</h3>
+            <p>Start by adding your first product to the store.</p>
+            <button class="btn btn-orange" onclick="openProductModal()"><i class="fa-solid fa-plus"></i> Add Product</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== CATEGORIES ==================== -->
+    <!-- ==================== NEW ARRIVALS ==================== -->
+    <section class="section" id="sec-arrivals">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fa-solid fa-box-open" style="color:var(--orange);margin-right:8px;"></i>New Arrivals</span>
+          <button class="btn btn-orange" onclick="openArrivalModal()">
+            <i class="fa-solid fa-plus"></i> Add Arrival
+          </button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Item Name</th>
+                  <th>Category</th>
+                  <th>Date Added</th>
+                  <th>Status</th>
+                  <th>Note</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="arrivalsTableBody"></tbody>
+            </table>
+          </div>
+          <div id="arrivalsEmpty" class="empty-state" style="display:none;">
+            <div class="empty-icon"><i class="fa-solid fa-box-open"></i></div>
+            <h3>No new arrivals yet</h3>
+            <p>Add items that recently arrived in your store.</p>
+            <button class="btn btn-orange" onclick="openArrivalModal()"><i class="fa-solid fa-plus"></i> Add Arrival</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LIVE CHAT ==================== -->
+    <section class="section" id="sec-chat">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fa-solid fa-comments" style="color:var(--orange);margin-right:8px;"></i>Live Chat Sessions</span>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Visitor Name</th>
+                  <th>Contact</th>
+                  <th>Sessions</th>
+                  <th>Last Message</th>
+                  <th>Unread</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="chatSessionsTableBody"></tbody>
+            </table>
+          </div>
+          <div id="chatSessionsEmpty" class="empty-state" style="display:none;">
+            <div class="empty-icon"><i class="fa-solid fa-comments"></i></div>
+            <h3>No active chats</h3>
+            <p>Customer chat sessions will appear here.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Detail View -->
+      <div class="card" style="margin-top:20px;display:none;" id="chatDetailCard">
+        <div class="card-header">
+          <span class="card-title" id="chatDetailTitle">Chat with Visitor</span>
+          <button class="btn btn-outline" onclick="closeChatDetail()"><i class="fa-solid fa-arrow-left"></i> Back</button>
+        </div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:16px;">
+          <!-- Messages Display -->
+          <div id="chatDetailMessages" style="height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--cream);"></div>
+          
+          <!-- Message Input -->
+          <div style="display:flex;gap:10px;">
+            <input type="text" id="chatDetailInput" placeholder="Type your response..." style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:.84rem;">
+            <button class="btn btn-orange" onclick="sendChatReply()"><i class="fa-solid fa-paper-plane"></i> Send</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== INQUIRIES ==================== -->
+    <section class="section" id="sec-inquiries">
+
+      <!-- Inquiries List -->
+      <div class="card" id="inqListCard">
+        <div class="card-header">
+          <span class="card-title"><i class="fa-solid fa-cart-shopping" style="color:var(--orange);margin-right:8px;"></i>Customer Inquiries</span>
+          <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-outline btn-sm" id="inqViewToggleBtn" onclick="toggleInqView()" style="min-width:120px;"><i class="fa-solid fa-clock-rotate-left" style="margin-right:5px;"></i>History View</button><button class="btn btn-outline btn-sm" onclick="clearNewInquiryBadge()">Mark all read</button></div>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th><th>Customer</th><th>Contact</th><th>Orders</th><th>Last Order</th><th>Status</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inquiriesTableBody"></tbody>
+            </table>
+          </div>
+          <div id="inquiriesEmpty" class="empty-state" style="display:none;">
+            <div class="empty-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+            <h3>No inquiries yet</h3>
+            <p>Cart inquiries from customers will appear here.</p>
+          </div>
+          <!-- History View: grouped by customer -->
+          <div id="inqHistoryView" style="display:none;padding:16px;">
+            <div id="inqHistoryList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inquiry Chat Panel (shown when an inquiry is opened) -->
+      <div id="inqChatPanel" style="display:none;margin-top:20px;">
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header" style="gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-outline btn-sm" onclick="closeInqDetail()" style="flex-shrink:0;">
+              <i class="fa-solid fa-arrow-left"></i> Back
+            </button>
+            <span class="card-title" id="inqChatTitle" style="flex:1;min-width:0;"></span>
+            <button class="btn btn-outline btn-sm" id="inqDeleteBtn" style="border-color:#d63030;color:#d63030;flex-shrink:0;">
+              <i class="fa-solid fa-trash"></i> Delete
+            </button>
+          </div>
+          <div class="card-body" style="padding:16px 20px;">
+            <!-- Customer info + ordered items + live chat side by side on wide screens -->
+            <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;">
+
+              <!-- LEFT: customer info + items -->
+              <div>
+                <div style="font-size:.68rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Customer</div>
+                <div id="inqCustomerInfo" style="background:var(--cream);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:.84rem;"></div>
+
+                <div style="font-size:.68rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Ordered Items</div>
+                <div id="inqItemsList" style="display:flex;flex-direction:column;gap:6px;"></div>
+              </div>
+
+              <!-- RIGHT: chat -->
+              <div style="display:flex;flex-direction:column;min-height:420px;">
+                <div style="font-size:.68rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Live Chat</div>
+                <!-- messages -->
+                <div id="inqChatMessages" style="flex:1;min-height:320px;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fafaf8;margin-bottom:12px;"></div>
+
+                <!-- image preview -->
+                <div id="inqImgPreview" style="display:none;margin-bottom:8px;position:relative;width:fit-content;">
+                  <img id="inqImgPreviewImg" style="max-height:80px;border-radius:8px;border:1px solid var(--border);">
+                  <button onclick="clearInqImg()" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#d63030;color:#fff;border:none;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <!-- input row -->
+                <div style="display:flex;gap:8px;align-items:flex-end;">
+                  <!-- image upload trigger -->
+                  <label for="inqImgUpload" style="width:36px;height:36px;border-radius:9px;background:var(--cream);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text-muted);font-size:.85rem;transition:all .2s;" title="Attach image">
+                    <i class="fa-solid fa-image"></i>
+                  </label>
+                  <input type="file" id="inqImgUpload" accept="image/*" style="display:none;" onchange="handleInqImgUpload(event)">
+
+                  <textarea id="inqChatInput" placeholder="Type your reply…" rows="1"
+                    style="flex:1;padding:9px 13px;border:1px solid var(--border);border-radius:10px;font-size:.82rem;font-family:inherit;outline:none;resize:none;max-height:90px;line-height:1.5;transition:border-color .2s;"
+                    onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendInqReply();}"
+                    oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px';"></textarea>
+
+                  <button class="btn btn-orange" onclick="sendInqReply()" style="height:36px;padding:0 16px;flex-shrink:0;" title="Send">
+                    <i class="fa-solid fa-paper-plane"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== USERS ==================== -->
+    <section class="section" id="sec-users">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fa-solid fa-users" style="color:var(--orange);margin-right:8px;"></i>Registered Users</span>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email / Phone</th>
+                  <th>Registered</th>
+                </tr>
+              </thead>
+              <tbody id="usersTableBody"></tbody>
+            </table>
+          </div>
+          <div id="usersEmpty" class="empty-state" style="display:none;">
+            <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
+            <h3>No registered users yet</h3>
+            <p>Users who create accounts will appear here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== LOGIN LOGS ==================== -->
+    <section class="section" id="sec-loginlogs">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fa-solid fa-clock-rotate-left" style="color:var(--orange);margin-right:8px;"></i>Login Records</span>
+          <button class="btn btn-outline btn-sm" onclick="if(confirm('Clear all login records?')){localStorage.removeItem('zm_login_logs');renderLoginLogs();}">Clear logs</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email / Phone</th>
+                  <th>Login Time</th>
+                </tr>
+              </thead>
+              <tbody id="loginLogsTableBody"></tbody>
+            </table>
+          </div>
+          <div id="loginLogsEmpty" class="empty-state" style="display:none;">
+            <div class="empty-icon"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            <h3>No login records</h3>
+            <p>Login activity will be tracked here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== SETTINGS ==================== -->
+    <section class="section" id="sec-settings">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fa-solid fa-gear" style="color:var(--orange);margin-right:8px;"></i>Store Settings</span>
+          <button class="btn btn-primary" onclick="saveSettings()">
+            <i class="fa-solid fa-floppy-disk"></i> Save Changes
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Store Name</label>
+              <input type="text" id="settStoreName" value="Zami Mart">
+            </div>
+            <div class="form-group">
+              <label>Tagline</label>
+              <input type="text" id="settTagline" value="Convenience &amp; Wholesale Store, Male'">
+            </div>
+            <div class="form-group">
+              <label>Location</label>
+              <input type="text" id="settLocation" value="Male', Maldives">
+            </div>
+            <div class="form-group">
+              <label>WhatsApp Number</label>
+              <input type="text" id="settWhatsapp" placeholder="+960 xxx xxxx">
+            </div>
+            <div class="form-group">
+              <label>Viber Number</label>
+              <input type="text" id="settViber" placeholder="+960 xxx xxxx">
+            </div>
+            <div class="form-group">
+              <label>Email Address</label>
+              <input type="email" id="settEmail" placeholder="info@zamimart.mv">
+            </div>
+            <div class="form-group">
+              <label>Facebook URL</label>
+              <input type="url" id="settFacebook" placeholder="https://facebook.com/...">
+            </div>
+            <div class="form-group">
+              <label>Instagram URL</label>
+              <input type="url" id="settInstagram" placeholder="https://instagram.com/...">
+            </div>
+            <div class="form-group full">
+              <label>Store Description</label>
+              <textarea id="settDesc">Your neighborhood convenience store and wholesale supplier for everyday essentials in Male', Maldives.</textarea>
+            </div>
+            <div class="form-group">
+              <label>Store Status</label>
+              <select id="settStatus">
+                <option value="open">Open</option>
+                <option value="closed">Closed</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Business Hours</label>
+              <input type="text" id="settHours" value="8:00 AM – 10:00 PM">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /page-content -->
+</div><!-- /main -->
+
+<!-- =============================================
+     EDIT PROFILE MODAL
+     ============================================= -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Edit Profile</span>
+      <button class="modal-close" onclick="closeModal('editProfileModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-grid cols-1">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="editProfileName" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="editProfileEmail" placeholder="your@email.com">
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="text" id="editProfilePhone" placeholder="+960 xxx xxxx">
+        </div>
+        <div class="form-group">
+          <label>Bio / Role</label>
+          <textarea id="editProfileBio" placeholder="Tell us about your role..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('editProfileModal')">Cancel</button>
+      <button class="btn btn-orange" onclick="saveEditProfile()"><i class="fa-solid fa-floppy-disk"></i> Save Profile</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     PRODUCT MODAL
+     ============================================= -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="productModalTitle">Add Product</span>
+      <button class="modal-close" onclick="closeModal('productModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="productId">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Product Name *</label>
+          <input type="text" id="productName" placeholder="e.g. Colgate Toothpaste 100g">
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select id="productCategory">
+            <option value="">Select category...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Price (MVR) *</label>
+          <input type="number" id="productPrice" placeholder="0.00" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Stock Quantity</label>
+          <input type="number" id="productStock" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="productStatus">
+            <option value="In Stock">In Stock</option>
+            <option value="Low Stock">Low Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Description</label>
+          <textarea id="productDesc" placeholder="Brief product description..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('productModal')">Cancel</button>
+      <button class="btn btn-orange" onclick="saveProduct()"><i class="fa-solid fa-floppy-disk"></i> Save Product</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     CATEGORY MODAL
+     ============================================= -->
+<!-- =============================================
+     ARRIVAL MODAL
+     ============================================= -->
+<div class="modal-overlay" id="arrivalModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="arrivalModalTitle">Add New Arrival</span>
+      <button class="modal-close" onclick="closeModal('arrivalModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="arrivalId">
+      <div class="form-grid">
+        <div class="form-group full">
+          <label>Item Name *</label>
+          <input type="text" id="arrivalName" placeholder="e.g. Dettol Hand Wash 250ml">
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select id="arrivalCategory">
+            <option value="">Select category...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="arrivalStatus">
+            <option value="New">New</option>
+            <option value="Featured">Featured</option>
+            <option value="Limited">Limited</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Note</label>
+          <textarea id="arrivalNote" placeholder="Any notes about this arrival..."></textarea>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('arrivalModal')">Cancel</button>
+      <button class="btn btn-orange" onclick="saveArrival()"><i class="fa-solid fa-floppy-disk"></i> Save Arrival</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     MESSAGE MODAL
+     ============================================= -->
+<!-- =============================================
+     CONFIRM DIALOG
+     ============================================= -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon"><i class="fa-solid fa-trash-can"></i></div>
+    <h3 id="confirmTitle">Delete Item?</h3>
+    <p id="confirmMsg">This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="confirmOkBtn">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     TOAST CONTAINER
+     ============================================= -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- =============================================
+     JAVASCRIPT
+     ============================================= -->
+<script>
+'use strict';
+
+// =============================================
+// DATA STORE (localStorage-backed)
+// =============================================
+const DB = {
+  get(key) {
+    try { return JSON.parse(localStorage.getItem('zm_' + key)) || []; }
+    catch { return []; }
+  },
+  set(key, val) {
+    try { localStorage.setItem('zm_' + key, JSON.stringify(val)); }
+    catch(e) { console.warn('Storage error', e); }
+  }
+};
+
+let products   = DB.get('products');
+let arrivals   = DB.get('arrivals');
+let settings   = DB.get('settings')[0] || {};
+let adminProfile = DB.get('adminProfile')[0] || { name: 'Admin', email: 'admin@zamimart.mv', phone: '', bio: '' };
+let nextId     = { p: Date.now(), a: Date.now()+2 };
+
+function save() {
+  DB.set('products',   products);
+  DB.set('arrivals',   arrivals);
+  DB.set('settings',   [settings]);
+  DB.set('adminProfile', [adminProfile]);
+}
+
+// =============================================
+// PROFILE MANAGEMENT
+// =============================================
+function updateProfileDisplay() {
+  document.getElementById('sidebarName').textContent = adminProfile.name;
+  document.getElementById('sidebarEmail').textContent = adminProfile.email;
+  document.getElementById('profileName').textContent = adminProfile.name;
+  document.getElementById('profileDisplayName').textContent = adminProfile.name;
+  document.getElementById('profileDisplayEmail').textContent = adminProfile.email;
+  const initial = (adminProfile.name || 'A').charAt(0).toUpperCase();
+  document.getElementById('sidebarAvatar').textContent = initial;
+  document.getElementById('profileAvatar').textContent = initial;
+}
+
+function toggleProfileDropdown() {
+  const dropdown = document.getElementById('profileDropdown');
+  dropdown.classList.toggle('open');
+  document.addEventListener('click', function closeDropdown(e) {
+    if (!e.target.closest('.topbar-profile')) {
+      dropdown.classList.remove('open');
+      document.removeEventListener('click', closeDropdown);
+    }
+  });
+}
+
+function openEditProfileModal() {
+  document.getElementById('editProfileName').value = adminProfile.name;
+  document.getElementById('editProfileEmail').value = adminProfile.email;
+  document.getElementById('editProfilePhone').value = adminProfile.phone || '';
+  document.getElementById('editProfileBio').value = adminProfile.bio || '';
+  openModal('editProfileModal');
+  document.getElementById('profileDropdown').classList.remove('open');
+}
+
+function saveEditProfile() {
+  const name = document.getElementById('editProfileName').value.trim();
+  const email = document.getElementById('editProfileEmail').value.trim();
+  const phone = document.getElementById('editProfilePhone').value.trim();
+  const bio = document.getElementById('editProfileBio').value.trim();
+
+  if (!name) { showToast('Name is required.', 'error'); return; }
+  if (!email) { showToast('Email is required.', 'error'); return; }
+
+  adminProfile = { name, email, phone, bio };
+  save();
+  updateProfileDisplay();
+  closeModal('editProfileModal');
+  addActivity(`Profile updated: ${name}`);
+  showToast('Profile saved successfully!', 'success');
+}
+
+function changePassword() {
+  showToast('Password change feature coming soon!', 'info');
+  document.getElementById('profileDropdown').classList.remove('open');
+}
+
+function logout() {
+  showToast('Logging out...', 'info');
+  document.getElementById('profileDropdown').classList.remove('open');
+  setTimeout(() => {
+    window.location.href = 'login.html';
+  }, 500);
+}
+
+// =============================================
+// NAVIGATION
+// ============================================= 
+const pageTitles = {
+  dashboard: 'Dashboard',
+  products:  'Products',
+  arrivals:  'New Arrivals',
+  inquiries: 'Customer Inquiries',
+  chat:      'Live Chat',
+  users:     'Registered Users',
+  loginlogs: 'Login Records',
+  settings:  'Store Settings'
+};
+
+function navigate(section) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.querySelector(`[data-section="${section}"]`).classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-' + section).classList.add('active');
+  document.getElementById('pageTitle').textContent = pageTitles[section] || section;
+  document.getElementById('pageBreadcrumb').textContent = 'Zami Mart / ' + (pageTitles[section] || section);
+  closeSidebar();
+  if (section === 'dashboard') updateDashboard();
+  if (section === 'products')  renderProducts();
+  if (section === 'arrivals')  renderArrivals();
+  if (section === 'inquiries') renderInquiries();
+  if (section === 'chat')      renderChatSessions();
+  if (section === 'users')     renderUsers();
+  if (section === 'loginlogs') renderLoginLogs();
+  if (section === 'settings')  loadSettings();
+}
+
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => navigate(btn.dataset.section));
+});
+
+// Mobile sidebar
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+document.getElementById('menuToggle').addEventListener('click', () => {
+  sidebar.classList.add('open');
+  overlay.classList.add('open');
+});
+overlay.addEventListener('click', closeSidebar);
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('open');
+}
+
+// Topbar scroll effect
+window.addEventListener('scroll', () => {
+  const topbar = document.getElementById('topbar');
+  if (window.scrollY > 10) {
+    topbar.classList.add('scrolled');
+  } else {
+    topbar.classList.remove('scrolled');
+  }
+});
+
+// =============================================
+// TOPBAR DATE
+// =============================================
+function updateDate() {
+  const now = new Date();
+  document.getElementById('topbarDate').textContent = now.toLocaleDateString('en-US', {
+    weekday: 'short', year: 'numeric', month: 'short', day: 'numeric'
+  });
+}
+updateDate();
+
+// =============================================
+// TOAST
+// =============================================
+function showToast(msg, type = 'success') {
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+  const tc = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.innerHTML = `<i class="fa-solid ${icons[type] || icons.success}"></i> ${msg}`;
+  tc.appendChild(t);
+  setTimeout(() => {
+    t.style.animation = 'toastOut .3s ease forwards';
+    setTimeout(() => t.remove(), 300);
+  }, 3000);
+}
+
+// =============================================
+// CONFIRM DIALOG
+// =============================================
+let confirmCallback = null;
+function showConfirm(title, msg, cb) {
+  document.getElementById('confirmTitle').textContent = title;
+  document.getElementById('confirmMsg').textContent = msg;
+  confirmCallback = cb;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirmOverlay').classList.remove('open');
+  confirmCallback = null;
+}
+document.getElementById('confirmOkBtn').addEventListener('click', () => {
+  if (confirmCallback) confirmCallback();
+  closeConfirm();
+});
+
+// =============================================
+// MODAL HELPERS
+// =============================================
+function openModal(id) {
+  document.getElementById(id).classList.add('open');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) closeModal(this.id);
+  });
+});
+
+// =============================================
+// DASHBOARD
+// =============================================
+function updateDashboard() {
+  // Stat counts
+  document.getElementById('statProducts').textContent  = products.length;
+  // Inquiries (realtime, Firebase) + Users from localStorage
+  try {
+    const inqs = InquirySystem.getInquiries();
+    document.getElementById('statInquiries').textContent = inqs.length;
+    const newInqs = inqs.filter(i => i.status === 'new').length;
+    _setBadge('navInqBadge', newInqs);
+  } catch(e) {}
+  try {
+    const users = JSON.parse(localStorage.getItem('zm_all_accounts') || '[]');
+    document.getElementById('statUsers').textContent = users.length;
+  } catch(e) {}
+
+  // Low stock = stock > 0 && stock <= 5; Out of stock = stock === 0
+  const LOW_THRESHOLD = 5;
+  const lowStockItems = products.filter(p => {
+    const s = parseInt(p.stock ?? p.qty ?? 0);
+    return s > 0 && s <= LOW_THRESHOLD;
+  });
+  const outOfStockItems = products.filter(p => parseInt(p.stock ?? p.qty ?? 0) === 0);
+
+  document.getElementById('statLowStock').textContent    = lowStockItems.length;
+  document.getElementById('statOutOfStock').textContent  = outOfStockItems.length;
+
+  // Populate low stock table
+  const alertItems = [...outOfStockItems, ...lowStockItems].slice(0, 8);
+  const tbody = document.getElementById('lowStockTableBody');
+  if (alertItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--text-muted);font-size:.82rem;"><i class="fa-solid fa-circle-check" style="color:#2a9d5c;margin-right:6px;"></i>All products are well-stocked!</td></tr>`;
+  } else {
+    tbody.innerHTML = alertItems.map(p => {
+      const stock = parseInt(p.stock ?? p.qty ?? 0);
+      const isOut = stock === 0;
+      const stockClass = isOut ? 'stock-out' : 'stock-low';
+      const badgeClass = isOut ? 'badge badge-outstock' : 'badge badge-lowstock';
+      const badgeLabel = isOut ? 'Out of Stock' : 'Low Stock';
+      const thumbHtml = p.image
+        ? `<div class="prod-thumb"><img src="${escHtml(p.image)}" alt=""></div>`
+        : `<div class="prod-thumb"><i class="fa-solid fa-box"></i></div>`;
+      return `
+      <tr>
+        <td>
+          <div class="prod-cell">
+            ${thumbHtml}
+            <span class="prod-name">${escHtml(p.name)}</span>
+          </div>
+        </td>
+        <td style="color:var(--text-muted);font-size:.8rem;">${escHtml(p.category || '—')}</td>
+        <td><span class="${stockClass}">${stock}</span></td>
+        <td><span class="${badgeClass}">${badgeLabel}</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline" onclick="navigate('products')">View</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  updateBadges();
+}
+
+function _setBadge(id, count) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = count;
+  el.classList.toggle('badge-visible', count > 0);
+}
+
+function updateBadges() {
+  _setBadge('navProductsBadge', products.length);
+  _setBadge('navArrivalsBadge', arrivals.length);
+}
+
+function updateNavBadges() {
+  _setBadge('navProductsBadge', products.length);
+  _setBadge('navArrivalsBadge', arrivals.length);
+  try {
+    const inqs = InquirySystem.getInquiries();
+    const newInqs = inqs.filter(i => i.status === 'new').length;
+    _setBadge('navInqBadge', newInqs);
+  } catch(e) {}
+  try {
+    const sessions = ChatSystem.getSessions();
+    let totalUnread = 0;
+    sessions.forEach(s => { totalUnread += ChatSystem.getUnreadCount(s.id); });
+    _setBadge('navChatBadge', totalUnread);
+  } catch(e) {}
+}
+
+function addActivity(text, subtext, iconType) {
+  const list = document.getElementById('activityList');
+  const colors = ['teal','orange','green','purple'];
+  const icons  = { teal:'fa-boxes-stacked', orange:'fa-arrow-down', green:'fa-cart-shopping', purple:'fa-file-lines' };
+  const color = iconType || colors[Math.floor(Math.random() * colors.length)];
+  const icon = icons[color] || 'fa-circle';
+  const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  const item = document.createElement('div');
+  item.className = 'activity-item-new';
+  item.innerHTML = `
+    <div class="act-icon-wrap ${color}"><i class="fa-solid ${icon}"></i></div>
+    <div class="act-content">
+      <div class="act-title">${text}</div>
+      ${subtext ? `<div class="act-sub">${subtext}</div>` : ''}
+    </div>
+    <div class="act-time">${now}</div>`;
+  list.insertBefore(item, list.firstChild);
+  while (list.children.length > 6) list.removeChild(list.lastChild);
+}
+
+// =============================================
+// PRODUCTS
+// =============================================
+function renderProducts() {
+  const search = (document.getElementById('productSearch').value || '').toLowerCase();
+  const catFilter = document.getElementById('productCatFilter').value;
+  const filtered = products.filter(p => {
+    const matchSearch = !search || p.name.toLowerCase().includes(search) || (p.desc || '').toLowerCase().includes(search);
+    const matchCat = !catFilter || p.category === catFilter;
+    return matchSearch && matchCat;
+  });
+
+  const tbody = document.getElementById('productsTableBody');
+  const empty = document.getElementById('productsEmpty');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map((p, i) => `
+    <tr>
+      <td style="color:var(--text-muted);font-size:.75rem;">${i + 1}</td>
+      <td style="font-weight:600;color:var(--teal);">${escHtml(p.name)}</td>
+      <td><span class="badge badge-teal">${escHtml(p.category || '—')}</span></td>
+      <td style="font-weight:600;">MVR ${p.price ? Number(p.price).toFixed(2) : '—'}</td>
+      <td>${p.stock !== '' && p.stock !== undefined ? p.stock : '—'}</td>
+      <td><span class="badge ${statusBadge(p.status)}">${escHtml(p.status || 'In Stock')}</span></td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-sm btn-outline btn-icon" title="Edit" onclick="editProduct(${p.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-sm btn-danger btn-icon" title="Delete" onclick="deleteProduct(${p.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function statusBadge(s) {
+  if (!s || s === 'In Stock') return 'badge-green';
+  if (s === 'Low Stock') return 'badge-orange';
+  if (s === 'Out of Stock') return 'badge-gray';
+  return 'badge-teal';
+}
+
+function openProductModal(id) {
+  document.getElementById('productModalTitle').textContent = id ? 'Edit Product' : 'Add Product';
+  document.getElementById('productId').value = id || '';
+  if (id) {
+    const p = products.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('productName').value     = p.name || '';
+    document.getElementById('productCategory').value = p.category || '';
+    document.getElementById('productPrice').value    = p.price || '';
+    document.getElementById('productStock').value    = p.stock !== undefined ? p.stock : '';
+    document.getElementById('productStatus').value   = p.status || 'In Stock';
+    document.getElementById('productDesc').value     = p.desc || '';
+  } else {
+    document.getElementById('productName').value     = '';
+    document.getElementById('productCategory').value = '';
+    document.getElementById('productPrice').value    = '';
+    document.getElementById('productStock').value    = '';
+    document.getElementById('productStatus').value   = 'In Stock';
+    document.getElementById('productDesc').value     = '';
+  }
+  openModal('productModal');
+}
+
+function saveProduct() {
+  const name = document.getElementById('productName').value.trim();
+  const cat  = document.getElementById('productCategory').value;
+  const price= document.getElementById('productPrice').value;
+  const stock= document.getElementById('productStock').value;
+  const stat = document.getElementById('productStatus').value;
+  const desc = document.getElementById('productDesc').value.trim();
+  const pid  = document.getElementById('productId').value;
+
+  if (!name) { showToast('Product name is required.', 'error'); return; }
+  if (!cat)  { showToast('Please select a category.', 'error'); return; }
+  if (!price || isNaN(price) || Number(price) < 0) { showToast('Enter a valid price.', 'error'); return; }
+
+  if (pid) {
+    const idx = products.findIndex(x => x.id === Number(pid));
+    if (idx > -1) {
+      products[idx] = { ...products[idx], name, category: cat, price: Number(price), stock: stock !== '' ? Number(stock) : '', status: stat, desc };
+      addActivity(`Updated product: ${name}`);
+      showToast('Product updated successfully!', 'success');
+    }
+  } else {
+    products.push({ id: ++nextId.p, name, category: cat, price: Number(price), stock: stock !== '' ? Number(stock) : '', status: stat, desc, createdAt: new Date().toISOString() });
+    addActivity(`Added new product: ${name}`);
+    showToast('Product added successfully!', 'success');
+  }
+
+  save();
+  closeModal('productModal');
+  renderProducts();
+  updateBadges();
+  updateDashboard();
+}
+
+function editProduct(id) { openProductModal(id); }
+
+function deleteProduct(id) {
+  const p = products.find(x => x.id === id);
+  showConfirm('Delete Product?', `Are you sure you want to delete "${p ? p.name : 'this product'}"?`, () => {
+    products = products.filter(x => x.id !== id);
+    save();
+    renderProducts();
+    updateBadges();
+    updateDashboard();
+    addActivity(`Deleted product: ${p ? p.name : id}`);
+    showToast('Product deleted.', 'success');
+  });
+}
+
+// =============================================
+// NEW ARRIVALS
+// =============================================
+function renderArrivals() {
+  const tbody = document.getElementById('arrivalsTableBody');
+  const empty = document.getElementById('arrivalsEmpty');
+
+  if (arrivals.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = arrivals.map((a, i) => {
+    const date = a.createdAt ? new Date(a.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+    const statusClass = a.status === 'Featured' ? 'badge-orange' : a.status === 'Limited' ? 'badge-purple' : 'badge-green';
+    return `
+    <tr>
+      <td style="color:var(--text-muted);font-size:.75rem;">${i + 1}</td>
+      <td style="font-weight:600;color:var(--teal);">${escHtml(a.name)}</td>
+      <td><span class="badge badge-teal">${escHtml(a.category || '—')}</span></td>
+      <td style="color:var(--text-muted);font-size:.8rem;">${date}</td>
+      <td><span class="badge ${statusClass}">${escHtml(a.status || 'New')}</span></td>
+      <td style="color:var(--text-muted);font-size:.8rem;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(a.note || '—')}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-sm btn-outline btn-icon" title="Edit" onclick="editArrival(${a.id})"><i class="fa-solid fa-pen"></i></button>
+          <button class="btn btn-sm btn-danger btn-icon" title="Delete" onclick="deleteArrival(${a.id})"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function openArrivalModal(id) {
+  document.getElementById('arrivalModalTitle').textContent = id ? 'Edit Arrival' : 'Add New Arrival';
+  document.getElementById('arrivalId').value = id || '';
+  if (id) {
+    const a = arrivals.find(x => x.id === id);
+    if (!a) return;
+    document.getElementById('arrivalName').value     = a.name || '';
+    document.getElementById('arrivalCategory').value = a.category || '';
+    document.getElementById('arrivalStatus').value   = a.status || 'New';
+    document.getElementById('arrivalNote').value     = a.note || '';
+  } else {
+    document.getElementById('arrivalName').value     = '';
+    document.getElementById('arrivalCategory').value = '';
+    document.getElementById('arrivalStatus').value   = 'New';
+    document.getElementById('arrivalNote').value     = '';
+  }
+  openModal('arrivalModal');
+}
+
+function saveArrival() {
+  const name = document.getElementById('arrivalName').value.trim();
+  const cat  = document.getElementById('arrivalCategory').value;
+  const stat = document.getElementById('arrivalStatus').value;
+  const note = document.getElementById('arrivalNote').value.trim();
+  const aid  = document.getElementById('arrivalId').value;
+
+  if (!name) { showToast('Item name is required.', 'error'); return; }
+
+  if (aid) {
+    const idx = arrivals.findIndex(x => x.id === Number(aid));
+    if (idx > -1) {
+      arrivals[idx] = { ...arrivals[idx], name, category: cat, status: stat, note };
+      addActivity(`Updated arrival: ${name}`);
+      showToast('Arrival updated!', 'success');
+    }
+  } else {
+    arrivals.push({ id: ++nextId.a, name, category: cat, status: stat, note, createdAt: new Date().toISOString() });
+    addActivity(`Added new arrival: ${name}`);
+    showToast('New arrival added!', 'success');
+  }
+
+  save();
+  closeModal('arrivalModal');
+  renderArrivals();
+  updateBadges();
+  updateDashboard();
+}
+
+function editArrival(id) { openArrivalModal(id); }
+
+function deleteArrival(id) {
+  const a = arrivals.find(x => x.id === id);
+  showConfirm('Delete Arrival?', `Delete "${a ? a.name : 'this item'}"?`, () => {
+    arrivals = arrivals.filter(x => x.id !== id);
+    save();
+    renderArrivals();
+    updateBadges();
+    updateDashboard();
+    addActivity(`Deleted arrival: ${a ? a.name : id}`);
+    showToast('Arrival deleted.', 'success');
+  });
+}
+
+// =============================================
+// SETTINGS
+// =============================================
+function loadSettings() {
+  const s = DB.get('settings')[0] || {};
+  if (s.storeName)   document.getElementById('settStoreName').value = s.storeName;
+  if (s.tagline)     document.getElementById('settTagline').value   = s.tagline;
+  if (s.location)    document.getElementById('settLocation').value  = s.location;
+  if (s.whatsapp)    document.getElementById('settWhatsapp').value  = s.whatsapp;
+  if (s.viber)       document.getElementById('settViber').value     = s.viber;
+  if (s.email)       document.getElementById('settEmail').value     = s.email;
+  if (s.facebook)    document.getElementById('settFacebook').value  = s.facebook;
+  if (s.instagram)   document.getElementById('settInstagram').value = s.instagram;
+  if (s.desc)        document.getElementById('settDesc').value      = s.desc;
+  if (s.status)      document.getElementById('settStatus').value    = s.status;
+  if (s.hours)       document.getElementById('settHours').value     = s.hours;
+}
+
+function saveSettings() {
+  settings = {
+    storeName: document.getElementById('settStoreName').value.trim(),
+    tagline:   document.getElementById('settTagline').value.trim(),
+    location:  document.getElementById('settLocation').value.trim(),
+    whatsapp:  document.getElementById('settWhatsapp').value.trim(),
+    viber:     document.getElementById('settViber').value.trim(),
+    email:     document.getElementById('settEmail').value.trim(),
+    facebook:  document.getElementById('settFacebook').value.trim(),
+    instagram: document.getElementById('settInstagram').value.trim(),
+    desc:      document.getElementById('settDesc').value.trim(),
+    status:    document.getElementById('settStatus').value,
+    hours:     document.getElementById('settHours').value.trim()
+  };
+  save();
+  addActivity('Store settings updated.');
+  showToast('Settings saved successfully!', 'success');
+}
+
+// =============================================
+// UTILITY
+// =============================================
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// =============================================
+// LIVE CHAT
+// =============================================
+let currentChatSessionId = null;
+
+function renderChatSessions() {
+  const sessions = ChatSystem.getSessions();
+  const tbody = document.getElementById('chatSessionsTableBody');
+  const empty = document.getElementById('chatSessionsEmpty');
+
+  if (sessions.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    tbody.closest('.table-wrap').style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  tbody.closest('.table-wrap').style.display = 'block';
+
+  // Group by customer — key = email/phone if available, else name
+  const grouped = [];
+  const keyMap = {};
+  sessions.forEach(s => {
+    const key = (s.email || s.name || 'guest').toLowerCase().trim();
+    if (!keyMap[key]) {
+      keyMap[key] = { name: s.name, contact: s.email || '—', sessions: [], totalUnread: 0 };
+      grouped.push(keyMap[key]);
+    }
+    keyMap[key].sessions.push(s);
+    keyMap[key].totalUnread += ChatSystem.getUnreadCount(s.id);
+    // Keep most recent contact info
+    if (s.email) keyMap[key].contact = s.email;
+  });
+
+  tbody.innerHTML = grouped.map((g, i) => {
+    // Use the most recent session for last message time
+    const latest = g.sessions.reduce((a, b) => new Date(a.lastMessageAt) > new Date(b.lastMessageAt) ? a : b);
+    const lastMsg = new Date(latest.lastMessageAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const sessionCount = g.sessions.length;
+    const unread = g.totalUnread;
+
+    // Sub-rows per session (hidden by default if >1)
+    const subRows = sessionCount > 1 ? g.sessions.map(s => {
+      const sStarted = new Date(s.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
+      const sUnread = ChatSystem.getUnreadCount(s.id);
+      return `<tr class="chat-subrow chat-subrow-${i}" style="display:none;background:#fafcfc;">
+        <td style="padding-left:32px;color:var(--text-muted);font-size:.72rem;">↳</td>
+        <td colspan="3" style="font-size:.76rem;color:var(--text-muted);">Session started ${sStarted}</td>
+        <td>${sUnread > 0 ? `<span class="badge badge-orange">${sUnread}</span>` : '<span class="badge badge-gray">—</span>'}</td>
+        <td colspan="2">
+          <div class="td-actions">
+            <button class="btn btn-sm btn-outline btn-icon" title="Open Chat" onclick="openChatDetail('${s.id}')"><i class="fa-solid fa-comment-dots"></i></button>
+            <button class="btn btn-sm btn-danger btn-icon" title="Delete" onclick="deleteChatSession('${s.id}')"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('') : '';
+
+    return `<tr>
+      <td style="color:var(--text-muted);font-size:.75rem;">${i + 1}</td>
+      <td style="font-weight:600;color:var(--teal);">
+        ${escHtml(g.name)}
+        ${sessionCount > 1 ? `<span style="margin-left:6px;background:var(--teal-soft);color:var(--teal);padding:1px 7px;border-radius:100px;font-size:.67rem;font-weight:700;">${sessionCount}</span>` : ''}
+      </td>
+      <td style="color:var(--text-muted);font-size:.82rem;">${escHtml(g.contact)}</td>
+      <td style="color:var(--text-muted);font-size:.8rem;">${sessionCount > 1 ? sessionCount + ' sessions' : '1 session'}</td>
+      <td style="color:var(--text-muted);font-size:.8rem;">${lastMsg}</td>
+      <td>${unread > 0 ? `<span class="badge badge-orange">${unread}</span>` : '<span class="badge badge-gray">—</span>'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-sm btn-outline btn-icon" title="Open Chat" onclick="openChatDetail('${latest.id}')"><i class="fa-solid fa-comment-dots"></i></button>
+          ${sessionCount > 1
+            ? `<button class="btn btn-sm btn-outline btn-icon" title="Show sessions" onclick="toggleChatSubrows(${i}, event)"><i class="fa-solid fa-chevron-down" id="chatChevron${i}" style="font-size:.7rem;transition:transform .2s;"></i></button>`
+            : `<button class="btn btn-sm btn-danger btn-icon" title="Delete" onclick="deleteChatSession('${latest.id}')"><i class="fa-solid fa-trash"></i></button>`
+          }
+        </div>
+      </td>
+    </tr>${subRows}`;
+  }).join('');
+}
+
+function toggleChatSubrows(groupIdx, event) {
+  if (event) event.stopPropagation();
+  const rows = document.querySelectorAll(`.chat-subrow-${groupIdx}`);
+  const chevron = document.getElementById(`chatChevron${groupIdx}`);
+  const visible = rows.length > 0 && rows[0].style.display !== 'none';
+  rows.forEach(r => r.style.display = visible ? 'none' : '');
+  if (chevron) chevron.style.transform = visible ? '' : 'rotate(180deg)';
+}
+
+function openChatDetail(sessionId) {
+  currentChatSessionId = sessionId;
+  const session = ChatSystem.getSession(sessionId);
+  if (!session) return;
+
+  document.getElementById('chatDetailTitle').textContent = `Chat with ${escHtml(session.name)}`;
+  document.getElementById('chatDetailCard').style.display = 'block';
+  document.getElementById('chatDetailInput').focus();
+
+  renderChatMessages();
+  ChatSystem.markSessionAsRead(sessionId);
+  updateChatBadge();
+}
+
+function closeChatDetail() {
+  currentChatSessionId = null;
+  document.getElementById('chatDetailCard').style.display = 'none';
+  renderChatSessions();
+}
+
+// ── Admin context menu (delete for all) ───────────────
+let zmAdminCtxMenu = null;
+function closeAdminCtxMenu(){ if(zmAdminCtxMenu){zmAdminCtxMenu.remove();zmAdminCtxMenu=null;} }
+document.addEventListener('click', closeAdminCtxMenu);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAdminCtxMenu(); });
+
+function showAdminCtxMenu(e, msgId){
+  e.preventDefault();
+  closeAdminCtxMenu();
+  const menu = document.createElement('div');
+  menu.className = 'zm-ctx-menu';
+  menu.innerHTML = `<div class="zm-ctx-item danger" id="zmAdminDelMsg"><i class="fa-solid fa-ban" style="font-size:.75rem;"></i> Delete for everyone</div>`;
+  const x = Math.min(e.clientX, window.innerWidth - 170);
+  const y = Math.min(e.clientY, window.innerHeight - 80);
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  document.body.appendChild(menu);
+  zmAdminCtxMenu = menu;
+  menu.querySelector('#zmAdminDelMsg').addEventListener('click', () => {
+    ChatSystem.deleteMessage(msgId);
+    closeAdminCtxMenu();
+    renderChatMessages();
+  });
+}
+
+function bindAdminMsgEvents(){
+  const container = document.getElementById('chatDetailMessages');
+  container.querySelectorAll('[data-msgid]').forEach(el => {
+    el.addEventListener('contextmenu', e => showAdminCtxMenu(e, el.dataset.msgid));
+    let lpt;
+    el.addEventListener('touchstart', e => { lpt = setTimeout(() => showAdminCtxMenu(e.touches[0], el.dataset.msgid), 600); }, {passive:true});
+    el.addEventListener('touchend', () => clearTimeout(lpt));
+    el.addEventListener('touchmove', () => clearTimeout(lpt));
+  });
+}
+
+function renderChatMessages() {
+  if (!currentChatSessionId) return;
+
+  const messages = ChatSystem.getSessionMessages(currentChatSessionId);
+  const container = document.getElementById('chatDetailMessages');
+  const scrolledToBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 60;
+
+  container.innerHTML = messages.map(msg => {
+    const time = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const isAdmin = msg.senderType === 'admin';
+    const isDeleted = !!msg.deleted;
+    const role    = isAdmin ? 'admin' : 'visitor';
+    const txtH    = isDeleted
+      ? `<span><i class="fa-solid fa-ban" style="font-size:.7rem;margin-right:4px;opacity:.6;"></i>This message was deleted</span>`
+      : (msg.text ? escHtml(msg.text) : '');
+    const imgH    = (!isDeleted && msg.imageData) ? `<img src="${msg.imageData}" alt="image">` : '';
+    const bubbleCls = `zm-chat-bubble${isDeleted ? ' deleted' : ''}`;
+    const initials = (msg.senderName || 'C').charAt(0).toUpperCase();
+    const avatarHtml = !isAdmin
+      ? `<div class="zm-chat-avatar">${initials}</div>`
+      : '';
+    return `
+    <div class="zm-chat-msg ${role}" data-msgid="${msg.id}">
+      ${avatarHtml}
+      <div>
+        <div class="${bubbleCls}">${txtH}${imgH}</div>
+        <div class="zm-chat-time">${time}</div>
+      </div>
+    </div>
+    `;
+  }).join('');
+
+  if(scrolledToBottom) container.scrollTop = container.scrollHeight;
+  bindAdminMsgEvents();
+}
+
+function sendChatReply() {
+  if (!currentChatSessionId) return;
+
+  const input = document.getElementById('chatDetailInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  ChatSystem.sendMessage(currentChatSessionId, 'admin', 'Admin', text);
+  input.value = '';
+  renderChatMessages();
+  input.focus();
+  showToast('Message sent!', 'success');
+}
+
+function deleteChatSession(sessionId) {
+  const session = ChatSystem.getSession(sessionId);
+  showConfirm('Delete Chat Session?', `Delete chat with "${session ? session.name : 'this visitor'}"? This cannot be undone.`, () => {
+    ChatSystem.deleteSession(sessionId);
+    if (currentChatSessionId === sessionId) {
+      closeChatDetail();
+    }
+    renderChatSessions();
+    updateChatBadge();
+    showToast('Chat session deleted.', 'success');
+  });
+}
+
+function updateChatBadge() {
+  const sessions = ChatSystem.getSessions();
+  let totalUnread = 0;
+  sessions.forEach(s => {
+    totalUnread += ChatSystem.getUnreadCount(s.id);
+  });
+  _setBadge('navChatBadge', totalUnread);
+  // Also refresh the notif dot
+  updateNotifDot();
+}
+
+ChatSystem.on('messages-updated', () => {
+  if (currentChatSessionId) {
+    renderChatMessages();
+  }
+  renderChatSessions();
+  updateChatBadge();
+  _checkAndPlaySounds();
+});
+
+ChatSystem.on('sessions-updated', () => {
+  renderChatSessions();
+  updateChatBadge();
+});
+
+// =============================================
+// SOUND NOTIFICATIONS
+// =============================================
+const NotifSound = (function() {
+  let _ctx = null;
+  function _getCtx() {
+    if (!_ctx) _ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_ctx.state === 'suspended') _ctx.resume();
+    return _ctx;
+  }
+  // Unlock audio on first user interaction
+  function _unlock() {
+    _getCtx();
+    document.removeEventListener('click', _unlock);
+    document.removeEventListener('keydown', _unlock);
+  }
+  document.addEventListener('click', _unlock);
+  document.addEventListener('keydown', _unlock);
+  // Play a soft two-tone chime
+  function playChime() {
+    try {
+      const ctx = _getCtx();
+      const now = ctx.currentTime;
+      [[660, 0, 0.12], [880, 0.13, 0.18]].forEach(([freq, start, dur]) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + start);
+        gain.gain.setValueAtTime(0, now + start);
+        gain.gain.linearRampToValueAtTime(0.18, now + start + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + start + dur);
+        osc.start(now + start);
+        osc.stop(now + start + dur + 0.05);
+      });
+    } catch(e) {}
+  }
+  // Play a short soft blip for chat
+  function playBlip() {
+    try {
+      const ctx = _getCtx();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(800, now);
+      osc.frequency.linearRampToValueAtTime(1000, now + 0.06);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc.start(now); osc.stop(now + 0.2);
+    } catch(e) {}
+  }
+  return { playChime, playBlip };
+})();
+
+// Track previous counts to only play sound on increase
+let _prevChatUnread = 0;
+let _prevInqNew = 0;
+
+function _checkAndPlaySounds() {
+  try {
+    const sessions = ChatSystem.getSessions();
+    let total = 0;
+    sessions.forEach(s => { total += ChatSystem.getUnreadCount(s.id); });
+    if (total > _prevChatUnread) NotifSound.playBlip();
+    _prevChatUnread = total;
+  } catch(e) {}
+  try {
+    const inqs = InquirySystem.getInquiries();
+    const newCount = inqs.filter(i => i.status === 'new').length;
+    if (newCount > _prevInqNew) NotifSound.playChime();
+    _prevInqNew = newCount;
+  } catch(e) {}
+}
+
+// =============================================
+// NOTIFICATION PANEL
+// =============================================
+let notifPanelOpen = false;
+
+function updateNotifDot() {
+  const chatUnread = ChatSystem.getAdminUnreadCount();
+  const inqs = InquirySystem.getInquiries();
+  const newInqs = inqs.filter(i => i.status === 'new').length;
+  const dot = document.getElementById('notifDot');
+  if (dot) dot.style.display = (chatUnread > 0 || newInqs > 0) ? '' : 'none';
+}
+
+function buildNotifPanel() {
+  const body = document.getElementById('notifPanelBody');
+  if (!body) return;
+  const items = [];
+
+  // Chat unread
+  const sessions = ChatSystem.getSessions();
+  sessions.forEach(s => {
+    const count = ChatSystem.getUnreadCount(s.id);
+    if (count > 0) {
+      items.push({
+        type: 'chat',
+        icon: 'fa-solid fa-comment',
+        title: `${count} new message${count > 1 ? 's' : ''} from ${s.name}`,
+        sub: 'Click to open chat',
+        action: () => { navigate('chat'); closeNotifPanel(); }
+      });
+    }
+  });
+
+  // New inquiries
+  const inqs = InquirySystem.getInquiries();
+  const newInqs = inqs.filter(i => i.status === 'new');
+  if (newInqs.length > 0) {
+    items.push({
+      type: 'inq',
+      icon: 'fa-solid fa-envelope',
+      title: `${newInqs.length} new inquir${newInqs.length > 1 ? 'ies' : 'y'}`,
+      sub: 'Click to open inquiries',
+      action: () => { navigate('inquiries'); closeNotifPanel(); }
+    });
+  }
+
+  // Low stock alert
+  try {
+    const prods = JSON.parse(localStorage.getItem('zm_products') || '[]');
+    const lowCount = prods.filter(p => {
+      const s = parseInt(p.stock ?? p.qty ?? 0);
+      return s >= 0 && s <= 5;
+    }).length;
+    if (lowCount > 0) {
+      items.push({
+        type: 'stock',
+        icon: 'fa-solid fa-triangle-exclamation',
+        title: `${lowCount} item${lowCount > 1 ? 's' : ''} low/out of stock`,
+        sub: 'Click to view inventory',
+        action: () => { navigate('products'); closeNotifPanel(); }
+      });
+    }
+  } catch(e) {}
+
+  if (items.length === 0) {
+    body.innerHTML = '<div class="notif-empty">No new notifications</div>';
+    return;
+  }
+
+  body.innerHTML = items.map(item => `
+    <div class="notif-item unread" onclick="(${item.action.toString()})()">
+      <div class="notif-icon ${item.type}"><i class="${item.icon}"></i></div>
+      <div class="notif-text">
+        <div class="notif-text-title">${item.title}</div>
+        <div class="notif-text-sub">${item.sub}</div>
+      </div>
+      <div class="notif-badge-dot"></div>
+    </div>
+  `).join('');
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  if (!panel) return;
+  notifPanelOpen = !notifPanelOpen;
+  if (notifPanelOpen) {
+    buildNotifPanel();
+    panel.style.display = '';
+  } else {
+    panel.style.display = 'none';
+  }
+}
+
+function closeNotifPanel() {
+  const panel = document.getElementById('notifPanel');
+  if (panel) panel.style.display = 'none';
+  notifPanelOpen = false;
+}
+
+function clearAllNotifs() {
+  ChatSystem.markAdminRead();
+  // Mark all inquiries as read
+  try { InquirySystem.markAllRead(); } catch(e) {}
+  buildNotifPanel();
+  updateNotifDot();
+  updateNavBadges();
+}
+
+// Close panel when clicking outside
+document.addEventListener('click', (e) => {
+  const wrapper = document.getElementById('notifWrapper');
+  if (wrapper && !wrapper.contains(e.target) && notifPanelOpen) {
+    closeNotifPanel();
+  }
+});
+
+// =============================================
+// VIEW STORE
+// =============================================
+function openStore() {
+  window.open('index.html?from_admin=1', '_blank');
+}
+
+// Init notif dot on load
+document.addEventListener('DOMContentLoaded', updateNotifDot);
+// Realtime: re-render everything relevant whenever inquiries change (own tab or
+// any customer/device anywhere, thanks to Firebase Firestore).
+InquirySystem.on('inquiries-updated', () => {
+  updateNotifDot();
+  updateNavBadges();
+  updateDashboard();
+  _checkAndPlaySounds();
+  if (_inqHistoryMode) { renderInqHistory(); } else { renderInquiries(); }
+  if (notifPanelOpen) buildNotifPanel();
+});
+
+// =============================================
+// INIT
+// =============================================
+// =============================================
+// INQUIRIES
+// =============================================
+function renderInquiries() {
+  const inqs = InquirySystem.getInquiries();
+  const tbody = document.getElementById('inquiriesTableBody');
+  const empty = document.getElementById('inquiriesEmpty');
+
+  if (inqs.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+
+  // Group inquiries by customer (email if available, else name)
+  const grouped = [];
+  const keyMap = {};
+  inqs.forEach(inq => {
+    const key = (inq.email || inq.name || 'guest').toLowerCase().trim();
+    if (!keyMap[key]) {
+      keyMap[key] = { name: inq.name || 'Guest', contact: inq.email || '—', inqs: [], hasNew: false };
+      grouped.push(keyMap[key]);
+    }
+    keyMap[key].inqs.push(inq);
+    if (inq.status === 'new') keyMap[key].hasNew = true;
+  });
+
+  tbody.innerHTML = grouped.map((g, i) => {
+    const lastInq = g.inqs[0]; // inqs are ordered newest first
+    const lastDate = new Date(lastInq.sentAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    const totalItems = g.inqs.reduce((sum, inq) => sum + (inq.items ? inq.items.length : 0), 0);
+    const orderCount = g.inqs.length;
+    const badge = g.hasNew
+      ? `<span style="background:#FD4D02;color:#fff;padding:2px 8px;border-radius:100px;font-size:.7rem;font-weight:700;">New</span>`
+      : `<span style="background:#e8eeeb;color:#5a7a7a;padding:2px 8px;border-radius:100px;font-size:.7rem;font-weight:600;">Read</span>`;
+
+    // Sub-rows for each order, hidden by default
+    const subRows = g.inqs.map(inq => {
+      const globalIdx = inqs.findIndex(x => x.id === inq.id);
+      const d = new Date(inq.sentAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      const ic = inq.items ? inq.items.length : 0;
+      const itemNames = inq.items ? inq.items.map(it => `${it.name}${it.qty > 1 ? ' ×'+it.qty : ''}`).join(', ') : '—';
+      const sBadge = inq.status === 'new'
+        ? `<span style="background:#FD4D02;color:#fff;padding:1px 7px;border-radius:100px;font-size:.67rem;font-weight:700;">New</span>`
+        : `<span style="background:#e8eeeb;color:#5a7a7a;padding:1px 7px;border-radius:100px;font-size:.67rem;font-weight:600;">Read</span>`;
+      return `<tr class="inq-subrow inq-subrow-${i}" style="display:none;background:#fafcfc;">
+        <td style="padding-left:32px;color:var(--text-muted);font-size:.72rem;">↳</td>
+        <td colspan="2" style="font-size:.76rem;color:var(--text-muted);">${itemNames}</td>
+        <td style="font-size:.76rem;">${ic} item${ic!==1?'s':''}</td>
+        <td style="font-size:.76rem;color:var(--text-muted);">${d}</td>
+        <td>${sBadge}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="viewInquiry(${globalIdx})" style="font-size:.72rem;padding:3px 10px;">View</button></td>
+      </tr>`;
+    }).join('');
+
+    // First inquiry's global index for the main View button
+    const firstIdx = inqs.findIndex(x => x.id === lastInq.id);
+
+    return `<tr class="inq-group-row" style="cursor:pointer;" onclick="toggleInqSubrows(${i}, event)">
+      <td>${i + 1}</td>
+      <td>
+        <strong>${escHtml(g.name)}</strong>
+        ${orderCount > 1 ? `<span style="margin-left:6px;background:var(--teal-soft);color:var(--teal);padding:1px 7px;border-radius:100px;font-size:.67rem;font-weight:700;">${orderCount} orders</span>` : ''}
+      </td>
+      <td style="font-size:.8rem;color:var(--text-muted);">${escHtml(g.contact)}</td>
+      <td>${totalItems} item${totalItems!==1?'s':''}</td>
+      <td>${lastDate}</td>
+      <td>${badge}</td>
+      <td onclick="event.stopPropagation()">
+        <button class="btn btn-outline btn-sm" onclick="viewInquiry(${firstIdx})" style="margin-right:4px;">View</button>
+        ${orderCount > 1 ? `<button class="btn btn-outline btn-sm" onclick="toggleInqSubrows(${i}, event)" style="padding:4px 8px;" title="Show orders"><i class="fa-solid fa-chevron-down" id="inqChevron${i}" style="font-size:.7rem;transition:transform .2s;"></i></button>` : `<button class="btn btn-outline btn-sm" onclick="deleteInquiry(${firstIdx})" style="border-color:#d63030;color:#d63030;">Delete</button>`}
+      </td>
+    </tr>${subRows}`;
+  }).join('');
+}
+
+function toggleInqSubrows(groupIdx, e) {
+  if (e) e.stopPropagation();
+  const rows = document.querySelectorAll(`.inq-subrow-${groupIdx}`);
+  const chevron = document.getElementById(`inqChevron${groupIdx}`);
+  const visible = rows.length > 0 && rows[0].style.display !== 'none';
+  rows.forEach(r => r.style.display = visible ? 'none' : '');
+  if (chevron) chevron.style.transform = visible ? '' : 'rotate(180deg)';
+}
+
+// =============================================
+// INQUIRIES — REALTIME CHAT v2
+// =============================================
+let _inqCurrentIdx   = null;   // current inquiry table index
+let _inqCurrentInqId = null;   // inquiry id (zm_inquiries)
+let _inqSessionId    = null;   // linked chat session
+let _inqPendingImg   = null;   // base64 image staged for send
+
+function _getInqs() { return InquirySystem.getInquiries(); }
+
+function viewInquiry(idx) {
+  const inqs = _getInqs();
+  const inq  = inqs[idx];
+  if (!inq) return;
+
+  _inqCurrentIdx   = idx;
+  _inqCurrentInqId = inq.id;
+  _inqPendingImg   = null;
+
+  // Mark as read
+  InquirySystem.markRead(inq.id);
+  updateDashboard();
+  renderInquiries();
+
+  // --- find or create a linked chat session ---
+  let sessionId = null;
+  const existingSessions = ChatSystem.getSessions();
+
+  // 1) Highest priority: the inquiry stores the customer's direct chat session ID
+  //    (set when the customer submitted the inquiry from a page where they had an open chat).
+  //    This is the ONLY session the customer's chat widget is listening to.
+  if (inq.linkedSessionId && existingSessions.find(s => s.id === inq.linkedSessionId)) {
+    sessionId = inq.linkedSessionId;
+    // Make sure this session is tagged with the inquiryId so future lookups (step 2) still work
+    ChatSystem.linkInquiryToSession(sessionId, inq.id);
+
+  } else {
+    // 2) Fallback: check if a session was already tagged with this inquiry's ID
+    const linked = existingSessions.find(s => s.inquiryId === inq.id);
+    if (linked) {
+      sessionId = linked.id;
+
+    } else {
+      // 3) Last resort: find by matching email, or create a brand-new session
+      const prevSession = inq.email
+        ? existingSessions.find(s => s.email && s.email.toLowerCase() === inq.email.toLowerCase())
+        : null;
+
+      if (prevSession) {
+        // Reuse existing session — append new inquiry as a continuation message
+        sessionId = prevSession.id;
+        ChatSystem.linkInquiryToSession(sessionId, inq.id);
+        if (inq.items && inq.items.length > 0) {
+          const itemLines = inq.items.map((it, idx) => `  ${idx+1}. ${it.name}${it.qty > 1 ? ' × ' + it.qty : ''}`).join('\n');
+          const d = new Date(inq.sentAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+          ChatSystem.sendMessage(sessionId, 'visitor', inq.name || 'Guest',
+            `📦 New Order Inquiry\n━━━━━━━━━━━━━━━\n${itemLines}\n━━━━━━━━━━━━━━━\n🕐 ${d}`);
+        }
+      } else {
+        // Brand-new customer — create a fresh session
+        sessionId = ChatSystem.createSession(inq.name || 'Guest', inq.email || '');
+        ChatSystem.linkInquiryToSession(sessionId, inq.id);
+        if (inq.items && inq.items.length > 0) {
+          const itemLines = inq.items.map((it, idx) => `  ${idx+1}. ${it.name}${it.qty > 1 ? ' × ' + it.qty : ''}`).join('\n');
+          const d = new Date(inq.sentAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+          ChatSystem.sendMessage(sessionId, 'visitor', inq.name || 'Guest',
+            `👋 Hi! I'd like to inquire about:\n━━━━━━━━━━━━━━━\n${itemLines}\n━━━━━━━━━━━━━━━\n🕐 ${d}`);
+        }
+      }
+    }
+  }
+  _inqSessionId = sessionId;
+
+  // Populate UI
+  const date = new Date(inq.sentAt).toLocaleString('en-US', { month:'long', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+  document.getElementById('inqChatTitle').innerHTML =
+    `<span style="font-size:.95rem;">Inquiry from <strong style="color:var(--teal);">${escHtml(inq.name||'Guest')}</strong></span>
+     <span style="font-size:.72rem;font-weight:400;color:var(--text-muted);margin-left:8px;">${date}</span>`;
+
+  document.getElementById('inqCustomerInfo').innerHTML = `
+    <div style="font-weight:600;color:var(--teal);margin-bottom:2px;">${escHtml(inq.name||'Guest')}</div>
+    ${inq.email ? `<div style="color:var(--text-muted);font-size:.78rem;">${escHtml(inq.email)}</div>` : ''}`;
+
+  document.getElementById('inqItemsList').innerHTML = (inq.items||[]).map(it => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--cream);border-radius:8px;">
+      <span style="font-size:.82rem;color:var(--teal);font-weight:500;">${escHtml(it.name)}</span>
+      <span style="font-size:.78rem;color:var(--text-muted);font-weight:700;background:#fff;padding:2px 8px;border-radius:100px;">×${it.qty}</span>
+    </div>`).join('');
+
+  document.getElementById('inqDeleteBtn').onclick = () => deleteInquiry(idx);
+
+  // Show panel
+  document.getElementById('inqListCard').style.display = 'none';
+  document.getElementById('inqChatPanel').style.display = 'block';
+
+  clearInqImg();
+  renderInqChat();
+  ChatSystem.markSessionAsRead(_inqSessionId);
+  document.getElementById('inqChatInput').focus();
+
+  // Scroll panel into view
+  document.getElementById('inqChatPanel').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function renderInqChat() {
+  if (!_inqSessionId) return;
+  const msgs = ChatSystem.getSessionMessages(_inqSessionId);
+  const container = document.getElementById('inqChatMessages');
+
+  if (msgs.length === 0) {
+    container.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.82rem;">No messages yet. Start the conversation!</div>`;
+    return;
+  }
+
+  container.innerHTML = msgs.map(msg => {
+    const isAdmin = msg.senderType === 'admin';
+    const time = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+    const imgHtml = msg.imageData
+      ? `<img src="${msg.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${msg.text?'6px':'0'};" data-src="${msg.imageData}">`
+      : '';
+    const textHtml = msg.text ? `<div style="font-size:.82rem;line-height:1.5;white-space:pre-wrap;">${escHtml(msg.text)}</div>` : '';
+    const role = isAdmin ? 'admin' : 'visitor';
+    const initials = (msg.senderName||'C').charAt(0).toUpperCase();
+    const avatarHtml = !isAdmin ? `<div class="zm-chat-avatar">${initials}</div>` : '';
+    return `
+    <div class="zm-chat-msg ${role}">
+      ${avatarHtml}
+      <div>
+        <div class="zm-chat-bubble">${textHtml}${imgHtml}</div>
+        <div class="zm-chat-time">${isAdmin?'You':'Customer'} · ${time}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendInqReply() {
+  if (!_inqSessionId) return;
+  const input = document.getElementById('inqChatInput');
+  const text  = input.value.trim();
+  if (!text && !_inqPendingImg) return;
+
+  ChatSystem.sendMessage(_inqSessionId, 'admin', 'Admin', text, _inqPendingImg);
+  input.value = '';
+  input.style.height = 'auto';
+  clearInqImg();
+  renderInqChat();
+  input.focus();
+  showToast('Reply sent to customer!', 'success');
+}
+
+function handleInqImgUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 3 * 1024 * 1024) { showToast('Image too large (max 3 MB)', 'error'); return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    _inqPendingImg = ev.target.result;
+    document.getElementById('inqImgPreviewImg').src = _inqPendingImg;
+    document.getElementById('inqImgPreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function clearInqImg() {
+  _inqPendingImg = null;
+  document.getElementById('inqImgPreview').style.display = 'none';
+  document.getElementById('inqImgPreviewImg').src = '';
+}
+
+function zoomInqImg(src) {
+  // lightbox
+  let overlay = document.getElementById('zmImgZoomOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'zmImgZoomOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+    overlay.onclick = () => overlay.remove();
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = `<img src="${src}" style="max-width:90vw;max-height:90vh;border-radius:12px;box-shadow:0 8px 40px rgba(0,0,0,.5);">`;
+  document.body.appendChild(overlay);
+}
+
+function closeInqDetail() {
+  _inqCurrentIdx = null;
+  _inqCurrentInqId = null;
+  _inqSessionId = null;
+  clearInqImg();
+  document.getElementById('inqChatPanel').style.display = 'none';
+  document.getElementById('inqListCard').style.display = 'block';
+}
+
+function deleteInquiry(idx) {
+  showConfirm('Delete Inquiry?', 'This will permanently delete the inquiry and its chat history.', () => {
+    const inqs = _getInqs();
+    const inq = inqs[idx];
+    // also delete linked chat session if any
+    if (_inqSessionId) {
+      ChatSystem.deleteSession(_inqSessionId);
+    } else if (inq) {
+      const linked = ChatSystem.getSessions().find(s => s.inquiryId === inq.id);
+      if (linked) ChatSystem.deleteSession(linked.id);
+    }
+    if (inq) InquirySystem.deleteInquiry(inq.id);
+    updateDashboard();
+    closeInqDetail();
+    renderInquiries();
+    showToast('Inquiry deleted.', 'success');
+  });
+}
+
+function clearNewInquiryBadge() {
+  InquirySystem.markAllRead();
+  updateDashboard();
+  renderInquiries();
+}
+
+// =============================================
+// INQUIRY HISTORY VIEW (grouped by customer)
+// =============================================
+let _inqHistoryMode = false;
+
+function toggleInqView() {
+  _inqHistoryMode = !_inqHistoryMode;
+  const tableWrap = document.querySelector('#inqListCard .table-wrap');
+  const emptyEl   = document.getElementById('inquiriesEmpty');
+  const historyEl = document.getElementById('inqHistoryView');
+  const btn       = document.getElementById('inqViewToggleBtn');
+
+  if (_inqHistoryMode) {
+    if (tableWrap) tableWrap.style.display = 'none';
+    emptyEl.style.display = 'none';
+    historyEl.style.display = 'block';
+    btn.innerHTML = '<i class="fa-solid fa-list" style="margin-right:5px;"></i>List View';
+    renderInqHistory();
+  } else {
+    if (tableWrap) tableWrap.style.display = '';
+    historyEl.style.display = 'none';
+    btn.innerHTML = '<i class="fa-solid fa-clock-rotate-left" style="margin-right:5px;"></i>History View';
+    renderInquiries();
+  }
+}
+
+function renderInqHistory() {
+  const customers = InquirySystem.getCustomers();
+  const container = document.getElementById('inqHistoryList');
+  if (!customers || customers.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">No inquiries yet.</div>';
+    return;
+  }
+  container.innerHTML = customers.map(c => {
+    const inqs = InquirySystem.getInquiriesByEmail(c.email);
+    const lastDate = new Date(c.lastSentAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    const newBadge = c.hasNew
+      ? '<span style="background:#FD4D02;color:#fff;padding:2px 8px;border-radius:100px;font-size:.7rem;font-weight:700;margin-left:6px;">New</span>'
+      : '';
+    const inqRows = inqs.map((inq, i) => {
+      const globalIdx = InquirySystem.getInquiries().findIndex(x => x.id === inq.id);
+      const d = new Date(inq.sentAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+      const itemCount = inq.items ? inq.items.length : 0;
+      const statusBadge = inq.status === 'new'
+        ? '<span style="background:#FD4D02;color:#fff;padding:1px 7px;border-radius:100px;font-size:.68rem;font-weight:700;">New</span>'
+        : '<span style="background:#e8eeeb;color:#5a7a7a;padding:1px 7px;border-radius:100px;font-size:.68rem;font-weight:600;">Read</span>';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:var(--cream);border-radius:8px;gap:12px;">
+        <div style="flex:1;min-width:0;">
+          <span style="font-size:.78rem;color:var(--teal);font-weight:600;">${d}</span>
+          <span style="font-size:.75rem;color:var(--text-muted);margin-left:8px;">${itemCount} item${itemCount!==1?'s':''}</span>
+          ${statusBadge}
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="viewInquiry(${globalIdx})" style="flex-shrink:0;font-size:.72rem;padding:3px 10px;">View Chat</button>
+      </div>`;
+    }).join('');
+
+    return `<div style="border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#fff;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        <div>
+          <span style="font-weight:700;color:var(--teal);font-size:.92rem;">${escHtml(c.name)}</span>
+          ${newBadge}
+          <div style="font-size:.76rem;color:var(--text-muted);margin-top:2px;">${escHtml(c.email)||'No email'} &bull; ${c.inquiryCount} inquiry${c.inquiryCount!==1?'ies':'y'} &bull; Last: ${lastDate}</div>
+        </div>
+        <i class="fa-solid fa-chevron-down" style="color:var(--text-muted);font-size:.8rem;"></i>
+      </div>
+      <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--border);">
+        ${inqRows}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Realtime: re-render chat if open
+ChatSystem.on('messages-updated', () => {
+  if (_inqSessionId) renderInqChat();
+});
+
+// =============================================
+// REGISTERED USERS
+// =============================================
+function renderUsers() {
+  const users = (() => { try { return JSON.parse(localStorage.getItem('zm_all_accounts') || '[]'); } catch(e) { return []; } })();
+  const tbody = document.getElementById('usersTableBody');
+  const empty = document.getElementById('usersEmpty');
+
+  // Also check current logged-in user if not in list
+  try {
+    const cur = JSON.parse(localStorage.getItem('zamimart_user') || 'null');
+    if (cur && !users.find(u => u.email === cur.email)) {
+      users.push({ name: cur.name, email: cur.email, phone: cur.phone || '', createdAt: null });
+    }
+  } catch(e) {}
+
+  if (users.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = users.map((u, i) => {
+    const date = u.createdAt ? new Date(u.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><strong>${u.name || '—'}</strong></td>
+      <td>${u.email || u.phone || '—'}</td>
+      <td>${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+// =============================================
+// LOGIN LOGS
+// =============================================
+function renderLoginLogs() {
+  const logs = (() => { try { return JSON.parse(localStorage.getItem('zm_login_logs') || '[]'); } catch(e) { return []; } })();
+  const tbody = document.getElementById('loginLogsTableBody');
+  const empty = document.getElementById('loginLogsEmpty');
+
+  if (logs.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = logs.map((log, i) => {
+    const date = new Date(log.loginAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><strong>${log.name || '—'}</strong></td>
+      <td>${log.email || '—'}</td>
+      <td>${date}</td>
+    </tr>`;
+  }).join('');
+}
+
+(function init() {
+  updateDashboard();
+  updateNavBadges();
+  updateDate();
+  updateProfileDisplay();
+  renderChatSessions();
+  updateChatBadge();
+})();
+</script>
+
+<script>
+/* zm-chat-img lightbox */
+document.addEventListener('click', function(e) {
+  var img = e.target.closest('.zm-chat-img');
+  if (!img) return;
+  var src = img.dataset.src || img.src;
+  var o = document.getElementById('zmLightbox');
+  if (!o) {
+    o = document.createElement('div');
+    o.id = 'zmLightbox';
+    o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+    o.onclick = function(){ o.remove(); };
+    document.body.appendChild(o);
+  }
+  o.innerHTML = '<img src="' + src + '" style="max-width:90vw;max-height:90vh;border-radius:10px;">';
+});
+</script>
+</body>
+</html>

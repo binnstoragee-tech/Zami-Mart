@@ -4,14 +4,27 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  /* --- Profile icon: redirect based on login state --- */
+  const navAccount = document.querySelector('.nav-account');
+  if (navAccount) {
+    try {
+      const user = JSON.parse(localStorage.getItem('zamimart_user') || 'null');
+      navAccount.href = user ? 'profile.html' : 'login.html';
+    } catch (e) {
+      navAccount.href = 'login.html';
+    }
+  }
+
   /* --- Navbar scroll state --- */
   const navbar = document.querySelector('.navbar');
-  const onScroll = () => {
-    if (window.scrollY > 30) navbar.classList.add('scrolled');
-    else navbar.classList.remove('scrolled');
-  };
-  window.addEventListener('scroll', onScroll);
-  onScroll();
+  if (navbar) {
+    const onScroll = () => {
+      if (window.scrollY > 30) navbar.classList.add('scrolled');
+      else navbar.classList.remove('scrolled');
+    };
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+  }
 
   /* --- Mobile nav toggle --- */
   const toggle = document.querySelector('.nav-toggle');
@@ -114,7 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  /* --- Entering animation (on load) --- */
+  /* --- Fix: reset transition if browser restores from bfcache (back button) --- */
+  window.addEventListener('pageshow', (e) => {
+    if (e.persisted) {
+      document.body.classList.remove('is-leaving', 'is-entering');
+    }
+  });
   requestAnimationFrame(() => {
     document.body.classList.add('is-entering');
     setTimeout(() => {

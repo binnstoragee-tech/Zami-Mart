@@ -69,14 +69,20 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ============================================
      Product Viewer (zoom modal)
   ============================================ */
-  const pvOverlay = document.getElementById('pvOverlay');
-  const pvStage   = document.getElementById('pvStage');
-  const pvImgWrap = document.getElementById('pvImgWrap');
-  const pvImg     = document.getElementById('pvImg');
-  const pvName    = document.getElementById('pvName');
-  const pvClose   = document.getElementById('pvClose');
-  const pvZoomIn  = document.getElementById('pvZoomIn');
-  const pvZoomOut = document.getElementById('pvZoomOut');
+  const pvOverlay     = document.getElementById('pvOverlay');
+  const pvStage       = document.getElementById('pvStage');
+  const pvImgWrap     = document.getElementById('pvImgWrap');
+  const pvImg         = document.getElementById('pvImg');
+  const pvName        = document.getElementById('pvName');
+  const pvClose       = document.getElementById('pvClose');
+  const pvZoomIn      = document.getElementById('pvZoomIn');
+  const pvZoomOut     = document.getElementById('pvZoomOut');
+  const pvAddCartBtn  = document.getElementById('pvAddCartBtn');
+  const pvRemoveBtn   = document.getElementById('pvRemoveBtn');
+  const pvQtyCtrl     = document.getElementById('pvQtyCtrl');
+  const pvQtyDec      = document.getElementById('pvQtyDec');
+  const pvQtyInc      = document.getElementById('pvQtyInc');
+  const pvQtyVal      = document.getElementById('pvQtyVal');
 
   const ZOOM_MIN = 1;
   const ZOOM_MAX = 4;
@@ -91,11 +97,6 @@ document.addEventListener('DOMContentLoaded', () => {
     pvImg.style.transform = `translate(${posX}px, ${posY}px) scale(${scale})`;
   }
 
-  function setDrift(active) {
-    if (!pvImgWrap) return;
-    pvImgWrap.classList.toggle('kb-drift', !!active);
-  }
-
   function resetView() {
     scale = 1;
     posX = 0;
@@ -104,7 +105,6 @@ document.addEventListener('DOMContentLoaded', () => {
     pvStage.classList.remove('dragging');
     pvZoomOut.disabled = true;
     pvZoomIn.disabled = false;
-    setDrift(true);
   }
 
   function clampPos() {
@@ -122,7 +122,84 @@ document.addEventListener('DOMContentLoaded', () => {
     setTransform();
     pvZoomOut.disabled = scale <= ZOOM_MIN;
     pvZoomIn.disabled = scale >= ZOOM_MAX;
-    setDrift(scale <= ZOOM_MIN);
+
+  }
+
+  // Track current product open in viewer
+  let pvCurrentProduct = { name: null, img: null };
+
+  function getPvQty() {
+    if (!window.ZMCart || !pvCurrentProduct.name) return 0;
+    const item = window.ZMCart.getItem(pvCurrentProduct.name);
+    return item ? item.qty : 0;
+  }
+
+  function syncPvCartBtn(productName, productImg) {
+    pvCurrentProduct = { name: productName, img: productImg };
+    if (!pvAddCartBtn) return;
+    const qty = getPvQty();
+    if (qty > 0) {
+      pvAddCartBtn.style.display = 'none';
+      pvRemoveBtn.style.display = '';
+      pvQtyCtrl.style.display = '';
+      pvQtyVal.textContent = qty;
+    } else {
+      pvAddCartBtn.style.display = '';
+      pvAddCartBtn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+      pvAddCartBtn.classList.remove('pv-added');
+      pvRemoveBtn.style.display = 'none';
+      pvQtyCtrl.style.display = 'none';
+    }
+  }
+
+  if (pvAddCartBtn) {
+    pvAddCartBtn.addEventListener('click', () => {
+      if (!window.ZMCart || !pvCurrentProduct.name) return;
+      if (pvAddCartBtn.classList.contains('pv-loading') || pvAddCartBtn.classList.contains('pv-added')) return;
+
+      // Step 1: Loading
+      pvAddCartBtn.classList.add('pv-loading');
+      pvAddCartBtn.innerHTML = '<div class="pv-btn-spinner"></div> Adding...';
+
+      // Step 2: Success after 900ms
+      setTimeout(() => {
+        window.ZMCart.addItem(pvCurrentProduct.name, pvCurrentProduct.img);
+        pvAddCartBtn.classList.remove('pv-loading');
+        pvAddCartBtn.classList.add('pv-added');
+        pvAddCartBtn.innerHTML = '<span class="pv-check-icon"><i class="fa-solid fa-check"></i></span> Added to Cart!';
+        syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
+      }, 900);
+    });
+  }
+
+  if (pvRemoveBtn) {
+    pvRemoveBtn.addEventListener('click', () => {
+      if (!window.ZMCart || !pvCurrentProduct.name) return;
+      window.ZMCart.removeItem(pvCurrentProduct.name);
+      syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
+    });
+  }
+
+  if (pvQtyDec) {
+    pvQtyDec.addEventListener('click', () => {
+      if (!window.ZMCart || !pvCurrentProduct.name) return;
+      const qty = getPvQty();
+      if (qty <= 1) {
+        window.ZMCart.removeItem(pvCurrentProduct.name);
+      } else {
+        window.ZMCart.setQty(pvCurrentProduct.name, qty - 1);
+      }
+      syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
+    });
+  }
+
+  if (pvQtyInc) {
+    pvQtyInc.addEventListener('click', () => {
+      if (!window.ZMCart || !pvCurrentProduct.name) return;
+      const qty = getPvQty();
+      window.ZMCart.setQty(pvCurrentProduct.name, qty + 1);
+      syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
+    });
   }
 
   function openViewer(tag) {
@@ -130,7 +207,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const name = tag.querySelector('.product-name');
     const wrap = tag.querySelector('.product-img-wrap');
 
-    pvName.textContent = name ? name.textContent : '';
+    const productName = name ? name.textContent.trim() : '';
+    const productImg  = (img && !wrap.classList.contains('no-img')) ? img.src : null;
+
+    pvName.textContent = productName;
     resetView();
 
     if (img && !wrap.classList.contains('no-img')) {
@@ -143,6 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
       pvStage.classList.add('no-img');
     }
 
+    syncPvCartBtn(productName, productImg);
+
     pvOverlay.classList.add('open');
     document.body.style.overflow = 'hidden';
   }
@@ -150,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeViewer() {
     pvOverlay.classList.remove('open');
     document.body.style.overflow = '';
-    setDrift(false);
+
   }
 
   document.querySelectorAll('.item-tag').forEach(tag => {
