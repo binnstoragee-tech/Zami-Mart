@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (pvAddCartBtn.classList.contains('pv-loading') || pvAddCartBtn.classList.contains('pv-added')) return;
 
       // Check login first before showing loading animation
-      const loggedIn = (() => { try { return !!localStorage.getItem('zamimart_user'); } catch(e) { return false; } })();
+      const loggedIn = !!(window.fb && window.fb.auth && window.fb.auth.currentUser);
       if (!loggedIn) {
         // Let ZMCart.addItem handle the toast (it checks too), but call it to trigger the toast
         window.ZMCart.addItem(pvCurrentProduct.name, pvCurrentProduct.img);
@@ -176,6 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
         pvAddCartBtn.classList.add('pv-added');
         pvAddCartBtn.innerHTML = '<span class="pv-check-icon"><i class="fa-solid fa-check"></i></span> Added to Cart!';
         syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
+        // Show centered success modal
+        if (window.zmShowCartSuccess) window.zmShowCartSuccess(pvCurrentProduct.name);
       }, 900);
     });
   }

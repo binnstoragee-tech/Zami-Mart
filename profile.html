@@ -841,23 +841,28 @@
 document.addEventListener('DOMContentLoaded', () => {
 
   // =============================================
-  // STORAGE HELPERS — uses localStorage so state
-  // persists across pages (same as login.html)
+  // AUTH — Firebase Auth (no localStorage)
   // =============================================
-  const STORAGE_KEY = 'zamimart_user';
+  let currentUser = null; // will be set by onAuthStateChanged
 
-  function loadUser() {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch(e) { return null; }
+  // Wait for firebase-init.js
+  function waitForFb(cb) {
+    if (window.fb && window.fb.auth) { cb(); return; }
+    window.addEventListener('fb-ready', cb, { once: true });
   }
 
-  function saveUser(user) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-  }
-
-  let currentUser = loadUser();
+  waitForFb(() => {
+    window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
+      if (user) {
+        currentUser = user;
+        await loadExtraProfile();
+        renderProfile();
+      } else {
+        // Not logged in — redirect to login
+        window.location.href = 'login.html';
+      }
+    });
+  });
 
   // =============================================
   // TOAST
@@ -905,8 +910,43 @@ document.addEventListener('DOMContentLoaded', () => {
   // =============================================
   // POPULATE PAGE
   // =============================================
-  function populatePage() {
+  // Extra profile fields from Firestore (phone, address, pwChangedAt)
+  let extraProfile = {};
+
+  async function loadExtraProfile() {
+    if (!window.fb || !currentUser) return;
+    try {
+      const { db, doc, getDoc } = window.fb;
+      const snap = await getDoc(doc(db, 'users', currentUser.uid));
+      if (snap.exists()) extraProfile = snap.data();
+    } catch(e) { /* non-fatal */ }
+  }
+
+  async function saveExtraProfile(data) {
+    if (!window.fb || !currentUser) return;
+    try {
+      extraProfile = { ...extraProfile, ...data };
+      const { db, doc, setDoc } = window.fb;
+      await setDoc(doc(db, 'users', currentUser.uid), extraProfile, { merge: true });
+    } catch(e) { console.warn('Firestore save error', e); }
+  }
+
+  // Map Firebase Auth user + Firestore extra fields into a plain object profile pages expect
+  function buildProfile() {
     const u = currentUser;
+    return {
+      name:       u.displayName || u.email || 'User',
+      email:      u.email || '',
+      phone:      extraProfile.phone   || '',
+      address:    extraProfile.address || '',
+      avatarPhoto:u.photoURL || extraProfile.avatarPhoto || null,
+      avatarColor:extraProfile.avatarColor || '#063b3f',
+      pwChangedAt:extraProfile.pwChangedAt || null,
+    };
+  }
+
+  function populatePage() {
+    const u = buildProfile();
 
     // Header
     renderAvatar(document.getElementById('headerAvatar'), u);
@@ -934,14 +974,14 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =============================================
-  // GATE: show profile or login prompt
+  // GATE: show profile (Firebase auth guards this)
   // =============================================
   const pfGate    = document.getElementById('pfGate');
   const pfContent = document.getElementById('pfContent');
 
-  if (!currentUser) {
-    pfGate.classList.add('show');
-  } else {
+  // renderProfile is called once Firebase user is confirmed
+  function renderProfile() {
+    if (!currentUser) { pfGate.classList.add('show'); return; }
     pfContent.classList.remove('pf-hidden');
     populatePage();
   }
@@ -969,10 +1009,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openDetailsEdit() {
     stagedAvatar = null;
-    document.getElementById('editName').value    = currentUser.name    || '';
-    document.getElementById('editEmail').value   = currentUser.email   || '';
-    document.getElementById('editPhone').value   = currentUser.phone   || '';
-    document.getElementById('editAddress').value = currentUser.address || '';
+    const u = buildProfile();
+    document.getElementById('editName').value    = u.name    || '';
+    document.getElementById('editEmail').value   = u.email   || '';
+    document.getElementById('editPhone').value   = u.phone   || '';
+    document.getElementById('editAddress').value = u.address || '';
     clearFieldError('editName');
     clearFieldError('editEmail');
     detailsView.classList.add('pf-hidden');
@@ -1005,7 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (file.size > 4 * 1024 * 1024) { showToast('Image too large (max 4 MB).', 'error'); return; }
     const reader = new FileReader();
     reader.onload = () => {
-      stagedAvatar = { avatarPhoto: reader.result, avatarColor: currentUser.avatarColor };
+      stagedAvatar = { avatarPhoto: reader.result, avatarColor: buildProfile().avatarColor };
       renderEditAvatar();
     };
     reader.readAsDataURL(file);
@@ -1014,7 +1055,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Remove photo — stage
   removeAvatarBtn.addEventListener('click', () => {
-    stagedAvatar = { avatarPhoto: null, avatarColor: currentUser.avatarColor || '#063b3f' };
+    stagedAvatar = { avatarPhoto: null, avatarColor: buildProfile().avatarColor || '#063b3f' };
     renderEditAvatar();
   });
 
@@ -1026,8 +1067,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // SAVE — commit everything (avatar + fields)
-  detailsSaveBtn.addEventListener('click', () => {
+  // SAVE — commit everything (avatar + fields) to Firebase
+  detailsSaveBtn.addEventListener('click', async () => {
     const name    = document.getElementById('editName').value.trim();
     const email   = document.getElementById('editEmail').value.trim();
     const phone   = document.getElementById('editPhone').value.trim();
@@ -1047,22 +1088,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (!valid) return;
 
-    currentUser.name    = name;
-    currentUser.email   = email;
-    currentUser.phone   = phone;
-    currentUser.address = address;
+    detailsSaveBtn.disabled = true;
+    detailsSaveBtn.textContent = 'Saving…';
 
-    // Commit staged avatar changes
-    if (stagedAvatar !== null) {
-      currentUser.avatarPhoto = stagedAvatar.avatarPhoto;
-      currentUser.avatarColor = stagedAvatar.avatarColor;
+    try {
+      // Update Firebase Auth displayName
+      const { updateProfile } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
+      await updateProfile(currentUser, { displayName: name });
+
+      // Commit staged avatar changes to Firestore extra profile
+      const extraUpdates = { phone, address };
+      if (stagedAvatar !== null) {
+        extraUpdates.avatarPhoto = stagedAvatar.avatarPhoto;
+        extraUpdates.avatarColor = stagedAvatar.avatarColor;
+      }
+      await saveExtraProfile(extraUpdates);
+
+      stagedAvatar = null;
+      populatePage();
+      closeDetailsEdit();
+      showToast('Profile saved successfully!');
+    } catch(e) {
+      showToast('Save failed: ' + (e && e.message ? e.message : e), 'error');
+    } finally {
+      detailsSaveBtn.disabled = false;
+      detailsSaveBtn.textContent = 'Save Changes';
     }
-
-    saveUser(currentUser);
-    stagedAvatar = null;
-    populatePage();
-    closeDetailsEdit();
-    showToast('Profile saved successfully!');
   });
 
   // =============================================
@@ -1148,9 +1199,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!current) {
       showFieldError('currentPw', 'currentPwErr', 'Please enter your current password.');
       valid = false;
-    } else if (current !== currentUser.password) {
-      showFieldError('currentPw', 'currentPwErr', 'Incorrect current password.');
-      valid = false;
     }
     if (!newPw || newPw.length < 8) {
       showFieldError('newPw', 'newPwErr', 'Password must be at least 8 characters.');
@@ -1162,12 +1210,40 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (!valid) return;
 
-    currentUser.password    = newPw;
-    currentUser.pwChangedAt = new Date().toISOString();
-    saveUser(currentUser);
-    populatePage();
-    closePwEdit();
-    showToast('Password updated successfully!');
+    pwSaveBtn.disabled = true;
+    pwSaveBtn.textContent = 'Saving…';
+
+    (async () => {
+      try {
+        const {
+          reauthenticateWithCredential,
+          EmailAuthProvider,
+          updatePassword
+        } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
+
+        const credential = EmailAuthProvider.credential(currentUser.email, current);
+        await reauthenticateWithCredential(currentUser, credential);
+        await updatePassword(currentUser, newPw);
+
+        // Save timestamp in Firestore
+        await saveExtraProfile({ pwChangedAt: new Date().toISOString() });
+        populatePage();
+        closePwEdit();
+        showToast('Password updated successfully!');
+      } catch(e) {
+        const code = e && e.code ? e.code : '';
+        if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+          showFieldError('currentPw', 'currentPwErr', 'Incorrect current password.');
+        } else if (code === 'auth/too-many-requests') {
+          showFieldError('currentPw', 'currentPwErr', 'Too many attempts. Try again later.');
+        } else {
+          showFieldError('newPw', 'newPwErr', e && e.message ? e.message : 'Password change failed.');
+        }
+      } finally {
+        pwSaveBtn.disabled = false;
+        pwSaveBtn.textContent = 'Save';
+      }
+    })();
   });
 
   // =============================================
@@ -1186,9 +1262,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // =============================================
   // LOGOUT
   // =============================================
-  document.getElementById('pfLogoutBtn').addEventListener('click', () => {
-    localStorage.removeItem(STORAGE_KEY);
-    currentUser = null;
+  document.getElementById('pfLogoutBtn').addEventListener('click', async () => {
+    try {
+      if (window.fb && window.fb.auth) await window.fb.signOut(window.fb.auth);
+    } catch(e) { /* non-fatal */ }
     // Page transition then redirect
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) { window.location.href = 'login.html'; return; }
@@ -1328,7 +1405,11 @@ let sessionId=null,visitorName=null,visitorAvatar=null,visitorInitials='?';
 function escH(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 
 function getLoggedUser(){
-  try{return JSON.parse(localStorage.getItem('zamimart_user')||'null');}catch(e){return null;}
+  try{
+    const u = window.fb && window.fb.auth ? window.fb.auth.currentUser : null;
+    if (!u) return null;
+    return { name: u.displayName || u.email || 'User', email: u.email || '', photoURL: u.photoURL || null };
+  }catch(e){return null;}
 }
 
 function avatarHtml(){

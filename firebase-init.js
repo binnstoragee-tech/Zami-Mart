@@ -7,8 +7,8 @@
 // inquiry-system.js can use them, and fires a "fb-ready"
 // event once everything is wired up.
 // =============================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js";
-import { getAnalytics, isSupported as analyticsIsSupported } from "https://www.gstatic.com/firebasejs/12.15.0/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+import { getAnalytics, isSupported as analyticsIsSupported } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-analytics.js";
 import {
   getFirestore,
   collection,
@@ -25,7 +25,14 @@ import {
   where,
   increment,
   serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDFayXb4VTQPgHVreyeXBnDLqdbt_BS_RE",
@@ -63,10 +70,11 @@ window.zmShowFbError = function(message) {
   document.getElementById('zmFbErrorText').textContent = '⚠️ Firebase error: ' + message;
 };
 
-let app, db;
+let app, db, auth;
 try {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
+  auth = getAuth(app);
 } catch (e) {
   window.zmShowFbError('Hindi na-initialize ang Firebase — ' + (e && e.message ? e.message : e));
 }
@@ -78,11 +86,52 @@ analyticsIsSupported().then((ok) => { if (ok) { try { getAnalytics(app); } catch
 window.fb = {
   app, db,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc, getDoc, getDocs,
-  onSnapshot, query, orderBy, where, increment, serverTimestamp
+  onSnapshot, query, orderBy, where, increment, serverTimestamp,
+  auth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+};
+
+// =============================================
+// GOOGLE SIGN-IN
+// Plain (non-module) scripts like the login page's inline <script>
+// can call window.zmSignInWithGoogle() — it returns the Firebase
+// user object (displayName, email, photoURL, uid) on success.
+// =============================================
+window.zmSignInWithGoogle = async function () {
+  if (!auth) throw new Error('Firebase Auth hindi pa ready.');
+  const provider = new GoogleAuthProvider();
+  const result = await signInWithPopup(auth, provider);
+  return result.user;
+};
+
+window.zmSignOutGoogle = function () {
+  if (!auth) return Promise.resolve();
+  return signOut(auth);
 };
 
 // Let any already-waiting non-module scripts know Firebase is ready.
 window.dispatchEvent(new Event('fb-ready'));
+
+// =============================================
+// AUTO-SAVE USER TO FIRESTORE on sign-in
+// When any user logs in (Google or email), save
+// their basic info to Firestore users/{uid} so
+// the admin panel can list registered users.
+// =============================================
+if (auth && db) {
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+    try {
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, {
+        displayName: user.displayName || '',
+        email: user.email || '',
+        photoURL: user.photoURL || '',
+        createdAt: user.metadata.creationTime || new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+      }, { merge: true });
+    } catch(e) { /* non-fatal */ }
+  });
+}
 
 // =============================================
 // CONNECTIVITY SELF-TEST

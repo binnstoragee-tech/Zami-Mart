@@ -10,6 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <link rel="stylesheet" href="style.css">
+<script type="module" src="firebase-init.js"></script>
 <style>
   /* ── PAGE BACKGROUND ── */
   .fb-page{
@@ -75,6 +76,8 @@
   /* ── CARD ── */
   .fb-right{ width:100%; }
   .fb-card{
+    position: relative;
+    overflow: hidden;
     background: rgba(255,255,255,.95);
     backdrop-filter: blur(18px) saturate(1.4);
     -webkit-backdrop-filter: blur(18px) saturate(1.4);
@@ -85,11 +88,12 @@
       0 2px 8px rgba(6,59,63,.06);
     padding: 2.2rem 2rem;
     border: 1px solid rgba(255,255,255,.7);
-    animation: bubble-in .4s cubic-bezier(.34,1.4,.64,1) both;
+    animation: bubble-in .55s cubic-bezier(.22,1.2,.48,1) both;
   }
   @keyframes bubble-in{
-    from{ transform: scale(.92) translateY(14px); opacity:0; }
-    to{   transform: scale(1)   translateY(0);    opacity:1; }
+    0%  { transform: scale(.88) translateY(22px); opacity:0; }
+    60% { transform: scale(1.02) translateY(-3px); opacity:1; }
+    100%{ transform: scale(1) translateY(0); opacity:1; }
   }
 
   /* logo INSIDE the card */
@@ -107,11 +111,82 @@
     border-radius: 8px;
     padding: .85rem 1rem;
     margin-bottom: 1.1rem;
+    animation: successSlide .35s cubic-bezier(.22,1.2,.48,1) both;
+  }
+  @keyframes successSlide{
+    from{ opacity:0; transform:translateY(-8px) scale(.97); }
+    to{ opacity:1; transform:none; }
   }
   .fb-success.show{ display:flex; }
   .fb-success i{ color:#1f7a4d; font-size:1rem; margin-top:2px; }
   .fb-success p{ margin:0; font-size:.82rem; color:#14201f; line-height:1.5; }
   .fb-success strong{ display:block; margin-bottom:2px; color:#14201f; }
+
+  /* ── SUCCESS OVERLAY (account created / login ok) ── */
+  .fb-success-overlay{
+    display:none;
+    position:absolute; inset:0;
+    background: rgba(255,255,255,.96);
+    backdrop-filter: blur(6px);
+    border-radius: 20px;
+    flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; text-align:center; padding:2rem;
+    z-index:10;
+    animation: overlayIn .4s cubic-bezier(.22,1.2,.48,1) both;
+  }
+  .fb-success-overlay.show{ display:flex; }
+  @keyframes overlayIn{
+    from{ opacity:0; transform:scale(.94); }
+    to{ opacity:1; transform:scale(1); }
+  }
+  .fb-so-ring{
+    position:relative; width:72px; height:72px;
+  }
+  .fb-so-ring svg{ position:absolute; inset:0; }
+  .fb-so-ring .so-bg-circle{ fill:none; stroke:#e8f7ef; stroke-width:5; }
+  .fb-so-ring .so-progress-circle{
+    fill:none; stroke: var(--teal); stroke-width:5;
+    stroke-linecap:round;
+    stroke-dasharray: 176;
+    stroke-dashoffset: 176;
+    transform-origin: 50% 50%;
+    transform: rotate(-90deg);
+    animation: ringDraw .6s cubic-bezier(.4,0,.2,1) .15s forwards;
+  }
+  @keyframes ringDraw{ to{ stroke-dashoffset:0; } }
+  .fb-so-check{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .fb-so-check svg path{
+    stroke-dasharray:30;
+    stroke-dashoffset:30;
+    animation: checkDraw .35s ease .65s forwards;
+  }
+  @keyframes checkDraw{ to{ stroke-dashoffset:0; } }
+  .fb-so-title{
+    font-size:1.1rem; font-weight:800; color:var(--teal);
+    letter-spacing:-.02em; margin:0;
+    animation: fadeUp .3s ease .5s both;
+  }
+  .fb-so-sub{
+    font-size:.82rem; color:#5d7977; margin:0; line-height:1.5;
+    animation: fadeUp .3s ease .6s both;
+  }
+  .fb-so-dots{
+    display:flex; gap:7px;
+    animation: fadeUp .3s ease .7s both;
+  }
+  .fb-so-dot{
+    width:8px; height:8px; border-radius:50%;
+    animation: dotPop .35s cubic-bezier(.34,1.6,.64,1) both;
+  }
+  .fb-so-dot:nth-child(1){ background:var(--orange); animation-delay:.72s; }
+  .fb-so-dot:nth-child(2){ background:var(--teal); animation-delay:.80s; }
+  .fb-so-dot:nth-child(3){ background:#f0b429; animation-delay:.88s; }
+  .fb-so-dot:nth-child(4){ background:var(--orange); animation-delay:.96s; }
+  @keyframes dotPop{ from{transform:scale(0);opacity:0;} to{transform:scale(1);opacity:1;} }
+  @keyframes fadeUp{ from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:none;} }
 
   .fb-form-group{ margin-bottom: .75rem; }
   .fb-input{
@@ -154,6 +229,34 @@
     transition: background .25s;
   }
   .fb-btn-primary:hover{ background:#052e31; }
+
+  .fb-btn-google{
+    display:flex; align-items:center; justify-content:center; gap:10px;
+    width:100%;
+    background:#fff;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-weight:600;
+    font-size: .95rem;
+    padding: 11px 0;
+    border-radius: 6px;
+    border: 1px solid #d8dad9;
+    cursor:pointer;
+    margin-bottom: 1rem;
+    transition: background .2s, border-color .2s;
+  }
+  .fb-btn-google:hover{ background:#f7f7f5; border-color:#c4c7c5; }
+  .fb-btn-google:disabled{ opacity:.6; cursor:default; }
+  .fb-btn-google img{ width:18px; height:18px; }
+
+  .fb-or-divider{
+    display:flex; align-items:center; gap:10px;
+    margin: 0 0 1rem;
+    color:#8aa19f; font-size:.78rem; font-weight:600;
+  }
+  .fb-or-divider::before, .fb-or-divider::after{
+    content:''; flex:1; height:1px; background:#e3e5e4;
+  }
 
   .fb-forgot{
     display:block;
@@ -412,6 +515,29 @@
           <img src="img/logo.png" alt="Zami Mart logo">
         </div>
 
+        <!-- SUCCESS OVERLAY -->
+        <div class="fb-success-overlay" id="fbSuccessOverlay">
+          <div class="fb-so-ring">
+            <svg viewBox="0 0 72 72" width="72" height="72">
+              <circle class="so-bg-circle" cx="36" cy="36" r="28"/>
+              <circle class="so-progress-circle" cx="36" cy="36" r="28"/>
+            </svg>
+            <div class="fb-so-check">
+              <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+                <path d="M7 15.5L12.5 21L23 10" stroke="#063b3f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+          <div class="fb-so-dots">
+            <span class="fb-so-dot"></span>
+            <span class="fb-so-dot"></span>
+            <span class="fb-so-dot"></span>
+            <span class="fb-so-dot"></span>
+          </div>
+          <p class="fb-so-title" id="fbOverlayTitle">Success!</p>
+          <p class="fb-so-sub" id="fbOverlaySub">Taking you to the homepage...</p>
+        </div>
+
         <div class="fb-success" id="fbSuccess">
           <i class="fa-solid fa-circle-check"></i>
           <p><strong id="fbSuccessTitle">Success</strong><span id="fbSuccessText"></span></p>
@@ -434,6 +560,11 @@
 
         <!-- LOG IN FORM -->
         <form id="loginForm" novalidate>
+          <button type="button" class="fb-btn-google" id="googleSignInBtn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+            Continue with Google
+          </button>
+          <div class="fb-or-divider">OR</div>
           <div class="fb-form-group" id="loginEmailGroup">
             <input type="text" class="fb-input" id="loginEmail" placeholder="Email or phone number">
             <span class="fb-field-error">Please enter your email or phone number.</span>
@@ -451,6 +582,11 @@
         <!-- SIGN UP FORM -->
         <form id="signupForm" class="hidden" novalidate>
           <h2>Create your account</h2>
+          <button type="button" class="fb-btn-google" id="googleSignUpBtn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+            Continue with Google
+          </button>
+          <div class="fb-or-divider">OR</div>
           <div class="fb-form-group" id="signupNameGroup">
             <input type="text" class="fb-input" id="signupName" placeholder="Full name">
             <span class="fb-field-error">Please enter your full name.</span>
@@ -479,27 +615,20 @@
 
 <script src="main.js"></script>
 <script>
+  // =============================================
+  // LOGIN PAGE — Firebase Auth (Google + Email)
+  // =============================================
+  // All auth state is managed by Firebase Auth.
+  // NO localStorage is used for the user session.
+  // =============================================
+
   document.addEventListener('DOMContentLoaded', () => {
 
-    const STORAGE_KEY = 'zamimart_user';
-
-    function loadUser() {
-      try { const r = localStorage.getItem(STORAGE_KEY); return r ? JSON.parse(r) : null; }
-      catch(e) { return null; }
-    }
-    function saveUser(u) { localStorage.setItem(STORAGE_KEY, JSON.stringify(u)); }
-    function removeUser() { localStorage.removeItem(STORAGE_KEY); }
-
-    const accounts = [];
-    let currentUser = loadUser();
-    if (currentUser) accounts.push(currentUser);
-
+    // ── DOM refs ────────────────────────────────
     const loginForm    = document.getElementById('loginForm');
     const signupForm   = document.getElementById('signupForm');
     const accountPanel = document.getElementById('accountPanel');
     const successBox   = document.getElementById('fbSuccess');
-    const successTitle = document.getElementById('fbSuccessTitle');
-    const successText  = document.getElementById('fbSuccessText');
 
     const fpOverlay    = document.getElementById('fpOverlay');
     const fpCloseBtn   = document.getElementById('fpCloseBtn');
@@ -514,25 +643,25 @@
     const fpStep2      = document.getElementById('fpStep2');
     const forgotLink   = document.getElementById('forgotPasswordLink');
 
+    // ── Helpers ─────────────────────────────────
     function clearErrors(form) {
       form.querySelectorAll('.fb-form-group').forEach(g => g.classList.remove('has-error'));
     }
     function hideSuccess() { successBox.classList.remove('show'); }
+
     function showForm(form) {
       [loginForm, signupForm].forEach(f => f.classList.add('hidden'));
       accountPanel.classList.remove('show');
       form.classList.remove('hidden');
       hideSuccess();
     }
+
     function setFieldError(groupId, message) {
       const group = document.getElementById(groupId);
       group.classList.add('has-error');
       if (message) group.querySelector('.fb-field-error').textContent = message;
     }
-    function findAccount(identifier) {
-      const key = identifier.trim().toLowerCase();
-      return accounts.find(a => a.email.toLowerCase() === key);
-    }
+
     function goHome() {
       const href = 'index.html';
       const noMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -544,14 +673,15 @@
       if (lastPanel) lastPanel.addEventListener('transitionend', go, { once: true });
       setTimeout(go, 900);
     }
+
     function renderAvatar(el, user) {
-      if (user.avatarPhoto) {
+      if (user.photoURL) {
         el.style.background = 'transparent';
-        el.innerHTML = `<img src="${user.avatarPhoto}" alt="${user.name}">`;
+        el.innerHTML = `<img src="${user.photoURL}" alt="${user.displayName || ''}">`;
       } else {
-        el.style.background = user.avatarColor || '#063b3f';
+        el.style.background = '#063b3f';
         el.innerHTML = '';
-        el.textContent = (user.name.trim().charAt(0) || 'Z').toUpperCase();
+        el.textContent = ((user.displayName || user.email || 'Z').trim().charAt(0)).toUpperCase();
       }
     }
 
@@ -559,23 +689,217 @@
       [loginForm, signupForm].forEach(f => f.classList.add('hidden'));
       hideSuccess();
       renderAvatar(document.getElementById('accountAvatar'), user);
-      document.getElementById('accountName').textContent = `Welcome, ${user.name}!`;
+      document.getElementById('accountName').textContent = `Welcome, ${user.displayName || user.email}!`;
       document.getElementById('accountEmail').textContent = `Logged in as ${user.email}`;
       accountPanel.classList.add('show');
     }
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-      removeUser();
-      currentUser = null;
-      showForm(loginForm);
-    });
+    function showSuccessOverlay(title, sub) {
+      const overlay = document.getElementById('fbSuccessOverlay');
+      document.getElementById('fbOverlayTitle').textContent = title;
+      document.getElementById('fbOverlaySub').textContent = sub;
+      overlay.classList.add('show');
+    }
 
+    // ── Firebase Auth state listener ────────────
+    // Wait for firebase-init.js to expose window.fb
+    function initAuth() {
+      if (!window.fb || !window.fb.auth) {
+        window.addEventListener('fb-ready', initAuth, { once: true });
+        return;
+      }
+
+      const { auth, onAuthStateChanged, signOut } = window.fb;
+
+      // Listen for auth changes (login / logout / page reload)
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // User is signed in — show account panel
+          showAccountPanel(user);
+        } else {
+          // Not signed in — show login form
+          showForm(loginForm);
+        }
+      });
+
+      // Logout button
+      document.getElementById('logoutBtn').addEventListener('click', async () => {
+        try {
+          await signOut(auth);
+          // onAuthStateChanged will fire and showForm(loginForm) automatically
+        } catch (e) {
+          alert('Hindi na-log out: ' + (e && e.message ? e.message : e));
+        }
+      });
+    }
+
+    initAuth();
+
+    // ── Switch between login / signup forms ─────
     document.getElementById('showSignup').addEventListener('click', () => showForm(signupForm));
     document.getElementById('showLogin').addEventListener('click', (e) => {
       e.preventDefault();
       showForm(loginForm);
     });
 
+    // ── Google Sign-In (shared handler) ─────────
+    async function handleGoogleSignIn(btn) {
+      if (typeof window.zmSignInWithGoogle !== 'function') {
+        alert('Hindi pa ready ang Google Sign-In. Subukan ulit sa ilang segundo.');
+        return;
+      }
+      const originalHTML = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<span>Connecting…</span>';
+      try {
+        const gUser = await window.zmSignInWithGoogle();
+        // onAuthStateChanged will fire, but show overlay immediately for UX
+        showSuccessOverlay(
+          `Welcome, ${gUser.displayName || gUser.email}!`,
+          'Taking you to the homepage…'
+        );
+        setTimeout(goHome, 1800);
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+        if (err && err.code === 'auth/popup-closed-by-user') return;
+        if (err && err.code === 'auth/unauthorized-domain') {
+          alert('Hindi pa authorized ang domain na ito sa Firebase Console (Authentication > Settings > Authorized domains). I-add muna doon.');
+          return;
+        }
+        if (err && err.code === 'auth/operation-not-allowed') {
+          alert('Hindi pa enabled ang Google sign-in sa Firebase Console (Authentication > Sign-in method > Google).');
+          return;
+        }
+        alert('Google sign-in error: ' + (err && err.message ? err.message : err));
+      }
+    }
+
+    document.getElementById('googleSignInBtn').addEventListener('click', (e) => handleGoogleSignIn(e.currentTarget));
+    document.getElementById('googleSignUpBtn').addEventListener('click', (e) => handleGoogleSignIn(e.currentTarget));
+
+    // ── Email/Password Login ─────────────────────
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors(loginForm);
+      hideSuccess();
+
+      if (!window.fb || !window.fb.auth) {
+        alert('Firebase hindi pa ready. Subukan ulit.'); return;
+      }
+
+      const emailEl = document.getElementById('loginEmail');
+      const pwEl    = document.getElementById('loginPw');
+      let valid = true;
+
+      if (!emailEl.value.trim()) {
+        setFieldError('loginEmailGroup', 'Please enter your email.');
+        valid = false;
+      }
+      if (!pwEl.value.trim()) {
+        setFieldError('loginPwGroup', 'Please enter your password.');
+        valid = false;
+      }
+      if (!valid) return;
+
+      const submitBtn = loginForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Logging in…';
+
+      try {
+        const { auth } = window.fb;
+        // Dynamically import signInWithEmailAndPassword
+        const { signInWithEmailAndPassword } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
+        const result = await signInWithEmailAndPassword(auth, emailEl.value.trim(), pwEl.value);
+        const user = result.user;
+        loginForm.reset();
+        showSuccessOverlay(`Welcome back, ${user.displayName || user.email}!`, 'Taking you to the homepage…');
+        loginForm.querySelectorAll('button, a').forEach(el => el.style.pointerEvents = 'none');
+        setTimeout(goHome, 1800);
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Log In';
+        const code = err && err.code ? err.code : '';
+        if (code === 'auth/user-not-found' || code === 'auth/invalid-email') {
+          setFieldError('loginEmailGroup', 'No account found with that email.');
+        } else if (code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+          setFieldError('loginPwGroup', 'Incorrect password.');
+        } else {
+          setFieldError('loginPwGroup', err && err.message ? err.message : 'Login failed.');
+        }
+      }
+    });
+
+    // ── Email/Password Sign-Up ───────────────────
+    signupForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors(signupForm);
+      hideSuccess();
+
+      if (!window.fb || !window.fb.auth) {
+        alert('Firebase hindi pa ready. Subukan ulit.'); return;
+      }
+
+      const nameEl    = document.getElementById('signupName');
+      const emailEl   = document.getElementById('signupEmail');
+      const pwEl      = document.getElementById('signupPw');
+      const confirmEl = document.getElementById('signupConfirm');
+      let valid = true;
+
+      if (!nameEl.value.trim()) {
+        setFieldError('signupNameGroup', 'Please enter your full name.');
+        valid = false;
+      }
+      if (!emailEl.value.trim()) {
+        setFieldError('signupEmailGroup', 'Please enter a valid email.');
+        valid = false;
+      }
+      if (pwEl.value.length < 8) {
+        setFieldError('signupPwGroup', 'Password must be at least 8 characters.');
+        valid = false;
+      }
+      if (confirmEl.value !== pwEl.value || !confirmEl.value) {
+        setFieldError('signupConfirmGroup', 'Passwords do not match.');
+        valid = false;
+      }
+      if (!valid) return;
+
+      const submitBtn = signupForm.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Creating account…';
+
+      try {
+        const { auth } = window.fb;
+        const {
+          createUserWithEmailAndPassword,
+          updateProfile
+        } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
+
+        const result = await createUserWithEmailAndPassword(auth, emailEl.value.trim(), pwEl.value);
+        // Set display name
+        await updateProfile(result.user, { displayName: nameEl.value.trim() });
+
+        signupForm.reset();
+        showSuccessOverlay('Account Created!', `Welcome, ${nameEl.value.trim()}! Taking you to the homepage…`);
+        signupForm.querySelectorAll('button, a').forEach(el => el.style.pointerEvents = 'none');
+        setTimeout(goHome, 1800);
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign Up';
+        const code = err && err.code ? err.code : '';
+        if (code === 'auth/email-already-in-use') {
+          setFieldError('signupEmailGroup', 'An account with this email already exists.');
+        } else if (code === 'auth/invalid-email') {
+          setFieldError('signupEmailGroup', 'Invalid email address.');
+        } else if (code === 'auth/weak-password') {
+          setFieldError('signupPwGroup', 'Password is too weak.');
+        } else {
+          setFieldError('signupEmailGroup', err && err.message ? err.message : 'Sign-up failed.');
+        }
+      }
+    });
+
+    // ── Forgot Password Modal ────────────────────
     function showFpStep(n) {
       fpStep1.classList.toggle('active', n === 1);
       fpStep2.classList.toggle('active', n === 2);
@@ -597,14 +921,25 @@
       if (e.key === 'Escape' && fpOverlay.classList.contains('show')) closeFp();
     });
 
-    fpSendBtn.addEventListener('click', () => {
+    fpSendBtn.addEventListener('click', async () => {
       const val = fpEmailInput.value.trim();
       if (!val) {
         fpEmailGroup.classList.add('has-error');
-        fpEmailGroup.querySelector('.fb-field-error').textContent = 'Please enter your email or phone number.';
+        fpEmailGroup.querySelector('.fb-field-error').textContent = 'Please enter your email.';
         return;
       }
       fpEmailGroup.classList.remove('has-error');
+
+      try {
+        if (window.fb && window.fb.auth) {
+          const { sendPasswordResetEmail } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
+          await sendPasswordResetEmail(window.fb.auth, val);
+        }
+      } catch (err) {
+        // Don't reveal if email exists; show success anyway for security
+        console.warn('Reset email error:', err);
+      }
+
       fpSentEmail.textContent = val;
       showFpStep(2);
     });
@@ -614,104 +949,6 @@
       fpResendBtn.disabled = true;
       setTimeout(() => { fpResendBtn.textContent = 'Resend link'; fpResendBtn.disabled = false; }, 4000);
     });
-
-    loginForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      clearErrors(loginForm);
-      hideSuccess();
-
-      const email = document.getElementById('loginEmail');
-      const pw    = document.getElementById('loginPw');
-      let valid = true;
-
-      if (!email.value.trim()) {
-        setFieldError('loginEmailGroup', 'Please enter your email or phone number.');
-        valid = false;
-      }
-      if (!pw.value.trim()) {
-        setFieldError('loginPwGroup', 'Please enter your password.');
-        valid = false;
-      }
-      if (!valid) return;
-
-      const account = findAccount(email.value);
-      if (!account) {
-        setFieldError('loginEmailGroup', 'No account found with that email or phone number. Try creating one.');
-        return;
-      }
-      if (account.password !== pw.value) {
-        setFieldError('loginPwGroup', 'Incorrect password.');
-        return;
-      }
-
-      currentUser = account;
-      saveUser(currentUser);
-      loginForm.reset();
-
-      successTitle.textContent = 'Login successful!';
-      successText.textContent = ` Welcome back, ${account.name}. Taking you to the homepage...`;
-      successBox.classList.add('show');
-      loginForm.querySelectorAll('button, a').forEach(el => el.style.pointerEvents = 'none');
-      setTimeout(goHome, 750);
-    });
-
-    signupForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      clearErrors(signupForm);
-      hideSuccess();
-
-      const name    = document.getElementById('signupName');
-      const email   = document.getElementById('signupEmail');
-      const pw      = document.getElementById('signupPw');
-      const confirm = document.getElementById('signupConfirm');
-      let valid = true;
-
-      if (!name.value.trim()) {
-        setFieldError('signupNameGroup', 'Please enter your full name.');
-        valid = false;
-      }
-      if (!email.value.trim()) {
-        setFieldError('signupEmailGroup', 'Please enter a valid email or phone number.');
-        valid = false;
-      } else if (findAccount(email.value)) {
-        setFieldError('signupEmailGroup', 'An account with this email or phone number already exists.');
-        valid = false;
-      }
-      if (pw.value.length < 8) {
-        setFieldError('signupPwGroup', 'Password must be at least 8 characters.');
-        valid = false;
-      }
-      if (confirm.value !== pw.value || !confirm.value) {
-        setFieldError('signupConfirmGroup', 'Passwords do not match.');
-        valid = false;
-      }
-      if (!valid) return;
-
-      const newAccount = {
-        name: name.value.trim(),
-        email: email.value.trim(),
-        password: pw.value,
-        avatarColor: '#063b3f',
-        avatarPhoto: null,
-        phone: '',
-        address: ''
-      };
-      accounts.push(newAccount);
-      currentUser = newAccount;
-      saveUser(currentUser);
-      signupForm.reset();
-
-      successTitle.textContent = 'Account created!';
-      successText.textContent = `Welcome, ${newAccount.name}! Taking you to the homepage...`;
-      successBox.classList.add('show');
-      signupForm.querySelectorAll('button, a').forEach(el => el.style.pointerEvents = 'none');
-      setTimeout(goHome, 750);
-    });
-
-    // On load: if already logged in, go straight to homepage
-    if (currentUser) {
-      goHome();
-    }
 
   });
 </script>

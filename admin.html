@@ -12,9 +12,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
-/* =============================================
-   CSS VARIABLES & RESETS
-   ============================================= */
 :root {
   --teal:       #063b3f;
   --teal-mid:   #0a5560;
@@ -26,11 +23,11 @@
   --text:       #1a2e2e;
   --text-muted: #6a8080;
   --border:     rgba(6,59,63,.1);
-  --sidebar-w:  260px;
-  --radius:     16px;
-  --radius-sm:  10px;
-  --shadow:     0 4px 24px -6px rgba(6,59,63,.12);
-  --shadow-lg:  0 12px 48px -12px rgba(6,59,63,.18);
+  --sidebar-w:  248px;
+  --radius:     12px;
+  --radius-sm:  8px;
+  --shadow:     0 2px 16px -4px rgba(6,59,63,.1);
+  --shadow-lg:  0 8px 32px -8px rgba(6,59,63,.15);
   --ease:       cubic-bezier(.4,0,.2,1);
   font-family: 'Poppins', sans-serif;
 }
@@ -51,13 +48,11 @@ button { font-family: inherit; cursor: pointer; border: none; }
 input, textarea, select { font-family: inherit; }
 ul { list-style: none; }
 
-/* =============================================
-   SIDEBAR
-   ============================================= */
+/* ─── SIDEBAR ─────────────────────────────── */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--teal);
-  min-height: 100vh;
+  height: 100vh;
   position: fixed;
   top: 0; left: 0;
   display: flex;
@@ -67,68 +62,67 @@ ul { list-style: none; }
 }
 
 .sidebar-logo {
-  padding: 28px 24px 20px;
-  border-bottom: 1px solid rgba(255,255,255,.08);
+  padding: 24px 20px 18px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 .sidebar-logo-icon {
-  width: 40px; height: 40px;
+  width: 36px; height: 36px;
   background: var(--orange);
-  border-radius: 12px;
+  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.1rem; color: #fff;
+  font-size: 1rem; color: #fff;
   flex-shrink: 0;
 }
-.sidebar-logo-text { display: flex; flex-direction: column; }
 .sidebar-logo-text strong {
-  font-size: .95rem; font-weight: 700;
+  display: block;
+  font-size: .9rem; font-weight: 700;
   color: #fff; letter-spacing: -.01em;
 }
 .sidebar-logo-text span {
-  font-size: .65rem; font-weight: 500;
-  color: rgba(255,255,255,.45);
-  letter-spacing: .12em; text-transform: uppercase;
+  font-size: .62rem; font-weight: 500;
+  color: rgba(255,255,255,.4);
+  letter-spacing: .14em; text-transform: uppercase;
 }
 
 .sidebar-nav {
   flex: 1;
-  padding: 20px 14px;
+  padding: 16px 12px;
   overflow-y: auto;
 }
 
 .nav-section-label {
-  font-size: .6rem; font-weight: 700;
+  font-size: .58rem; font-weight: 700;
   letter-spacing: .2em; text-transform: uppercase;
-  color: rgba(255,255,255,.3);
-  padding: 14px 10px 6px;
+  color: rgba(255,255,255,.25);
+  padding: 12px 8px 4px;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  color: rgba(255,255,255,.6);
-  font-size: .84rem;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 8px;
+  color: rgba(255,255,255,.55);
+  font-size: .82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all .2s var(--ease);
-  margin-bottom: 2px;
+  transition: background .15s, color .15s;
+  margin-bottom: 1px;
   background: none;
   width: 100%;
   text-align: left;
 }
 .nav-item i {
-  width: 18px; text-align: center;
-  font-size: .9rem; flex-shrink: 0;
+  width: 16px; text-align: center;
+  font-size: .85rem; flex-shrink: 0;
 }
 .nav-item:hover {
-  background: rgba(255,255,255,.07);
-  color: rgba(255,255,255,.9);
-  transform: translateX(3px);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.85);
 }
 .nav-item.active {
   background: var(--orange);
@@ -137,62 +131,50 @@ ul { list-style: none; }
 }
 .nav-item .nav-badge {
   margin-left: auto;
-  background: var(--orange);
+  background: rgba(255,255,255,.18);
   color: #fff;
-  font-size: .6rem;
+  font-size: .58rem;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 1px 6px;
   border-radius: 100px;
-  min-width: 20px;
-  text-align: center;
   display: none;
 }
-.nav-item .nav-badge.badge-visible {
-  display: inline-block;
-}
+.nav-item .nav-badge.badge-visible { display: inline-block; }
 .nav-item.active .nav-badge.badge-visible {
-  display: inline-block;
-  background: rgba(255,255,255,.25);
+  background: rgba(255,255,255,.22);
 }
 
 .sidebar-footer {
-  padding: 16px 14px 24px;
-  border-top: 1px solid rgba(255,255,255,.08);
+  padding: 14px 12px 20px;
+  border-top: 1px solid rgba(255,255,255,.07);
 }
 .sidebar-user {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all .2s var(--ease);
+  transition: background .15s;
 }
-.sidebar-user:hover { 
-  background: rgba(255,255,255,.06);
-  transform: translateX(2px);
-}
+.sidebar-user:hover { background: rgba(255,255,255,.05); }
 .sidebar-avatar {
-  width: 34px; height: 34px;
+  width: 32px; height: 32px;
   border-radius: 50%;
   background: var(--orange);
   display: flex; align-items: center; justify-content: center;
-  font-size: .8rem; font-weight: 700; color: #fff;
+  font-size: .78rem; font-weight: 700; color: #fff;
   flex-shrink: 0;
 }
 .sidebar-user-info { flex: 1; min-width: 0; }
 .sidebar-user-info strong {
-  display: block; font-size: .8rem; color: #fff;
+  display: block; font-size: .78rem; color: #fff;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.sidebar-user-info span {
-  font-size: .65rem; color: rgba(255,255,255,.4);
-}
-.sidebar-user i { color: rgba(255,255,255,.3); font-size: .75rem; }
+.sidebar-user-info span { font-size: .62rem; color: rgba(255,255,255,.35); }
+.sidebar-user i { color: rgba(255,255,255,.25); font-size: .72rem; }
 
-/* =============================================
-   MAIN CONTENT
-   ============================================= */
+/* ─── MAIN ────────────────────────────────── */
 .main {
   margin-left: var(--sidebar-w);
   flex: 1;
@@ -205,676 +187,410 @@ ul { list-style: none; }
 .topbar {
   background: var(--white);
   border-bottom: 1px solid var(--border);
-  padding: 0 32px;
-  height: 64px;
+  padding: 0 28px;
+  height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky; top: 0;
   z-index: 50;
-  transition: box-shadow .2s var(--ease);
 }
-.topbar.scrolled {
-  box-shadow: 0 2px 12px rgba(6,59,63,.08);
-}
-.topbar-left {
-  display: flex; align-items: center; gap: 16px;
-}
+.topbar.scrolled { box-shadow: 0 1px 8px rgba(6,59,63,.07); }
+.topbar-left { display: flex; align-items: center; gap: 14px; }
 .menu-toggle {
   display: none;
   background: none;
-  font-size: 1.2rem; color: var(--teal);
+  font-size: 1.1rem; color: var(--teal);
   cursor: pointer;
-  transition: transform .2s var(--ease);
 }
-.menu-toggle:hover { transform: scale(1.1); }
 .page-title {
-  font-size: 1.05rem; font-weight: 700;
-  color: var(--teal); letter-spacing: -.01em;
+  font-size: 1rem; font-weight: 700;
+  color: var(--teal);
 }
 .page-breadcrumb {
-  font-size: .75rem; color: var(--text-muted);
-  margin-top: 1px;
+  font-size: .72rem; color: var(--text-muted);
 }
+.topbar-right { display: flex; align-items: center; gap: 12px; }
 
-.topbar-right {
-  display: flex; align-items: center; gap: 16px;
-}
 .topbar-btn {
-  width: 38px; height: 38px;
-  border-radius: 10px;
+  width: 36px; height: 36px;
+  border-radius: 8px;
   border: 1px solid var(--border);
   background: none;
   display: flex; align-items: center; justify-content: center;
-  font-size: .9rem; color: var(--text-muted);
+  font-size: .88rem; color: var(--text-muted);
   cursor: pointer;
-  transition: all .2s var(--ease);
+  transition: background .15s, color .15s;
   position: relative;
 }
-.topbar-btn:hover {
-  background: var(--cream);
-  color: var(--teal);
-  border-color: rgba(6,59,63,.15);
-  transform: translateY(-2px);
-}
+.topbar-btn:hover { background: var(--cream); color: var(--teal); }
 .topbar-btn .notif-dot {
-  position: absolute; top: 7px; right: 7px;
-  width: 7px; height: 7px;
+  position: absolute; top: 6px; right: 6px;
+  width: 6px; height: 6px;
   border-radius: 50%; background: var(--orange);
   border: 2px solid #fff;
-  animation: pulse 2s ease-in-out infinite;
 }
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .6; }
-}
+
 /* Notification panel */
-.notif-wrapper {
-  position: relative;
-}
+.notif-wrapper { position: relative; }
 .notif-panel {
-  position: absolute; top: calc(100% + 10px); right: 0;
-  width: 320px; background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 16px 48px -8px rgba(6,59,63,.18), 0 0 0 1px rgba(6,59,63,.07);
+  position: absolute; top: calc(100% + 8px); right: 0;
+  width: 300px; background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px -8px rgba(6,59,63,.16), 0 0 0 1px rgba(6,59,63,.07);
   z-index: 9999;
   overflow: hidden;
-  animation: notifFadeIn .18s ease;
-}
-@keyframes notifFadeIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
 }
 .notif-panel-header {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px 10px;
-  font-size: .8rem; font-weight: 700; color: var(--teal);
-  border-bottom: 1px solid rgba(6,59,63,.08);
+  padding: 12px 16px 10px;
+  font-size: .78rem; font-weight: 700; color: var(--teal);
+  border-bottom: 1px solid rgba(6,59,63,.07);
 }
 .notif-clear-btn {
-  font-size: .7rem; color: var(--text-muted); background: none;
-  border: none; cursor: pointer; padding: 2px 6px; border-radius: 6px;
-  transition: background .15s;
+  font-size: .68rem; color: var(--text-muted); background: none;
+  border: none; cursor: pointer; padding: 2px 6px; border-radius: 5px;
 }
-.notif-clear-btn:hover { background: rgba(6,59,63,.07); color: var(--teal); }
-.notif-panel-body { max-height: 320px; overflow-y: auto; }
-.notif-empty {
-  padding: 28px 16px; text-align: center;
-  font-size: .78rem; color: var(--text-muted);
-}
+.notif-clear-btn:hover { background: rgba(6,59,63,.06); color: var(--teal); }
+.notif-panel-body { max-height: 300px; overflow-y: auto; }
+.notif-empty { padding: 24px 16px; text-align: center; font-size: .75rem; color: var(--text-muted); }
 .notif-item {
   display: flex; gap: 10px; align-items: flex-start;
-  padding: 11px 16px; cursor: pointer;
-  transition: background .15s;
+  padding: 10px 16px; cursor: pointer;
+  transition: background .12s;
   border-bottom: 1px solid rgba(6,59,63,.05);
 }
 .notif-item:last-child { border-bottom: none; }
-.notif-item:hover { background: rgba(6,59,63,.04); }
-.notif-item.unread { background: rgba(253,77,2,.04); }
+.notif-item:hover { background: rgba(6,59,63,.03); }
+.notif-item.unread { background: rgba(253,77,2,.03); }
 .notif-icon {
-  width: 34px; height: 34px; border-radius: 10px;
+  width: 32px; height: 32px; border-radius: 8px;
   display: flex; align-items: center; justify-content: center;
-  font-size: .85rem; flex-shrink: 0;
+  font-size: .8rem; flex-shrink: 0;
 }
 .notif-icon.chat  { background: #e8f7ef; color: #2a9d5c; }
 .notif-icon.inq   { background: var(--teal-soft); color: var(--teal); }
 .notif-icon.stock { background: #fef3c7; color: #b45309; }
 .notif-text { flex: 1; }
-.notif-text-title { font-size: .78rem; font-weight: 600; color: var(--text); margin-bottom: 2px; }
-.notif-text-sub   { font-size: .7rem; color: var(--text-muted); line-height: 1.4; }
-.notif-badge-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--orange); flex-shrink: 0; margin-top: 5px;
-}
-.topbar-date {
-  font-size: .75rem; color: var(--text-muted);
-  font-weight: 500;
-}
+.notif-text-title { font-size: .76rem; font-weight: 600; color: var(--text); margin-bottom: 1px; }
+.notif-text-sub   { font-size: .68rem; color: var(--text-muted); }
+.notif-badge-dot  { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); flex-shrink: 0; margin-top: 5px; }
 
-/* PROFILE DROPDOWN IN TOPBAR */
-.topbar-profile {
-  position: relative;
-}
+.topbar-date { font-size: .72rem; color: var(--text-muted); font-weight: 500; }
+
+/* Profile dropdown */
+.topbar-profile { position: relative; }
 .profile-trigger {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 12px;
-  border-radius: 10px;
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 12px;
+  border-radius: 8px;
   background: var(--cream);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: all .2s var(--ease);
-  font-size: .82rem;
-  font-weight: 500;
-  color: var(--teal);
+  transition: background .15s, border-color .15s;
+  font-size: .8rem; font-weight: 500; color: var(--teal);
 }
-.profile-trigger:hover {
-  background: var(--orange);
-  color: #fff;
-  border-color: var(--orange);
-  transform: translateY(-2px);
-}
-.profile-trigger i {
-  font-size: .8rem;
-}
+.profile-trigger:hover { background: var(--white); border-color: rgba(6,59,63,.18); }
+.profile-trigger i { font-size: .78rem; }
 .profile-dropdown {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  margin-top: 8px;
+  position: absolute; top: 100%; right: 0;
+  margin-top: 6px;
   background: var(--white);
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid var(--border);
-  box-shadow: 0 12px 40px -8px rgba(6,59,63,.2);
-  min-width: 240px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-8px);
-  transition: all .25s var(--ease);
+  box-shadow: var(--shadow-lg);
+  min-width: 220px;
+  opacity: 0; visibility: hidden;
+  transform: translateY(-6px);
+  transition: all .2s var(--ease);
   z-index: 1000;
 }
-.profile-dropdown.open {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
+.profile-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
 .profile-dropdown-header {
-  padding: 16px 20px;
+  padding: 14px 18px;
   border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 12px;
+  display: flex; align-items: center; gap: 10px;
 }
 .profile-avatar-sm {
-  width: 40px; height: 40px;
-  border-radius: 50%;
+  width: 36px; height: 36px; border-radius: 50%;
   background: var(--orange);
   display: flex; align-items: center; justify-content: center;
-  font-size: .9rem; font-weight: 700; color: #fff;
+  font-size: .85rem; font-weight: 700; color: #fff;
   flex-shrink: 0;
 }
-.profile-info {
-  flex: 1;
-}
-.profile-name {
-  font-size: .85rem; font-weight: 700;
-  color: var(--teal);
-}
-.profile-email {
-  font-size: .7rem; color: var(--text-muted);
-  margin-top: 2px;
-}
-.profile-dropdown-menu {
-  padding: 8px 0;
-}
+.profile-name { font-size: .82rem; font-weight: 700; color: var(--teal); }
+.profile-email { font-size: .68rem; color: var(--text-muted); margin-top: 1px; }
+.profile-dropdown-menu { padding: 6px 0; }
 .profile-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 20px;
-  color: var(--text);
-  font-size: .82rem;
-  cursor: pointer;
-  transition: all .15s var(--ease);
-  background: none;
-  width: 100%;
-  text-align: left;
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 18px;
+  color: var(--text); font-size: .8rem;
+  cursor: pointer; transition: background .12s;
+  background: none; width: 100%; text-align: left;
 }
-.profile-menu-item:hover {
-  background: var(--cream);
-  color: var(--orange);
-  padding-left: 24px;
-}
-.profile-menu-item i {
-  font-size: .8rem;
-  width: 16px;
-  text-align: center;
-  color: var(--orange);
-}
-.profile-dropdown-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 8px 0;
-}
+.profile-menu-item:hover { background: var(--cream); }
+.profile-menu-item i { font-size: .75rem; width: 14px; text-align: center; color: var(--orange); }
+.profile-dropdown-divider { height: 1px; background: var(--border); margin: 4px 0; }
 
 /* PAGE CONTENT */
 .page-content {
-  padding: 32px;
+  padding: 28px;
   flex: 1;
-  animation: fadeIn .3s var(--ease);
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* SECTION (view) */
 .section { display: none; }
-.section.active { display: block; animation: fadeIn .3s var(--ease); }
+.section.active { display: block; animation: fadeIn .25s var(--ease); }
 
-/* stat cards moved to dashboard redesign section below */
-
-/* =============================================
-   CARDS / PANELS
-   ============================================= */
+/* ─── CARDS ────────────────────────────────── */
 .card {
   background: var(--white);
   border-radius: var(--radius);
   border: 1px solid var(--border);
   overflow: hidden;
-  transition: all .3s var(--ease);
 }
-.card:hover {
-  box-shadow: var(--shadow);
-}
-
 .card-header {
-  padding: 20px 24px;
+  padding: 18px 22px;
   border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
+  display: flex; align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
-.card-title {
-  font-size: .9rem; font-weight: 700;
-  color: var(--teal); letter-spacing: -.01em;
-}
-.card-body { padding: 24px; }
+.card-title { font-size: .88rem; font-weight: 700; color: var(--teal); }
+.card-body { padding: 22px; }
 
-/* =============================================
-   BUTTONS
-   ============================================= */
+/* ─── BUTTONS ──────────────────────────────── */
 .btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 9px 18px;
-  border-radius: 10px;
-  font-size: .82rem; font-weight: 600;
-  border: none; cursor: pointer;
-  transition: all .2s var(--ease);
-}
-.btn:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.1); }
-.btn:active { transform: translateY(0); }
-
-.btn-primary {
-  background: var(--teal); color: #fff;
-}
-.btn-primary:hover {
-  background: var(--teal-mid);
-  box-shadow: 0 8px 24px -6px rgba(6,59,63,.3);
-}
-.btn-orange {
-  background: var(--orange); color: #fff;
-}
-.btn-orange:hover {
-  background: #e04300;
-  box-shadow: 0 8px 24px -6px rgba(253,77,2,.35);
-}
-.btn-outline {
-  background: none;
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-}
-.btn-outline:hover {
-  border-color: var(--teal);
-  color: var(--teal);
-  background: var(--teal-soft);
-}
-.btn-danger {
-  background: #fff0f0; color: #c0392b;
-  border: 1px solid #ffd5d5;
-}
-.btn-danger:hover {
-  background: #c0392b; color: #fff;
-}
-.btn-sm {
-  padding: 6px 12px;
-  font-size: .76rem;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
   border-radius: 8px;
+  font-size: .8rem; font-weight: 600;
+  border: none; cursor: pointer;
+  transition: background .15s, box-shadow .15s;
 }
-.btn-icon {
-  width: 34px; height: 34px;
-  padding: 0;
-  border-radius: 9px;
-  justify-content: center;
-}
+.btn:hover { box-shadow: 0 3px 10px rgba(0,0,0,.1); }
+.btn:active { transform: none; box-shadow: none; }
 
-/* =============================================
-   TABLE
-   ============================================= */
+.btn-primary { background: var(--teal); color: #fff; }
+.btn-primary:hover { background: var(--teal-mid); }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn-orange:hover { background: #e04300; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text-muted); }
+.btn-outline:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-soft); }
+.btn-danger { background: #fff0f0; color: #c0392b; border: 1px solid #ffd5d5; }
+.btn-danger:hover { background: #c0392b; color: #fff; }
+.btn-sm { padding: 5px 11px; font-size: .74rem; border-radius: 7px; }
+.btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; }
+
+/* ─── TABLE ────────────────────────────────── */
 .table-wrap { overflow-x: auto; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+table { width: 100%; border-collapse: collapse; }
 thead th {
-  padding: 12px 16px;
-  font-size: .7rem; font-weight: 700;
-  letter-spacing: .1em; text-transform: uppercase;
+  padding: 11px 14px;
+  font-size: .67rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
   color: var(--text-muted);
   background: var(--cream);
-  text-align: left;
-  white-space: nowrap;
+  text-align: left; white-space: nowrap;
 }
-thead th:first-child { border-radius: 10px 0 0 10px; }
-thead th:last-child  { border-radius: 0 10px 10px 0; }
-tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: all .15s var(--ease);
-}
+thead th:first-child { border-radius: 8px 0 0 8px; }
+thead th:last-child  { border-radius: 0 8px 8px 0; }
+tbody tr { border-bottom: 1px solid rgba(6,59,63,.06); transition: background .1s; }
 tbody tr:last-child { border-bottom: none; }
-tbody tr:hover { background: #fafcfc; }
-tbody td {
-  padding: 14px 16px;
-  font-size: .83rem;
-  color: var(--text);
-  vertical-align: middle;
-}
-.td-actions { display: flex; gap: 6px; }
+tbody tr:hover { background: #f9fbfb; }
+tbody td { padding: 13px 14px; font-size: .82rem; color: var(--text); vertical-align: middle; }
+.td-actions { display: flex; gap: 5px; }
 
-/* =============================================
-   BADGE / PILL
-   ============================================= */
+/* ─── BADGES ───────────────────────────────── */
 .badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 10px;
-  border-radius: 100px;
-  font-size: .68rem; font-weight: 700;
-  letter-spacing: .04em;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 9px; border-radius: 100px;
+  font-size: .66rem; font-weight: 700; letter-spacing: .03em;
 }
 .badge-green  { background: #e8f7ef; color: #2a9d5c; }
 .badge-orange { background: var(--orange-soft); color: var(--orange); }
 .badge-teal   { background: var(--teal-soft); color: var(--teal); }
 .badge-gray   { background: #f0f0f0; color: #888; }
 .badge-purple { background: #f0eeff; color: #7360f2; }
+.badge-lowstock  { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
+.badge-outstock  { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+.badge-instock   { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+.stock-low  { color: #ca8a04; font-weight: 700; }
+.stock-out  { color: #dc2626; font-weight: 700; }
+.stock-ok   { color: #16a34a; font-weight: 700; }
 
-/* =============================================
-   FORM
-   ============================================= */
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-}
+/* ─── FORM ─────────────────────────────────── */
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .form-grid.cols-1 { grid-template-columns: 1fr; }
 .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-
-.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
 .form-group.full { grid-column: 1 / -1; }
-
-label {
-  font-size: .76rem; font-weight: 600;
-  color: var(--teal); letter-spacing: .02em;
-}
-input[type="text"],
-input[type="number"],
-input[type="email"],
-input[type="url"],
-select,
-textarea {
-  padding: 10px 14px;
+label { font-size: .73rem; font-weight: 600; color: var(--teal); }
+input[type="text"], input[type="number"], input[type="email"], input[type="url"],
+select, textarea {
+  padding: 9px 12px;
   border: 1px solid var(--border);
-  border-radius: 10px;
-  font-size: .84rem;
-  color: var(--text);
+  border-radius: 8px;
+  font-size: .82rem; color: var(--text);
   background: var(--white);
   outline: none;
-  transition: all .2s var(--ease);
+  transition: border-color .15s, box-shadow .15s;
   width: 100%;
 }
 input:focus, select:focus, textarea:focus {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(6,59,63,.08);
+  box-shadow: 0 0 0 3px rgba(6,59,63,.07);
 }
-textarea { resize: vertical; min-height: 90px; }
-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236a8080' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+textarea { resize: vertical; min-height: 86px; }
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236a8080' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 12px center;
+  padding-right: 34px;
+}
+.form-hint { font-size: .7rem; color: var(--text-muted); }
 
-.form-hint { font-size: .72rem; color: var(--text-muted); }
-
-/* =============================================
-   MODAL
-   ============================================= */
+/* ─── MODAL ────────────────────────────────── */
 .modal-overlay {
   position: fixed; inset: 0;
-  background: rgba(6,20,20,.55);
-  backdrop-filter: blur(4px);
+  background: rgba(6,20,20,.5);
+  backdrop-filter: blur(3px);
   z-index: 200;
   display: flex; align-items: center; justify-content: center;
   padding: 20px;
   opacity: 0; pointer-events: none;
-  transition: opacity .25s var(--ease);
+  transition: opacity .2s var(--ease);
 }
-.modal-overlay.open {
-  opacity: 1; pointer-events: all;
-}
+.modal-overlay.open { opacity: 1; pointer-events: all; }
 .modal {
   background: var(--white);
-  border-radius: 20px;
-  width: 100%; max-width: 540px;
+  border-radius: 16px;
+  width: 100%; max-width: 520px;
   max-height: 90vh; overflow-y: auto;
-  box-shadow: 0 32px 80px -16px rgba(0,0,0,.35);
-  transform: translateY(20px) scale(.97);
-  transition: transform .3s var(--ease);
+  box-shadow: 0 24px 60px -12px rgba(0,0,0,.3);
+  transform: translateY(16px) scale(.98);
+  transition: transform .25s var(--ease);
 }
 .modal-overlay.open .modal { transform: translateY(0) scale(1); }
-
 .modal-header {
-  padding: 22px 24px 18px;
+  padding: 20px 22px 16px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center; justify-content: space-between;
 }
-.modal-title {
-  font-size: .95rem; font-weight: 700; color: var(--teal);
-}
+.modal-title { font-size: .9rem; font-weight: 700; color: var(--teal); }
 .modal-close {
-  width: 32px; height: 32px;
-  border-radius: 8px;
+  width: 30px; height: 30px; border-radius: 7px;
   background: var(--cream); color: var(--text-muted);
   display: flex; align-items: center; justify-content: center;
-  font-size: .85rem; cursor: pointer;
-  transition: all .2s var(--ease);
+  font-size: .82rem; cursor: pointer; transition: background .15s;
 }
 .modal-close:hover { background: #ffd5d5; color: #c0392b; }
-.modal-body { padding: 24px; }
+.modal-body { padding: 22px; }
 .modal-footer {
-  padding: 16px 24px;
+  padding: 14px 22px;
   border-top: 1px solid var(--border);
-  display: flex; justify-content: flex-end; gap: 10px;
+  display: flex; justify-content: flex-end; gap: 8px;
 }
 
-/* =============================================
-   TOAST
-   ============================================= */
-.toast-container {
-  position: fixed; bottom: 28px; right: 28px;
-  z-index: 999;
-  display: flex; flex-direction: column; gap: 10px;
-}
+/* ─── TOAST ────────────────────────────────── */
+.toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
 .toast {
-  background: var(--teal);
-  color: #fff;
-  padding: 13px 18px;
-  border-radius: 12px;
-  font-size: .82rem; font-weight: 500;
-  display: flex; align-items: center; gap: 10px;
-  box-shadow: 0 8px 28px -6px rgba(6,59,63,.35);
-  animation: toastIn .3s var(--ease) forwards;
-  max-width: 320px;
+  background: var(--teal); color: #fff;
+  padding: 11px 16px; border-radius: 10px;
+  font-size: .8rem; font-weight: 500;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn .25s var(--ease) forwards;
+  max-width: 300px;
 }
 .toast.success { background: #1a7a4a; }
 .toast.error   { background: #c0392b; }
-.toast i { font-size: .9rem; flex-shrink: 0; }
+.toast i { font-size: .85rem; flex-shrink: 0; }
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(30px); }
+  from { opacity: 0; transform: translateX(24px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 
-/* =============================================
-   CONFIRM DIALOG
-   ============================================= */
+/* ─── CONFIRM ──────────────────────────────── */
 .confirm-overlay {
   position: fixed; inset: 0;
-  background: rgba(6,20,20,.55);
-  backdrop-filter: blur(4px);
+  background: rgba(6,20,20,.5);
+  backdrop-filter: blur(3px);
   z-index: 300;
   display: flex; align-items: center; justify-content: center;
   padding: 20px;
   opacity: 0; pointer-events: none;
-  transition: opacity .25s var(--ease);
+  transition: opacity .2s var(--ease);
 }
 .confirm-overlay.open { opacity: 1; pointer-events: all; }
 .confirm-box {
-  background: var(--white);
-  border-radius: 18px;
-  padding: 28px;
-  width: 100%; max-width: 380px;
+  background: var(--white); border-radius: 16px;
+  padding: 28px; width: 100%; max-width: 360px;
   text-align: center;
-  box-shadow: 0 32px 80px -16px rgba(0,0,0,.3);
-  transform: scale(.95);
-  transition: transform .25s var(--ease);
+  box-shadow: 0 24px 60px -12px rgba(0,0,0,.25);
+  transform: scale(.96);
+  transition: transform .2s var(--ease);
 }
 .confirm-overlay.open .confirm-box { transform: scale(1); }
 .confirm-icon {
-  width: 56px; height: 56px;
-  border-radius: 50%;
+  width: 52px; height: 52px; border-radius: 50%;
   background: #fff0f0;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.4rem; color: #c0392b;
-  margin: 0 auto 16px;
+  font-size: 1.3rem; color: #c0392b;
+  margin: 0 auto 14px;
 }
-.confirm-box h3 {
-  font-size: 1rem; font-weight: 700;
-  color: var(--teal); margin-bottom: 8px;
-}
-.confirm-box p {
-  font-size: .83rem; color: var(--text-muted);
-  margin-bottom: 22px; line-height: 1.6;
-}
-.confirm-actions { display: flex; gap: 10px; justify-content: center; }
+.confirm-box h3 { font-size: .95rem; font-weight: 700; color: var(--teal); margin-bottom: 7px; }
+.confirm-box p  { font-size: .8rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
+.confirm-actions { display: flex; gap: 8px; justify-content: center; }
 
-/* =============================================
-   SEARCH & FILTER BAR
-   ============================================= */
-.filter-bar {
-  display: flex; align-items: center; gap: 10px;
-  flex-wrap: wrap;
-}
-.search-input-wrap {
-  position: relative; flex: 1; min-width: 200px;
-}
+/* ─── SEARCH BAR ───────────────────────────── */
+.filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.search-input-wrap { position: relative; flex: 1; min-width: 180px; }
 .search-input-wrap i {
-  position: absolute; left: 12px; top: 50%;
+  position: absolute; left: 11px; top: 50%;
   transform: translateY(-50%);
-  color: var(--text-muted); font-size: .85rem;
+  color: var(--text-muted); font-size: .82rem;
   pointer-events: none;
 }
-.search-input-wrap input {
-  padding-left: 36px;
-}
+.search-input-wrap input { padding-left: 34px; }
 
-/* =============================================
-   EMPTY STATE
-   ============================================= */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-}
+/* ─── EMPTY STATE ──────────────────────────── */
+.empty-state { text-align: center; padding: 52px 20px; }
 .empty-icon {
-  width: 72px; height: 72px;
-  border-radius: 50%;
+  width: 64px; height: 64px; border-radius: 50%;
   background: var(--cream);
   display: flex; align-items: center; justify-content: center;
-  font-size: 1.8rem; color: var(--text-muted);
-  margin: 0 auto 16px;
+  font-size: 1.6rem; color: var(--text-muted);
+  margin: 0 auto 14px;
 }
-.empty-state h3 {
-  font-size: .95rem; font-weight: 700;
-  color: var(--teal); margin-bottom: 6px;
-}
-.empty-state p {
-  font-size: .82rem; color: var(--text-muted);
-  max-width: 280px; margin: 0 auto 20px;
-}
+.empty-state h3 { font-size: .9rem; font-weight: 700; color: var(--teal); margin-bottom: 5px; }
+.empty-state p  { font-size: .8rem; color: var(--text-muted); max-width: 260px; margin: 0 auto 18px; }
 
-/* dashboard grid and activity styles moved to dashboard redesign section below */
-
-/* =============================================
-   RESPONSIVE
-   ============================================= */
-@media (max-width: 1100px) {
-  .dashboard-grid { grid-template-columns: 1fr; }
-}
-
-@media (max-width: 768px) {
-  .sidebar {
-    transform: translateX(-100%);
-  }
-  .sidebar.open {
-    transform: translateX(0);
-    box-shadow: 4px 0 32px rgba(0,0,0,.2);
-  }
-  .main { margin-left: 0; }
-  .menu-toggle { display: flex; }
-  .page-content { padding: 20px 16px; }
-  .topbar { padding: 0 16px; }
-  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-  .form-grid { grid-template-columns: 1fr; }
-  .form-grid.cols-3 { grid-template-columns: 1fr; }
-  .topbar-date { display: none; }
-  .profile-dropdown {
-    right: auto;
-    left: 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .stats-grid { grid-template-columns: 1fr; }
-  .topbar-right { gap: 8px; }
-  .profile-trigger { padding: 6px 10px; }
-}
-
-.sidebar-overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.4);
-  z-index: 99;
-}
+/* ─── SIDEBAR OVERLAY ──────────────────────── */
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.35); z-index: 99; }
 .sidebar-overlay.open { display: block; }
 
-/* =============================================
-   DASHBOARD REDESIGN
-   ============================================= */
-
-/* Stat cards - new style */
+/* ─── STAT CARDS ───────────────────────────── */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
 }
 .stat-card {
   background: var(--white);
-  border-radius: 14px;
-  padding: 22px 22px 18px;
+  border-radius: 12px;
+  padding: 18px 18px 14px;
   border: 1px solid var(--border);
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  transition: all .25s var(--ease);
-  box-shadow: 0 1px 4px rgba(6,59,63,.04);
+  display: flex; align-items: flex-start; gap: 14px;
+  transition: box-shadow .2s;
 }
-.stat-card:hover {
-  box-shadow: 0 8px 28px -8px rgba(6,59,63,.14);
-  transform: translateY(-3px);
-}
-.stat-card-warn:hover { border-color: #f59e0b; }
-.stat-card-danger:hover { border-color: #ef4444; }
-.stat-card-green:hover { border-color: #2a9d5c; }
-
+.stat-card:hover { box-shadow: var(--shadow); }
 .stat-icon-wrap {
-  width: 52px; height: 52px;
-  border-radius: 50%;
+  width: 44px; height: 44px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
 }
@@ -882,179 +598,146 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 .stat-icon-wrap.yellow { background: #fef9c3; color: #ca8a04; }
 .stat-icon-wrap.red    { background: #fee2e2; color: #dc2626; }
 .stat-icon-wrap.green  { background: #dcfce7; color: #16a34a; }
-
 .stat-info { flex: 1; min-width: 0; }
 .stat-label {
-  font-size: .72rem; font-weight: 600;
+  font-size: .68rem; font-weight: 600;
   color: var(--text-muted); letter-spacing: .04em;
   text-transform: uppercase; margin-bottom: 4px;
 }
 .stat-num {
-  font-size: 2rem; font-weight: 800;
+  font-size: 1.8rem; font-weight: 800;
   color: var(--teal); line-height: 1;
-  letter-spacing: -.04em; margin-bottom: 8px;
+  letter-spacing: -.04em; margin-bottom: 6px;
 }
-.stat-link {
-  font-size: .72rem; color: var(--text-muted);
-  font-weight: 500; cursor: pointer;
-  transition: color .15s;
-}
+.stat-link { font-size: .7rem; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: color .12s; }
 .stat-card:hover .stat-link { color: var(--orange); }
 
-/* Dashboard body layout */
+/* Dashboard layout */
 .dash-body {
   display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: 20px;
+  grid-template-columns: 1fr 340px;
+  gap: 18px;
   align-items: start;
 }
 .dash-main { min-width: 0; }
-.dash-side { display: flex; flex-direction: column; gap: 18px; }
+.dash-side { display: flex; flex-direction: column; gap: 16px; }
 
-/* Low stock table product cell */
-.prod-cell {
-  display: flex; align-items: center; gap: 10px;
-}
+/* Prod cell */
+.prod-cell { display: flex; align-items: center; gap: 10px; }
 .prod-thumb {
-  width: 40px; height: 40px;
-  border-radius: 8px;
-  background: var(--cream);
-  object-fit: contain;
+  width: 38px; height: 38px; border-radius: 7px;
+  background: var(--cream); object-fit: contain;
   border: 1px solid var(--border);
   display: flex; align-items: center; justify-content: center;
-  color: var(--text-muted); font-size: .8rem;
-  flex-shrink: 0;
-  overflow: hidden;
+  color: var(--text-muted); font-size: .78rem;
+  flex-shrink: 0; overflow: hidden;
 }
 .prod-thumb img { width: 100%; height: 100%; object-fit: contain; }
-.prod-name { font-weight: 600; color: var(--teal); font-size: .83rem; }
+.prod-name { font-weight: 600; color: var(--teal); font-size: .81rem; }
 
-/* Status badges */
-.badge-lowstock  { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }
-.badge-outstock  { background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
-.badge-instock   { background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
-
-/* Stock number colors */
-.stock-low  { color: #ca8a04; font-weight: 700; }
-.stock-out  { color: #dc2626; font-weight: 700; }
-.stock-ok   { color: #16a34a; font-weight: 700; }
-
-/* Activity - new style */
+/* Activity */
 .activity-item-new {
-  display: flex; align-items: flex-start; gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(6,59,63,.06);
 }
 .activity-item-new:last-child { border-bottom: none; }
 .act-icon-wrap {
-  width: 32px; height: 32px;
-  border-radius: 50%;
+  width: 30px; height: 30px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: .75rem; flex-shrink: 0; margin-top: 1px;
+  font-size: .72rem; flex-shrink: 0; margin-top: 1px;
 }
 .act-icon-wrap.teal   { background: var(--teal-soft); color: var(--teal); }
 .act-icon-wrap.orange { background: var(--orange-soft); color: var(--orange); }
 .act-icon-wrap.green  { background: #dcfce7; color: #16a34a; }
 .act-icon-wrap.purple { background: #f0eeff; color: #7360f2; }
 .act-content { flex: 1; min-width: 0; }
-.act-title { font-size: .8rem; font-weight: 600; color: var(--teal); line-height: 1.3; }
-.act-sub { font-size: .72rem; color: var(--text-muted); margin-top: 1px; }
-.act-time { font-size: .67rem; color: var(--text-muted); white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
+.act-title { font-size: .78rem; font-weight: 600; color: var(--teal); line-height: 1.3; }
+.act-sub   { font-size: .7rem; color: var(--text-muted); margin-top: 1px; }
+.act-time  { font-size: .65rem; color: var(--text-muted); white-space: nowrap; margin-top: 2px; flex-shrink: 0; }
 
-/* Tip bar */
 .dash-tip {
-  background: var(--teal-soft);
-  border: 1px solid rgba(6,59,63,.12);
-  border-radius: 10px;
-  padding: 11px 16px;
-  display: flex; align-items: center; gap: 10px;
-  font-size: .78rem; color: var(--teal);
-  margin-top: 20px;
+  background: var(--teal-soft); border: 1px solid rgba(6,59,63,.1);
+  border-radius: 9px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 9px;
+  font-size: .76rem; color: var(--teal); margin-top: 16px;
 }
 .dash-tip i { color: var(--teal-mid); flex-shrink: 0; }
-.dash-tip button { margin-left: auto; background: none; color: var(--text-muted); font-size: .85rem; }
+.dash-tip button { margin-left: auto; background: none; color: var(--text-muted); font-size: .82rem; }
 
-@media (max-width: 1100px) {
-  .dash-body { grid-template-columns: 1fr; }
-  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+/* ─── RESPONSIVE ───────────────────────────── */
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .dash-body  { grid-template-columns: 1fr; }
 }
-@media (max-width: 600px) {
-  .stats-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+@media (max-width: 768px) {
+  .sidebar { transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.18); }
+  .main { margin-left: 0; }
+  .menu-toggle { display: flex; }
+  .page-content { padding: 18px 14px; }
+  .topbar { padding: 0 14px; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-grid.cols-3 { grid-template-columns: 1fr; }
+  .topbar-date { display: none; }
+  .profile-dropdown { right: auto; left: 0; }
+}
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .topbar-right { gap: 6px; }
 }
 
-/* ── Messenger-style chat bubbles (admin panel) ── */
+/* ─── CHAT BUBBLES ─────────────────────────── */
 .zm-chat-msg {
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
+  display: flex; align-items: flex-end; gap: 7px;
   margin-bottom: 2px;
 }
-/* Admin messages → right side, white bubble */
-.zm-chat-msg.admin {
-  flex-direction: row-reverse;
-}
+.zm-chat-msg.admin { flex-direction: row-reverse; }
 .zm-chat-msg.admin .zm-chat-bubble {
-  background: #fff;
-  color: var(--text, #1a2e2e);
-  border-radius: 18px 18px 4px 18px;
-  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  background: #fff; color: var(--text);
+  border-radius: 16px 16px 4px 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.07);
 }
-/* Customer messages → left side, orange bubble */
 .zm-chat-msg.visitor .zm-chat-bubble {
-  background: #FD4D02;
-  color: #fff;
-  border-radius: 18px 18px 18px 4px;
+  background: var(--orange); color: #fff;
+  border-radius: 16px 16px 16px 4px;
 }
 .zm-chat-bubble {
-  max-width: 72%;
-  padding: 9px 14px;
-  font-size: .82rem;
-  line-height: 1.5;
-  word-break: break-word;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  max-width: 70%; padding: 8px 13px;
+  font-size: .8rem; line-height: 1.5;
+  word-break: break-word; white-space: pre-wrap; overflow-wrap: anywhere;
 }
 .zm-chat-bubble.deleted {
-  font-style: italic;
-  opacity: .55;
-  font-size: .74rem;
-  background: #ddd !important;
-  color: #666 !important;
+  font-style: italic; opacity: .52; font-size: .72rem;
+  background: #ddd !important; color: #666 !important;
 }
-.zm-ctx-menu{position:fixed;background:#1a2e2e;color:#fff;border-radius:10px;padding:4px 0;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:999999;font-family:'Poppins',sans-serif;font-size:.78rem;}
-.zm-ctx-item{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;transition:background .15s;}
-.zm-ctx-item:hover{background:rgba(255,255,255,.1);}
-.zm-ctx-item.danger{color:#ff6b6b;}
-.zm-ctx-item.danger:hover{background:rgba(255,107,107,.15);}
+.zm-ctx-menu {
+  position: fixed; background: #1a2e2e; color: #fff;
+  border-radius: 9px; padding: 4px 0; min-width: 150px;
+  box-shadow: 0 6px 20px rgba(0,0,0,.28);
+  z-index: 999999; font-family: 'Poppins', sans-serif; font-size: .76rem;
+}
+.zm-ctx-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; cursor: pointer; transition: background .12s; }
+.zm-ctx-item:hover { background: rgba(255,255,255,.08); }
+.zm-ctx-item.danger { color: #ff6b6b; }
+.zm-ctx-item.danger:hover { background: rgba(255,107,107,.12); }
 .zm-chat-bubble img {
-  max-width: 180px;
-  max-height: 140px;
-  border-radius: 8px;
-  display: block;
-  cursor: zoom-in;
-  margin-top: 4px;
+  max-width: 160px; max-height: 120px;
+  border-radius: 7px; display: block; cursor: zoom-in; margin-top: 4px;
 }
 .zm-chat-time {
-  font-size: .65rem;
-  color: var(--text-muted, #888);
-  margin-top: 3px;
-  padding: 0 4px;
+  font-size: .63rem; color: var(--text-muted);
+  margin-top: 2px; padding: 0 3px;
 }
-.zm-chat-msg.admin .zm-chat-time { text-align: right; }
+.zm-chat-msg.admin .zm-chat-time   { text-align: right; }
 .zm-chat-msg.visitor .zm-chat-time { text-align: left; }
 .zm-chat-avatar {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #1a2e2e;
-  color: #fff;
-  font-size: .7rem;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  margin-bottom: 18px;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: #1a2e2e; color: #fff;
+  font-size: .66rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-bottom: 18px;
 }
 </style>
 </head>
@@ -1086,7 +769,8 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <span class="nav-badge" id="navArrivalsBadge">0</span>
     </button>
 
-    <div class="nav-section-label" style="margin-top:8px;">Communication</div>
+
+    <div class="nav-section-label">Communication</div>
     <button class="nav-item" data-section="inquiries">
       <i class="fa-solid fa-cart-shopping"></i> Inquiries
       <span class="nav-badge" id="navInqBadge">0</span>
@@ -1096,7 +780,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <span class="nav-badge" id="navChatBadge">0</span>
     </button>
 
-    <div class="nav-section-label" style="margin-top:8px;">Users</div>
+    <div class="nav-section-label">Users</div>
     <button class="nav-item" data-section="users">
       <i class="fa-solid fa-users"></i> Registered Users
     </button>
@@ -1104,11 +788,16 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
       <i class="fa-solid fa-clock-rotate-left"></i> Login Records
     </button>
 
-    <div class="nav-section-label" style="margin-top:8px;">Settings</div>
+    <div class="nav-section-label">Settings</div>
     <button class="nav-item" data-section="settings">
       <i class="fa-solid fa-gear"></i> Store Settings
     </button>
   </nav>
+
+  <!-- hidden elements to keep JS references working -->
+  <span id="sidebarAvatar" style="display:none;"></span>
+  <span id="sidebarName" style="display:none;"></span>
+  <span id="sidebarEmail" style="display:none;"></span>
 
 </aside>
 
@@ -1237,7 +926,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
           <div class="stat-info">
             <div class="stat-label">Inquiries</div>
             <div class="stat-num" id="statInquiries">0</div>
-            <a class="stat-link" style="color:#FD4D02;">View inquiries →</a>
+            <a class="stat-link" onclick="navigate('inquiries')" style="cursor:pointer;">View inquiries →</a>
           </div>
         </div>
 
@@ -1259,7 +948,7 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
         <!-- Low Stock Items Table -->
         <div class="card dash-main">
           <div class="card-header">
-            <span class="card-title">Low Stock Items</span>
+            <span class="card-title">Stocks</span>
             <button class="btn btn-outline btn-sm" onclick="navigate('products')">View all</button>
           </div>
           <div style="padding:0;">
@@ -1284,50 +973,6 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
         <!-- Right: Sales + Recent Activities -->
         <div class="dash-side">
-
-          <!-- Today's Sales -->
-          <div class="card dash-sales">
-            <div class="card-header">
-              <span class="card-title">Today's Sales</span>
-              <button class="topbar-btn" title="Calendar" style="width:32px;height:32px;border-radius:8px;">
-                <i class="fa-regular fa-calendar"></i>
-              </button>
-            </div>
-            <div class="card-body" style="padding:20px 24px;">
-              <div style="font-size:.72rem;font-weight:600;color:var(--text-muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;">Total Sales</div>
-              <div style="font-size:2rem;font-weight:800;color:#2a9d5c;letter-spacing:-.04em;line-height:1.1;">MVR 0</div>
-              <div style="display:flex;gap:32px;margin-top:14px;">
-                <div>
-                  <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Transactions</div>
-                  <div style="font-size:1.1rem;font-weight:800;color:var(--teal);" id="dashTransactions">0</div>
-                </div>
-                <div>
-                  <div style="font-size:.7rem;color:var(--text-muted);font-weight:600;margin-bottom:2px;">Avg. Sale</div>
-                  <div style="font-size:1.1rem;font-weight:800;color:var(--teal);" id="dashAvgSale">—</div>
-                </div>
-              </div>
-              <!-- Mini chart (decorative) -->
-              <div style="margin-top:18px;height:60px;position:relative;overflow:hidden;">
-                <svg viewBox="0 0 280 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
-                  <defs>
-                    <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stop-color="#2a9d5c" stop-opacity="0.2"/>
-                      <stop offset="100%" stop-color="#2a9d5c" stop-opacity="0"/>
-                    </linearGradient>
-                  </defs>
-                  <path d="M0,45 C20,40 35,20 55,25 C75,30 90,50 110,42 C130,34 145,15 165,20 C185,25 200,45 220,35 C240,25 260,30 280,22" stroke="#2a9d5c" stroke-width="2" fill="none" stroke-linecap="round"/>
-                  <path d="M0,45 C20,40 35,20 55,25 C75,30 90,50 110,42 C130,34 145,15 165,20 C185,25 200,45 220,35 C240,25 260,30 280,22 L280,60 L0,60 Z" fill="url(#salesGrad)"/>
-                </svg>
-              </div>
-              <div style="display:flex;justify-content:space-between;margin-top:4px;">
-                <span style="font-size:.65rem;color:var(--text-muted);">12 AM</span>
-                <span style="font-size:.65rem;color:var(--text-muted);">6 AM</span>
-                <span style="font-size:.65rem;color:var(--text-muted);">12 PM</span>
-                <span style="font-size:.65rem;color:var(--text-muted);">6 PM</span>
-                <span style="font-size:.65rem;color:var(--text-muted);">11 PM</span>
-              </div>
-            </div>
-          </div>
 
           <!-- Recent Activities -->
           <div class="card">
@@ -1355,6 +1000,38 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
 
     <!-- ==================== PRODUCTS ==================== -->
     <section class="section" id="sec-products">
+
+      <!-- Products Stat Cards -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px;">
+        <div class="stat-card">
+          <div class="stat-icon-wrap teal">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Total Products</div>
+            <div class="stat-num" id="prodStatTotal">0</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card-warn">
+          <div class="stat-icon-wrap yellow">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Low Stock <span style="font-weight:400;color:var(--text-muted);">(≤10)</span></div>
+            <div class="stat-num" id="prodStatLow">0</div>
+          </div>
+        </div>
+        <div class="stat-card stat-card-danger">
+          <div class="stat-icon-wrap red">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">Out of Stock</div>
+            <div class="stat-num" id="prodStatOut">0</div>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <span class="card-title"><i class="fa-solid fa-boxes-stacked" style="color:var(--orange);margin-right:8px;"></i>Products</span>
@@ -1365,6 +1042,14 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
             </div>
             <select id="productCatFilter" onchange="renderProducts()" style="width:auto;min-width:140px;">
               <option value="">All Categories</option>
+              <option value="Personal Care">Personal Care</option>
+              <option value="Health & Wellness">Health &amp; Wellness</option>
+              <option value="Household & Cleaning">Household &amp; Cleaning</option>
+              <option value="Snacks & Confectionery">Snacks &amp; Confectionery</option>
+              <option value="Baby Care">Baby Care</option>
+              <option value="Pantry & Cooking">Pantry &amp; Cooking</option>
+              <option value="Beverages & Hydration">Beverages &amp; Hydration</option>
+              <option value="Stationery & Misc">Stationery &amp; Misc</option>
             </select>
             <button class="btn btn-orange" onclick="openProductModal()">
               <i class="fa-solid fa-plus"></i> Add Product
@@ -1762,23 +1447,24 @@ select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmln
           <label>Category *</label>
           <select id="productCategory">
             <option value="">Select category...</option>
+            <option value="Personal Care">Personal Care</option>
+            <option value="Health & Wellness">Health &amp; Wellness</option>
+            <option value="Household & Cleaning">Household &amp; Cleaning</option>
+            <option value="Snacks & Confectionery">Snacks &amp; Confectionery</option>
+            <option value="Baby Care">Baby Care</option>
+            <option value="Pantry & Cooking">Pantry &amp; Cooking</option>
+            <option value="Beverages & Hydration">Beverages &amp; Hydration</option>
+            <option value="Stationery & Misc">Stationery &amp; Misc</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Price (MVR) *</label>
+          <label>Price (MVR) <span style="font-weight:400;color:var(--text-muted);font-size:.8rem;">optional</span></label>
           <input type="number" id="productPrice" placeholder="0.00" min="0" step="0.01">
         </div>
         <div class="form-group">
           <label>Stock Quantity</label>
           <input type="number" id="productStock" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label>Status</label>
-          <select id="productStatus">
-            <option value="In Stock">In Stock</option>
-            <option value="Low Stock">Low Stock</option>
-            <option value="Out of Stock">Out of Stock</option>
-          </select>
+          <span class="form-hint">Status auto-sets: &gt;10 = In Stock · 1–10 = Low Stock · 0 = Out of Stock</span>
         </div>
         <div class="form-group full">
           <label>Description</label>
@@ -1882,7 +1568,13 @@ const DB = {
   }
 };
 
-let products   = DB.get('products');
+// Seed default products if localStorage is empty
+const _defaultProducts = [{"id":1,"name":"Age Lite Face Serum 30ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_1.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":2,"name":"Amrutanjan Extra Power Yellow 27.5ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_2.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":3,"name":"Amrutanjan Strong Green 27.5ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_3.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":4,"name":"Himalaya Anti Dandruff Coolmint Shampoo 340ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_4.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":5,"name":"Himalaya Anti Dandruff Tea Tree Shampoo 340ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_5.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":6,"name":"AXE Africa Shower Gel (250ML / 400ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_6.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":7,"name":"AXE Alaska Shower Gel (250ML / 400ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_7.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":8,"name":"AXE Apollo Shower Gel (250ML / 400ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_8.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":9,"name":"AXE Black Shower Gel (250ML / 400ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_9.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":10,"name":"AXE Dark Temptation Shower Gel (250ML / 400ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_10.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":11,"name":"AXE Excite Shower Gel (250ML / 400ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_11.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":12,"name":"AXE Sport Blast Shower Gel (250ML / 400ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_12.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":13,"name":"AXE 24*7 Body Spray 150ML/96G","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_13.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":14,"name":"AXE Gold Temptation Body Spray 150ML/96G","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_14.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":15,"name":"AXE Intense Body Spray 150ML/96G","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_15.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":16,"name":"AXE Dark Temptation Body Spray 150ML/96G","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_16.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":17,"name":"AXE Midnight Body Spray 150ML/96G","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_17.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":18,"name":"AXE Pulse Body Spray 150ML/96G","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_18.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":19,"name":"Bajaj Almond Hair Oil (114ML / 190ML / 50ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_19.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":20,"name":"Banjara`s Aloe Vera Gel 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_20.png","createdAt":"2026-06-25T00:00:00.000Z"},{"id":21,"name":"Bigen Hair Color Conditioner Natural Black","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_21.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":22,"name":"Binaca Extra Clean Tooth Brush Soft","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_22.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":23,"name":"Bioline Jelly 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_23.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":24,"name":"Bioline Lip Care","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_24.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":25,"name":"Care Touch Paper Tissue 100`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_25.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":26,"name":"Cauvery Papaya Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_26.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":27,"name":"Cauvery Sandal Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_27.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":28,"name":"Cauvery Sandal Soap 3`S Pack","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_28.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":29,"name":"Cetaphil Cleansing Liquid 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_29.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":30,"name":"Cetaphil Dam 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_30.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":31,"name":"Cetaphil Moisturising Cream 80GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_31.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":32,"name":"Cetaphil Moist Cream 250GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_32.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":33,"name":"Cetaphil Moisturising Lotion 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_33.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":34,"name":"Cetaphil Bar","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_34.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":35,"name":"Cetaphil Pro Urea Lotion 200ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_35.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":36,"name":"Cetaphil Sun Cream SPF 50","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_36.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":37,"name":"Cetaphil Oil Control Foam Wash 236ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_37.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":38,"name":"Cetaphil Refresh Toner 150ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_38.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":39,"name":"Cetaphil Restoraderm 295ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_39.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":40,"name":"Cinthol Original Soap 150GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_40.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":41,"name":"Cinthol Original Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_41.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":42,"name":"Chanthirika Soap 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_42.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":43,"name":"Closeup Tooth Paste 90G","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_43.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":44,"name":"Closeup Toothpaste 42GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_44.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":45,"name":"Colgate Charcoal Clean Gel 120GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_45.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":46,"name":"Colgate Active Salt 115GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_46.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":47,"name":"Colgate Gentle Clean Tooth Brush","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_47.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":48,"name":"Colgate Sensitive Tooth Brush","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_48.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":49,"name":"Colgate Herbal Teeth Paste 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_49.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":50,"name":"Colgate Max Fresh Peppermint Mouth Wash 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_50.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":51,"name":"Colgate Plax Freshmint Mouth Wash 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_51.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":52,"name":"Colgate Maxfresh Red Tooth Paste 38GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_52.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":53,"name":"Colgate Visible White Daily Tooth Paste 120GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_53.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":54,"name":"Colgate Visible Whith Tooth Paste 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_53.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":55,"name":"Colgate Strong Teeth 38GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_54.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":56,"name":"Colgate Strong Teeth Tooth Paste 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_55.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":57,"name":"Colgate Maxfresh Tooth Paste 80GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_57.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":58,"name":"Colgate Super Flexi Tooth Brush","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_58.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":59,"name":"Colgate Total 12 Advance Health 150GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_59.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":60,"name":"Colgate Total 12 Charcoal Deep Clean Tooth","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_60.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":61,"name":"Colgate Zig-zag Tooth Brush","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_61.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":62,"name":"Dabur Almond Hair Oil (100ML / 190ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_62.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":63,"name":"Dabur Amla Hair Oil 180ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_63.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":64,"name":"Dabur Red Tooth Paste (16GM / 36GM / 100GM / 200GM)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_64.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":65,"name":"Dettol Soap Cool (100GM / 150GM)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_65.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":66,"name":"Dettol Soap Original (100GM / 150GM)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_66.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":67,"name":"Dhathri Hair Oil 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_67.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":68,"name":"Dr.morepen Herbal Tooth Paste 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_68.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":69,"name":"Dr.rashel Aloe Vera Facial Kit","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_69.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":70,"name":"Dr.rashel Aloe Vera Foot Mask","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_70.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":71,"name":"Dr.rashel Aloevera Face &amp; Body Gel 380ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_71.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":72,"name":"Dr.rashel Aloe Vera Face &amp; Body Scrub 380ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_72.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":73,"name":"Dr.rashel De-tan Face &amp; Body Scrub 380ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_73.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":74,"name":"Dr.rashel Multani Mitti Face &amp; Body Scrub 380ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_74.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":75,"name":"Dr.rashel Redwine Cream 380ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_75.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":76,"name":"Dr.rashel De-tan Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_76.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":77,"name":"Dr.rashel Neem Fresh Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_77.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":78,"name":"Dr.rashel Ubtan Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_78.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":79,"name":"Dr.rashel De-tan Sunscreen Spf50 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_79.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":80,"name":"Dr.rashel Aloevera Face Serum 30ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_80.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":81,"name":"Dr.rashel Aloevera Wet Wipes 25`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_81.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":82,"name":"Dr.rashel De-tan Wet Wipes 25`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_82.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":83,"name":"Dr.rashel Lavender Wet Wipes 25`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_83.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":84,"name":"Dr.rashel Lemon Wet Wipes 25`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_84.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":85,"name":"Dr.rashel Strawberry Wet Wipes 25`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_85.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":86,"name":"Dr.rashel Ice Fresh Wet Wipes 25`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_86.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":87,"name":"Dr.rashel Onion Black Seed Hair Oil 100 ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_87.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":88,"name":"Dr.rashel Onion Shampoo 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_88.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":89,"name":"Dr.rashel Papaya Facial Kit","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_89.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":90,"name":"Dr.rashel Strong Hold Hair Styling Spray 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_90.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":91,"name":"Dr.rashel Ultra Hold Hair Styling Spray 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_91.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":92,"name":"Dr.rashil VIT-C Body Lotion 200ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_92.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":93,"name":"Dr.tooth Smile Tooth Brush 8`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_93.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":94,"name":"Evereve Period Panties M-l [60CM-100CM]2","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_94.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":95,"name":"Eye Brow Razor Tinkie 3`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_95.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":96,"name":"Fair &amp; Handsome Insatant Face Wash","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_96.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":97,"name":"Fair &amp; Handsome Oil Clear Face Wash","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_97.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":98,"name":"Fair And Handsome (30GM / 60GM)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_98.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":99,"name":"Faiza Whitening Soap","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_99.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":100,"name":"Fem Gold Bleach 8GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/personal_care/personal_care_100.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":101,"name":"Fem Gold Bleach 24GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-120.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":102,"name":"Fem Gold Bleach 40GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-121.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":103,"name":"Fem Hair Removal Cream Rose 60GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-122.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":104,"name":"Fem Hair Removal Cream Sandle 60GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-123.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":105,"name":"Fem Hair Removal Cream Turmeric 60GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-124.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":106,"name":"Fem Hair Removal Cream Gold 60GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-125.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":107,"name":"Fem Soft Glow Bleach 24GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-126.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":108,"name":"Fem Soft Glow Bleach 8GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-127.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":109,"name":"Fiama Gel Bar Soap Peach &amp; Avocado 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-128.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":110,"name":"Fiama Gel Bar Soap Golden Sandalwood Oil &amp;","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-129.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":111,"name":"Patchouli 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-130.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":112,"name":"Fiama Gel Bar Soap Blackcurrant &amp; Bearberry 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-131.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":113,"name":"Fiama Gel Bar Soap Patchouli &amp; Macadamia 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-132.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":114,"name":"Foot Care Cream 25GM Cadila","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-133.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":115,"name":"Garnier Color Natural Black Men And Women 60GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-134.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":116,"name":"Garnier Colour Natural Black Men 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-135.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":117,"name":"Garnier Colour Natural Black Women 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-136.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":118,"name":"Garnier Colour Natural Men Darkest Brown 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-137.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":119,"name":"Garnier Colour Natural Women Darkest Brown 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-138.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":120,"name":"Garnier Colour Natural Women Darkest Brown 60GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-139.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":121,"name":"Garnier Men Acno Fight Face Wash (100ML / 50ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-140.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":122,"name":"Garnier Men Oilclear Face Wash (50ML / 100ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-142.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":123,"name":"Garnier Men Turbo Bright Face Wash (100ML / 50ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-144.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":124,"name":"Garnier Men Shampoo Based Hair Color 10ML [black]","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-146.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":125,"name":"Garnier Men Shampoo Based Hair Color 10ML [brown]","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-147.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":126,"name":"Himalaya Gentle Daily Care Shampoo 340ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-148.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":127,"name":"Gillete Blades 50 Pack","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-149.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":128,"name":"Gillete Guard Dispo Raizor (single)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-150.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":129,"name":"Gillete Guard Dispo Raizor","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-151.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":130,"name":"Gillete Shaving Brush","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-152.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":131,"name":"Gillette Foam Regular 196GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-153.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":132,"name":"Gillette Foam Regular 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-154.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":133,"name":"Gillette Lime Shaving Cream 70GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-155.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":134,"name":"Gillette Regular Saving Cream 70GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-156.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":135,"name":"Glow &amp; Lovely BB Cream 9GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-157.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":136,"name":"Glow &amp; Lovely BB Cream 18GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-158.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":137,"name":"Glow &amp; Lovely BB Cream 40GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-159.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":138,"name":"Glow &amp; Lovely Ayurvedic Cream 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-160.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":139,"name":"Glow &amp; Lovely Ayurvedic Cream 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-161.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":140,"name":"Glow &amp; Lovely Face Wash (100ML / 50ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-162.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":141,"name":"Glow &amp; Lovely Face Cream 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-164.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":142,"name":"Glow &amp; Lovely Face Cream 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-165.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":143,"name":"Glow &amp; Lovely Face Cream 80GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-166.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":144,"name":"Glow &amp; Lovely Face Wash 110GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-167.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":145,"name":"Glow Fair &amp; Handsome 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-168.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":146,"name":"Glow Fair &amp; Handsome 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-169.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":147,"name":"Godrej Hair Colour 3GM 12`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-170.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":148,"name":"Green Leaf Aloevera Gel 120GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-171.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":149,"name":"Green Leaf Pure Aloe Vera Skin Gel 60GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-172.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":150,"name":"Hamam Lemon Flowers 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-173.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":151,"name":"Hamam Neem Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-174.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":152,"name":"Herbal Veni Oil 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-175.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":153,"name":"Hide AC Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-176.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":154,"name":"Hide AC Gel 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-177.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":155,"name":"Himalaya Almond Rose Soap 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-178.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":156,"name":"Himalaya Anti Dandruff Hair Cream 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-179.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":157,"name":"Himalaya Anti Hair Fall Cream 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-180.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":158,"name":"Himalaya Cucumber Soap 75G","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-181.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":159,"name":"Himalaya Lipblam 10GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-182.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":160,"name":"Himalaya Natural Glow Kesar Cream 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-183.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":161,"name":"Himalaya Natural Glow Kesar Cream 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-184.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":162,"name":"Himalaya Natural Glow Rose Face Cream 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-185.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":163,"name":"Himalaya Natural Glow Rose Face Cream 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-186.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":164,"name":"Himalaya Neem &amp; Turmeric Soap 125GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-187.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":165,"name":"Himalaya Neem Face Wash (50ML / 100ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-188.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":166,"name":"Himalaya Protein Hair Cream 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-190.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":167,"name":"Indu Bringha Hair Oil 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-191.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":168,"name":"Jovees De-tan Face Pack 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-192.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":169,"name":"Jovees Men Essential Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-193.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":170,"name":"Jovees Sun Cover Spf30 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-194.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":171,"name":"Kayathirumen Oil 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-195.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":172,"name":"Krack Cream 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-196.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":173,"name":"LA Sheild SPF 40 Gel 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-197.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":174,"name":"Lifebuoy Clear Skin Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-198.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":175,"name":"Lifebuoy Lemon Aloe Fresh 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-199.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":176,"name":"Lifebuoy Soap 125GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-200.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":177,"name":"Lifebuoy Neem Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-201.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":178,"name":"Lifebuoy Turmeric Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-202.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":179,"name":"Listerine Coolmint Mouthwash (100ML / 250ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-203.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":180,"name":"Listerine Original Mouthwash (250ML / 100ML / 80ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-205.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":181,"name":"Livion Anti-frizz Hair Serum 95ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-208.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":182,"name":"Loreal Anti Hairfall Shampoo 340ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-209.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":183,"name":"Loreal Conditioner Anti-hairfall 180ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-210.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":184,"name":"Loreal Color Protecting Shampoo 340ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-211.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":185,"name":"Loreal Extraordinary Oil Shampoo 340ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-212.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":186,"name":"Loreal Total Repair Shampoo 340ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-213.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":187,"name":"Loreal Total Repair Serum 80ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-214.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":188,"name":"Lux Bright Glow Soap Jasmine 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-215.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":189,"name":"Lux Clear Glow Soap Sandalwood 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-216.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":190,"name":"Lux Even-toned Glow Soap Rose 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-217.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":191,"name":"Lux Fresh Glow Plus Soap Lotus 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-218.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":192,"name":"Mamaearth Alovera Facewash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-219.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":193,"name":"Mamaearth Alovera Gel 300ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-220.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":194,"name":"Mamaearth Charcol Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-221.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":195,"name":"Mamaearth Multani Mitti Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-222.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":196,"name":"Mamaearth Onion Shampoo 180ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-223.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":197,"name":"Mamaearth Oilfree Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-224.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":198,"name":"Mamaearth Onion Hair Fall Control Shampoo 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-225.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":199,"name":"Mamaearth Onion Conditioner 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-226.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":200,"name":"Mamaearth Rosmary Anti-hair Fall Conditioner 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-227.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":201,"name":"Mamaearth Rosmary Anti-hair Fall Shampoo 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-228.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":202,"name":"Mamaearth Ubtan Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-229.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":203,"name":"Mamaearth Teatree Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-230.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":204,"name":"Mamaearth Beetroot Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-231.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":205,"name":"Manoj Heera Panna 20GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-232.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":206,"name":"Manoj Heera Panna 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-233.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":207,"name":"Manoj Heera Panna 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-234.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":208,"name":"Mediker Shampoo 50ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-235.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":209,"name":"Medimix Soap 125GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-236.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":210,"name":"Mysore Sandal Soap 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-237.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":211,"name":"Mysore Sandal Soap 150GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-238.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":212,"name":"Nature`s Aloe Beauty Gel 200ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-239.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":213,"name":"Natures Almond &amp; Honey Lotion 400ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-240.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":214,"name":"Natures Papaya Face Wash 65ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-241.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":215,"name":"Natures Neem &amp; Aloe Face Wash 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-242.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":216,"name":"Natures Sunban Cream Spf30 120ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-243.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":217,"name":"Navratna Hair Oil (45ML / 90ML / 180ML / 270ML / 450ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-244.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":218,"name":"Nomarks Ayurvedic Antimarks Cream All Skin 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-249.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":219,"name":"Nomarks Ayurvedic Antimarks Cream Dry Skin 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-250.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":220,"name":"Nomarks Ayurvedic Antimarks Cream Oily Skin 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-251.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":221,"name":"Nycil Powder","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-252.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":222,"name":"Odomos Cream 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-253.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":223,"name":"Odomos Lotion (60ML / 120ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-254.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":224,"name":"Oral -B Bacteria Fighter Medium Extra Soft","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-256.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":225,"name":"Tooth Brush","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-257.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":226,"name":"Oral -B Everyday Care Extra Soft Tooth Brush","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-258.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":227,"name":"Bot X 27.3GM]","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-259.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":228,"name":"Orthoherb Oil 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-260.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":229,"name":"Oxylife Cream Bleach 9GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-261.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":230,"name":"Parachute Coconut Oil (100ML / 175ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-262.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":231,"name":"Pears Oil - Clear &amp; Glow 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-264.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":232,"name":"Pears Alovevera Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-265.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":233,"name":"Pears Naturale Pomegranate Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-266.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":234,"name":"Pears Pure And Gentle Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-267.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":235,"name":"Pears Soft And Fresh Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-268.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":236,"name":"Pepsodent Germi Check White Paste 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-269.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":237,"name":"Pepsodent Tooth Brush","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-270.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":238,"name":"Pigeon Breast Pads Comfy 12`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-271.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":239,"name":"Pond &amp; Pure Detox Face Face Wash 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-272.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":240,"name":"Pond`s Bb+cream 9GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-273.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":241,"name":"Ponds Bb+ Cream 18GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-274.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":242,"name":"Ponds Bb+ Cream 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-275.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":243,"name":"Pond`s Bright Beauty Face Wash 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-276.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":244,"name":"Pond`s Bright Beauty Face Wash 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-277.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":245,"name":"Pond`s Dreamflower Powder 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-278.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":246,"name":"Pond`s Pure Detox Face Wash 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-279.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":247,"name":"Ponds Bright Beauty Serm Cream 23GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-280.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":248,"name":"Ponds Bright Beauty Serm Cream 34GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-281.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":249,"name":"Ponds Bright Beauty Serm Cream 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-282.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":250,"name":"Power Papaya Soap 125GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-283.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":251,"name":"Raktha Chandan Soap 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-284.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":252,"name":"Rexona Deodorant Aloe-vera (25ML / 50ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-285.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":253,"name":"Rexona Deodorant Powder Dry (25ML / 50ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-287.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":254,"name":"Rexona Deodorant Shower Fresh (25ML / 50ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-289.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":255,"name":"Ritco Scissor RC002 [6.3 Inch]","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-291.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":256,"name":"Ritco Scissor RC003 (5.5 Inch)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-292.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":257,"name":"Ritco Scissor RC004 (5 Inch)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-293.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":258,"name":"Ritco Scissor RC008 (7 Inch)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-294.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":259,"name":"Ritco Scissor RC009 (7.5 Inch)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-295.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":260,"name":"Santoor Sandal &amp; Turmeric Soap 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-296.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":261,"name":"Santoor Sandal &amp; Turmeric Soap 125GM [5PACK]","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-297.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":262,"name":"Santoor Sandal &amp; Turmeric Soap 150GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-298.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":263,"name":"Sensodyne Daily Care Tooth Brush Soft 1`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-299.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":264,"name":"Sensodyne Fresh Gel 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-300.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":265,"name":"Sensodyne Fresh Mint 75GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-301.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":266,"name":"Sensodyne Mouth Wash 250ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-302.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":267,"name":"Sensodyne Multicare Tooth Brush Soft 1`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-303.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":268,"name":"Sensodyne Rapid Relief Paste","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-304.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":269,"name":"Sensodyne Repair Protect 70GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-305.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":270,"name":"Sensodyne Sensitive Tooth Brush Soft (1`S / 4`S)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-306.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":271,"name":"Sesa Oil 100ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-308.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":272,"name":"Shower TO Shower Cologene Powder 150GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-309.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":273,"name":"Shower TO Shower Sandal 150GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-310.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":274,"name":"Stayfree BY OB Tampons 10`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-311.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":275,"name":"Stayfree Drymax Allnight 14`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-312.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":276,"name":"Stayfree Secure Nights 18`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-313.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":277,"name":"Stayfree Ultra Drymax 16`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-314.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":278,"name":"Sunshield SPF 70 Cream 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-315.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":279,"name":"Tulip Cotton Balls 50PCS","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-316.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":280,"name":"Tulip Cotton Buds Bamboo Sticks Jar (100`S / 200`S)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-317.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":281,"name":"Tulip Cotton Buds Paper Stick Flat Box 100`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-318.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":282,"name":"Tulip Cotton Buds Bamboo Sticks Packet 100`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-320.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":283,"name":"Tulip Cotton Buds Paper Stick Jar (100`S / 200`S)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-321.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":284,"name":"Tulip Cotton Buds Paper Stick Packet 100`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-323.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":285,"name":"Tulip Cotton Pads (100`S / 50`S)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-324.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":286,"name":"Tulip Nail Polish Remover Wipes 30`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-326.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":287,"name":"Tulips Super Soft Facial Tissues 10`S","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-327.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":288,"name":"UV Doux Blue Sunscreen Gel 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-328.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":289,"name":"UV Doux D-tan Aqua Sunscreen Lotion Spf50; 50ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-329.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":290,"name":"UV Doux Gold Sunscreen Gel Spf50; 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-330.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":291,"name":"UV Doux Mineral Sunscreen Gel 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-331.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":292,"name":"UV Doux Sunscreen Gel Spf50; 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-332.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":293,"name":"UV Doux Sunscreen Gel Spf50; 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-333.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":294,"name":"UV Doux Sunscreen Lotion Spf30; 50ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-334.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":295,"name":"V Wash Plus (100ML / 20ML)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-335.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":296,"name":"V Wash Plus Lotion 200ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-337.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":297,"name":"Vaseline Petro Jelly Orginal 100GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-338.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":298,"name":"Vaseline Petro Jelly Orginal 20GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-339.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":299,"name":"Vaseline Petro Jelly Orginal 50ML","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-340.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":300,"name":"Veet Body Wax Strips Dry Skin (20`S / 8`S)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-341.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":301,"name":"Veet Body Wax Strips Normal Skin (20`S / 8`S)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-343.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":302,"name":"Veet Body Wax Strips Sensitive Skin (20`S / 8`S)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-345.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":303,"name":"Veet Hair Removal Dry Skin 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-347.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":304,"name":"Veet Hair Removal Normal 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-348.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":305,"name":"Veet Hair Removal Normal Skin 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-349.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":306,"name":"Veet Hair Removal Sensitive Skin 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-350.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":307,"name":"Veet Hair Removal Sensitive Skin 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-351.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":308,"name":"Veet Men Hair Removal Skin Cream 50GM Blue","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-352.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":309,"name":"Veet Men Hair Removal Skin Cream 50GM Pink","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-353.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":310,"name":"Vicco Turmeric Skin Cream 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-354.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":311,"name":"Vicco Turmeric Wso Skin Cream 30GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-355.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":312,"name":"White Tone Cream 25GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-356.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":313,"name":"White Tone Cream 50GM","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-357.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":314,"name":"Women Max Shave Body Raiser (6 Pieces)","category":"Personal Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-358.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":315,"name":"Amrutanjan Back Pain Rollon 50ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-359.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":316,"name":"Amrutanjan Green Balm 8ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-360.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":317,"name":"Amrutanjan Yellow Balm 8ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-361.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":318,"name":"Amrutanjan Headache Faster Relaxation Rollon 5ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-362.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":319,"name":"Calamine Lotion 100ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-363.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":320,"name":"Closeup Multivitamin Paste 80GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-364.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":321,"name":"Cofsils Lozenges Ginger Lemon","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-365.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":322,"name":"Cofsils Lozenges Honey Lemon","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-366.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":323,"name":"Cofsils Lozenges Orange","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-367.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":324,"name":"Dettol Hand Wash 200ML 2`S (pack)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-368.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":325,"name":"Dettol Hand Wash Sensitive 200ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-369.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":326,"name":"Dettol Hand Wash Skincare 200ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-370.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":327,"name":"Dettol Original Hand Sanitizer (50ML / 200ML)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-371.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":328,"name":"Dr.rashel Strawberry Lip Balm","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-373.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":329,"name":"Dr.rashel Vitamin-c Day Cream 50GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-374.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":330,"name":"Dr.rashel Vitamin-c Face &amp; Body Cream 380ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-375.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":331,"name":"Dr.rashel Vitamin-c Face Cream 50GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-376.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":332,"name":"Dr.rashel Vitamin-c Face Serum 30ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-377.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":333,"name":"Dr.rashel Vitamin-c Lip Balm","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-378.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":334,"name":"Dr.rashel Vitamin-c Night Cream 50GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-379.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":335,"name":"Dr.rashel Vitamin-c Wet Wipes 25`S","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-380.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":336,"name":"Eno Lemon","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-381.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":337,"name":"Eno Orange","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-382.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":338,"name":"Garnier Men Vitamin C Face Wash 100GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-383.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":339,"name":"Garnier Men Vitamin C Face Wash 50ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-384.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":340,"name":"Garnier Vitamin-c B.b Cream 18GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-385.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":341,"name":"Garnier Vitamin-c B.b Cream 30GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-386.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":342,"name":"Garnier Vitamin-c Serum Cream 23GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-387.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":343,"name":"Glucose 100GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-388.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":344,"name":"Glucose Jar 500GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-389.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":345,"name":"Hansaplast Regular 140`S","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-390.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":346,"name":"Hansaplast Water Proof 140`S","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-391.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":347,"name":"Himalaya Cold Balm 10GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-392.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":348,"name":"Iodex Balm 16GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-393.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":349,"name":"Iodex Balm 40GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-394.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":350,"name":"Jeewaka Vata Lepaya Balm 50GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-395.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":351,"name":"Koflet Lozenges (175`S / 65`S)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-396.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":352,"name":"Lacto Calamin Lotion [LK] 100ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-398.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":353,"name":"Mamaearth Vitamin-c Face Cream 80GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-399.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":354,"name":"Mamaearth Vitamin-c Face Wash 100ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-400.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":355,"name":"Ors Lemon","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-401.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":356,"name":"Ors Orange","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-402.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":357,"name":"Panadol Tab","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-403.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":358,"name":"RA Thermoseal Toothpaste 100G","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-404.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":359,"name":"Rumalaya Pain Balm 10GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-405.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":360,"name":"Siddhalepa Balm 25GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-406.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":361,"name":"Siddhalepa Balm 50GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-407.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":362,"name":"Sloans Liniment 71ML","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-408.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":363,"name":"Sterillium Liquid (100ML / 500ML)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-409.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":364,"name":"Strepsils Honey Lemon PK 150`S","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-411.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":365,"name":"Strepsils Orange 128`S","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-412.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":366,"name":"Thermoseal Repair Toothpaste 100G","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-413.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":367,"name":"Tiger Balm Red (21ML / 9ML)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-414.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":368,"name":"Tiger Balm White (21ML / 9ML)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-416.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":369,"name":"UV Doux Lip Lightening Balm 8GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-418.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":370,"name":"Vaseline Lip Balm 10GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-419.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":371,"name":"Vaseline Rosy Lip Care Balm 10GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-420.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":372,"name":"Vicks Cough Drops Double Power (110`S / 140`S)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-421.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":373,"name":"Vicks Inhelar 12`S","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-423.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":374,"name":"Vicks Roll-on Inhaler 2-IN-1","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-424.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":375,"name":"Vicks Vaporub 110GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-425.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":376,"name":"Vicks Vaporub 19GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-426.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":377,"name":"Vicks Vaporub Extra Strong (25ML / 50ML)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-427.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":378,"name":"Vicks Vaporup 25GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-429.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":379,"name":"Vicks Vaporup 50GM","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-430.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":380,"name":"Zandu Balm (8ML / 25ML)","category":"Health & Wellness","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-431.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":381,"name":"Body Guard Mosquito Coil","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-433.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":382,"name":"Body Guard Mosquito Spray 100ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-434.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":383,"name":"Comfort Fabric Conditionar Pink 860ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-435.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":384,"name":"Comfort Fabric Conditionar Perfume 860ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-436.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":385,"name":"Dettol Liquid (125ML / 1 L / 250ML / 550ML / 60ML)","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-437.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":386,"name":"Duracell Long Lasting AAA Battery 10`S","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-442.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":387,"name":"Duracell Longer Lasting AA Battery 10`S","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-443.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":388,"name":"Duracell Ultra AAA Battery 8`S","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-444.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":389,"name":"Good Night Machine","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-445.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":390,"name":"Good Night Refil 45ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-446.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":391,"name":"Harpic Bathroom Cleaner Lemon Fresh 500ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-447.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":392,"name":"Harpic Liquid (200ML / 500ML)","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-448.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":393,"name":"Harpic White &amp; Shine Bleach 500ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-450.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":394,"name":"Hit Antiroach Gel","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-451.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":395,"name":"More Light Detergent 5 Ltr","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-452.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":396,"name":"Mortein Cockroach Spray (200ML / 400ML)","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-453.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":397,"name":"Odonil Room Spray Jasmine Fresh 220ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-455.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":398,"name":"Odonil Room Spray Citrus Fresh 220ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-456.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":399,"name":"Odonil Room Spray Lavender Mist 220ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-457.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":400,"name":"Odonil Room Spray Rose Garden 220ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-458.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":401,"name":"Odonil Room Spray Sandal Bouquet 220ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-459.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":402,"name":"Pigeon Liquid Cleanser 200ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-460.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":403,"name":"Rin Soap 230GM","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-461.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":404,"name":"Sunlight Laundry Soap 150GM","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-462.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":405,"name":"Surf Excel Detergent Bar 150GM","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-463.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":406,"name":"Surf Excel Detergent Bar 250GM","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-464.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":407,"name":"Vim Dishwash Liquid Gel 250ML","category":"Household & Cleaning","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-465.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":408,"name":"Boomer Chewing Gum 200`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-466.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":409,"name":"Boomer Krunch Strawberry Flavour Chewing Gum [8x28.8GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-467.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":410,"name":"Boomer Strawberry Flavour Stick 24`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-468.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":411,"name":"Boomer Mint Flavour Stick 24`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-469.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":412,"name":"C-candy Orange Flavour Jar 250`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-470.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":413,"name":"Center Fresh 150`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-471.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":414,"name":"Center Fresh Extra Sticks 24`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-472.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":415,"name":"Center Fruit Watermelon Flavour 150`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-473.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":416,"name":"Center Fruit Strawberry 150`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-474.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":417,"name":"Dark Fantasy Choco 69GM","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-475.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":418,"name":"Five Star Chocolate 18GM 40`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-476.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":419,"name":"Five Star Chocolate 33GM 28`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-477.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":420,"name":"Good Day Choco 100GM","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-478.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":421,"name":"Happydent Wave Mint 18`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-479.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":422,"name":"Happydent Wave Strawberry 18`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-480.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":423,"name":"Happydent White Mint 18`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-481.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":424,"name":"Happydent White Mint Jar 210`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-482.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":425,"name":"Himalaya Ayurveda Gum Care Tooth Paste 100GM","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-483.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":426,"name":"Kopiko Coffee Chocklate 235`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-484.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":427,"name":"Mentos Mini Bottle Gum 12`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-485.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":428,"name":"Mentos Mint 210`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-486.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":429,"name":"Mentos Mint Stick 30`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-487.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":430,"name":"Mentos Orange &amp; Strawberry Stick 30`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-488.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":431,"name":"Mentos Orange 200`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-489.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":432,"name":"Mentos Rainbow Stick 30`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-490.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":433,"name":"Mentos Strwberry 200`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-491.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":434,"name":"Orbit Mixed Fruit Flavour Chewing Gum [8 Bot X 19.8GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-492.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":435,"name":"Orbit Spearmint [32 Units X 3.3GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-493.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":436,"name":"Orbit Spearmint Flavour Chewing Gum [8 Bot X 19.8GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-494.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":437,"name":"Orbit Sweetmint Flavour Chewing Gum [8 Bot X 19.8GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-495.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":438,"name":"Orbit Sweetmint [32 Units X 3.3GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-496.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":439,"name":"Skittles Sour Bite Size Fruit Candies [8 Bot X 27.3GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-497.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":440,"name":"Skittles Original Bite Size Fruit Candies [8x27.3GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-498.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":441,"name":"Skittles Wild Berry Bite Size Fruit Candies [8x27.3GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-499.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":442,"name":"Doublemint Lemonmint Flavour [8 Bot X 22GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-500.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":443,"name":"Doublemint Straberrymint Flavour [8 Bot X 22GM]","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-501.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":444,"name":"Oreo Choco 120GM","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-502.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":445,"name":"Oreo Vennila","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-503.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":446,"name":"Pepsodent Gum Care 70GM","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-504.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":447,"name":"Solano Choco Candy Jar 600`S","category":"Snacks & Confectionery","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-505.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":448,"name":"Cetaphil Baby Daily Lotion 400ML","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-506.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":449,"name":"Cetaphil Baby Organic Calendula Cream 85GM","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-507.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":450,"name":"Cetaphil Baby Organic Calendula Daily Lotion 400ML","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-508.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":451,"name":"Cetaphil Baby Organic Calendula Wash &amp; Shampoo 400ML","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-509.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":452,"name":"Cetaphil Baby Wash &amp;shampoo 230ML","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-510.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":453,"name":"Kinderjoy Choco 20GM Blue","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-511.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":454,"name":"Kinderjoy Choco 20GM Pink","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-512.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":455,"name":"Luv Lap Baby Wipes 72`S","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-513.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":456,"name":"Pigeon Baby Fabric Softener 400ML","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-514.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":457,"name":"Tulip Safety Baby Buds 50`S","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-515.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":458,"name":"Vicks Baby Rub 25GM","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-516.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":459,"name":"Vicks Baby Rub 50GM","category":"Baby Care","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-517.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":460,"name":"Basmati Platinum Rice 1KG","category":"Pantry & Cooking","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-518.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":461,"name":"Basmati Royal Rice Heritage 1KG","category":"Pantry & Cooking","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-519.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":462,"name":"Basmati Seeraga Samba Rice 1KG","category":"Pantry & Cooking","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-520.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":463,"name":"Basmati Xxxl Rice Heritage 1KG","category":"Pantry & Cooking","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-521.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":464,"name":"Mamaearth Rice Face Wash 100ML","category":"Pantry & Cooking","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-522.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":465,"name":"Turky Plus Olive Oil Green 100ML","category":"Pantry & Cooking","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-523.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":466,"name":"Ocean Fruit Drink Apple 500ML","category":"Beverages & Hydration","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-524.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":467,"name":"Ocean Fruit Drink Mango &amp; Passion Fruit 500ML","category":"Beverages & Hydration","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-525.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":468,"name":"Ocean Fruit Drink Peach &amp; Passion 500ML","category":"Beverages & Hydration","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-526.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":469,"name":"Ocean Fruit Drink Strawberry &amp; Lime 500ML","category":"Beverages & Hydration","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-527.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":470,"name":"Ocean Fruit Drink Guava 500ML","category":"Beverages & Hydration","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-528.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":471,"name":"Rose Water (120ML / 250ML)","category":"Beverages & Hydration","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-529.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":472,"name":"Nail Clippers Gloaa","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-531.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":473,"name":"Nail Clippers Kcorona","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-532.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":474,"name":"Nail Clippers Munika","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-533.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":475,"name":"Nail Cutter Xindong M","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-534.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":476,"name":"Tooth Pick (200`S / 25`S)","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-535.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":477,"name":"Tulips Wooden Toothpick Jar 240`S","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-537.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":478,"name":"Wooden Cotton Buds Bottle 50`S","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-538.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":479,"name":"Wooden Cotton Buds Jar 200`S","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-539.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":480,"name":"Wooden Cotton Buds Pkt 100`S","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-540.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":481,"name":"Apsara Matt Magic Pencil 2.0 Pack OF 10","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-541.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":482,"name":"Doms Correction Pen Whitener","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-542.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":483,"name":"Kangaro Stapler HD 10","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-543.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":484,"name":"Kangaro Stapler Pin HD 10","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-544.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":485,"name":"Doms Marker Pen CD DVD","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-545.jpg","createdAt":"2026-06-25T00:00:00.000Z"},{"id":486,"name":"Casio Calculator MJ 120D","category":"Stationery & Misc","price":"","stock":"","status":"In Stock","desc":"","image":"https://binnstoragee-tech.github.io/Zami-Mart/img/products/product-546.jpg","createdAt":"2026-06-25T00:00:00.000Z"}];
+let products = DB.get('products');
+if (!products || products.length === 0) {
+  products = _defaultProducts;
+  DB.set('products', products);
+}
 let arrivals   = DB.get('arrivals');
 let settings   = DB.get('settings')[0] || {};
 let adminProfile = DB.get('adminProfile')[0] || { name: 'Admin', email: 'admin@zamimart.mv', phone: '', bio: '' };
@@ -2093,26 +1785,104 @@ function updateDashboard() {
     _setBadge('navInqBadge', newInqs);
   } catch(e) {}
   try {
-    const users = JSON.parse(localStorage.getItem('zm_all_accounts') || '[]');
-    document.getElementById('statUsers').textContent = users.length;
+    if (window.fb && window.fb.db) {
+      const { db, collection, getDocs } = window.fb;
+      getDocs(collection(db, 'users')).then(snap => {
+        document.getElementById('statUsers').textContent = snap.size;
+      }).catch(() => {});
+    }
   } catch(e) {}
 
   // Low stock = stock > 0 && stock <= 5; Out of stock = stock === 0
-  const LOW_THRESHOLD = 5;
+  // Only count products where stock has been explicitly set (not blank)
+  const LOW_THRESHOLD = 10;
   const lowStockItems = products.filter(p => {
-    const s = parseInt(p.stock ?? p.qty ?? 0);
-    return s > 0 && s <= LOW_THRESHOLD;
+    if (p.stock === '' || p.stock === undefined || p.stock === null) return false;
+    const s = parseInt(p.stock);
+    return !isNaN(s) && s > 0 && s <= LOW_THRESHOLD;
   });
-  const outOfStockItems = products.filter(p => parseInt(p.stock ?? p.qty ?? 0) === 0);
+  const outOfStockItems = products.filter(p => {
+    if (p.stock === '' || p.stock === undefined || p.stock === null) return false;
+    const s = parseInt(p.stock);
+    return !isNaN(s) && s === 0;
+  });
 
   document.getElementById('statLowStock').textContent    = lowStockItems.length;
   document.getElementById('statOutOfStock').textContent  = outOfStockItems.length;
 
-  // Populate low stock table
+  // Populate stocks table — show only low stock + out of stock
   const alertItems = [...outOfStockItems, ...lowStockItems].slice(0, 8);
   const tbody = document.getElementById('lowStockTableBody');
-  if (alertItems.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:36px;color:var(--text-muted);font-size:.82rem;"><i class="fa-solid fa-circle-check" style="color:#2a9d5c;margin-right:6px;"></i>All products are well-stocked!</td></tr>`;
+
+  // Check if ANY product has a stock value entered
+  const anyStockEntered = products.some(p =>
+    p.stock !== '' && p.stock !== undefined && p.stock !== null && !isNaN(parseInt(p.stock))
+  );
+
+  if (!anyStockEntered) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:40px;color:var(--text-muted);font-size:.82rem;">
+      <div style="margin-bottom:8px;font-size:1.4rem;">📦</div>
+      No stock data entered yet.<br>
+      <span style="font-size:.76rem;">Edit your products and add stock quantities to monitor them here.</span>
+    </td></tr>`;
+  } else if (alertItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="padding:0;">
+      <div class="wellstocked-state">
+        <style>
+          @keyframes floatUp {
+            0%,100% { transform: translateY(0px); }
+            50%      { transform: translateY(-8px); }
+          }
+          @keyframes floatUpDelay {
+            0%,100% { transform: translateY(0px); }
+            50%      { transform: translateY(-6px); }
+          }
+          @keyframes pulseGlow {
+            0%,100% { box-shadow: 0 0 0 0 rgba(42,157,92,.18); }
+            50%      { box-shadow: 0 0 0 14px rgba(42,157,92,0); }
+          }
+          @keyframes fadeInUp {
+            from { opacity:0; transform:translateY(12px); }
+            to   { opacity:1; transform:translateY(0); }
+          }
+          .wellstocked-state {
+            display:flex; flex-direction:column; align-items:center;
+            justify-content:center; padding:48px 24px; gap:14px;
+            animation: fadeInUp .4s ease;
+          }
+          .wellstocked-icon-wrap {
+            width:72px; height:72px; border-radius:50%;
+            background: linear-gradient(135deg,#e8f7ef,#d0f0e0);
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.8rem;
+            animation: floatUp 3s ease-in-out infinite, pulseGlow 3s ease-in-out infinite;
+          }
+          .wellstocked-dots {
+            display:flex; gap:6px; margin-top:-4px;
+          }
+          .wellstocked-dot {
+            width:6px; height:6px; border-radius:50%; background:#2a9d5c; opacity:.25;
+          }
+          .wellstocked-dot:nth-child(1) { animation: floatUp 2s ease-in-out infinite; }
+          .wellstocked-dot:nth-child(2) { animation: floatUpDelay 2s ease-in-out infinite .3s; }
+          .wellstocked-dot:nth-child(3) { animation: floatUp 2s ease-in-out infinite .6s; }
+          .wellstocked-title {
+            font-size:.95rem; font-weight:700; color:#1a6b3c; margin:0;
+          }
+          .wellstocked-sub {
+            font-size:.76rem; color:var(--text-muted); margin:0; text-align:center; line-height:1.5;
+          }
+        </style>
+        <div class="wellstocked-icon-wrap"><svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 19L14.5 25.5L28 11" stroke="#1a6b3c" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="wellstocked-dots">
+          <div class="wellstocked-dot"></div>
+          <div class="wellstocked-dot"></div>
+          <div class="wellstocked-dot"></div>
+        </div>
+        <p class="wellstocked-title">All products are well-stocked!</p>
+        <p class="wellstocked-sub">No items are running low or out of stock right now.</p>
+      </div>
+    </td></tr>`;
   } else {
     tbody.innerHTML = alertItems.map(p => {
       const stock = parseInt(p.stock ?? p.qty ?? 0);
@@ -2193,9 +1963,35 @@ function addActivity(text, subtext, iconType) {
 }
 
 // =============================================
+// PRODUCT STATS (for Products page cards)
+// =============================================
+function renderProductStats() {
+  const LOW_THRESHOLD = 10;
+  const total = products.length;
+  const lowStock = products.filter(p => {
+    if (p.stock === '' || p.stock === undefined || p.stock === null) return false;
+    const s = parseInt(p.stock);
+    return !isNaN(s) && s > 0 && s <= LOW_THRESHOLD;
+  }).length;
+  const outOfStock = products.filter(p => {
+    if (p.stock === '' || p.stock === undefined || p.stock === null) return false;
+    const s = parseInt(p.stock);
+    return !isNaN(s) && s === 0;
+  }).length;
+
+  const tEl = document.getElementById('prodStatTotal');
+  const lEl = document.getElementById('prodStatLow');
+  const oEl = document.getElementById('prodStatOut');
+  if (tEl) tEl.textContent = total;
+  if (lEl) lEl.textContent = lowStock;
+  if (oEl) oEl.textContent = outOfStock;
+}
+
+// =============================================
 // PRODUCTS
 // =============================================
 function renderProducts() {
+  renderProductStats();
   const search = (document.getElementById('productSearch').value || '').toLowerCase();
   const catFilter = document.getElementById('productCatFilter').value;
   const filtered = products.filter(p => {
@@ -2214,22 +2010,36 @@ function renderProducts() {
   }
   empty.style.display = 'none';
 
-  tbody.innerHTML = filtered.map((p, i) => `
+  tbody.innerHTML = filtered.map((p, i) => {
+    const hasStock = p.stock !== '' && p.stock !== undefined && p.stock !== null;
+    const stockNum = hasStock ? parseInt(p.stock) : null;
+    const stockDisplay = hasStock && !isNaN(stockNum) ? stockNum : '—';
+    let autoStatus, badgeCls;
+    if (!hasStock || isNaN(stockNum)) {
+      autoStatus = 'In Stock'; badgeCls = 'badge-green';
+    } else if (stockNum === 0) {
+      autoStatus = 'Out of Stock'; badgeCls = 'badge-gray';
+    } else if (stockNum <= 10) {
+      autoStatus = 'Low Stock'; badgeCls = 'badge-orange';
+    } else {
+      autoStatus = 'In Stock'; badgeCls = 'badge-green';
+    }
+    return `
     <tr>
       <td style="color:var(--text-muted);font-size:.75rem;">${i + 1}</td>
       <td style="font-weight:600;color:var(--teal);">${escHtml(p.name)}</td>
       <td><span class="badge badge-teal">${escHtml(p.category || '—')}</span></td>
-      <td style="font-weight:600;">MVR ${p.price ? Number(p.price).toFixed(2) : '—'}</td>
-      <td>${p.stock !== '' && p.stock !== undefined ? p.stock : '—'}</td>
-      <td><span class="badge ${statusBadge(p.status)}">${escHtml(p.status || 'In Stock')}</span></td>
+      <td style="font-weight:600;">${p.price ? 'MVR ' + Number(p.price).toFixed(2) : '—'}</td>
+      <td style="font-weight:600;">${stockDisplay}</td>
+      <td><span class="badge ${badgeCls}">${autoStatus}</span></td>
       <td>
         <div class="td-actions">
           <button class="btn btn-sm btn-outline btn-icon" title="Edit" onclick="editProduct(${p.id})"><i class="fa-solid fa-pen"></i></button>
           <button class="btn btn-sm btn-danger btn-icon" title="Delete" onclick="deleteProduct(${p.id})"><i class="fa-solid fa-trash"></i></button>
         </div>
       </td>
-    </tr>
-  `).join('');
+    </tr>`;
+  }).join('');
 }
 
 function statusBadge(s) {
@@ -2249,17 +2059,23 @@ function openProductModal(id) {
     document.getElementById('productCategory').value = p.category || '';
     document.getElementById('productPrice').value    = p.price || '';
     document.getElementById('productStock').value    = p.stock !== undefined ? p.stock : '';
-    document.getElementById('productStatus').value   = p.status || 'In Stock';
     document.getElementById('productDesc').value     = p.desc || '';
   } else {
     document.getElementById('productName').value     = '';
     document.getElementById('productCategory').value = '';
     document.getElementById('productPrice').value    = '';
     document.getElementById('productStock').value    = '';
-    document.getElementById('productStatus').value   = 'In Stock';
     document.getElementById('productDesc').value     = '';
   }
   openModal('productModal');
+}
+
+function _autoStatus(stock) {
+  if (stock === '' || stock === undefined || stock === null || isNaN(parseInt(stock))) return 'In Stock';
+  const s = parseInt(stock);
+  if (s === 0) return 'Out of Stock';
+  if (s <= 10) return 'Low Stock';
+  return 'In Stock';
 }
 
 function saveProduct() {
@@ -2267,23 +2083,23 @@ function saveProduct() {
   const cat  = document.getElementById('productCategory').value;
   const price= document.getElementById('productPrice').value;
   const stock= document.getElementById('productStock').value;
-  const stat = document.getElementById('productStatus').value;
+  const stat = _autoStatus(stock);
   const desc = document.getElementById('productDesc').value.trim();
   const pid  = document.getElementById('productId').value;
 
   if (!name) { showToast('Product name is required.', 'error'); return; }
   if (!cat)  { showToast('Please select a category.', 'error'); return; }
-  if (!price || isNaN(price) || Number(price) < 0) { showToast('Enter a valid price.', 'error'); return; }
+  if (price !== '' && (isNaN(price) || Number(price) < 0)) { showToast('Enter a valid price.', 'error'); return; }
 
   if (pid) {
     const idx = products.findIndex(x => x.id === Number(pid));
     if (idx > -1) {
-      products[idx] = { ...products[idx], name, category: cat, price: Number(price), stock: stock !== '' ? Number(stock) : '', status: stat, desc };
+      products[idx] = { ...products[idx], name, category: cat, price: price !== '' ? Number(price) : '', stock: stock !== '' ? Number(stock) : '', status: stat, desc };
       addActivity(`Updated product: ${name}`);
       showToast('Product updated successfully!', 'success');
     }
   } else {
-    products.push({ id: ++nextId.p, name, category: cat, price: Number(price), stock: stock !== '' ? Number(stock) : '', status: stat, desc, createdAt: new Date().toISOString() });
+    products.push({ id: ++nextId.p, name, category: cat, price: price !== '' ? Number(price) : '', stock: stock !== '' ? Number(stock) : '', status: stat, desc, createdAt: new Date().toISOString() });
     addActivity(`Added new product: ${name}`);
     showToast('Product added successfully!', 'success');
   }
@@ -3339,20 +3155,24 @@ ChatSystem.on('messages-updated', () => {
 });
 
 // =============================================
-// REGISTERED USERS
+// REGISTERED USERS — reads from Firestore
 // =============================================
-function renderUsers() {
-  const users = (() => { try { return JSON.parse(localStorage.getItem('zm_all_accounts') || '[]'); } catch(e) { return []; } })();
+async function renderUsers() {
   const tbody = document.getElementById('usersTableBody');
   const empty = document.getElementById('usersEmpty');
+  tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#8aa19f;padding:16px;">Loading users…</td></tr>';
 
-  // Also check current logged-in user if not in list
+  let users = [];
   try {
-    const cur = JSON.parse(localStorage.getItem('zamimart_user') || 'null');
-    if (cur && !users.find(u => u.email === cur.email)) {
-      users.push({ name: cur.name, email: cur.email, phone: cur.phone || '', createdAt: null });
+    if (window.fb && window.fb.db) {
+      const { db, collection, getDocs } = window.fb;
+      const snap = await getDocs(collection(db, 'users'));
+      snap.forEach(doc => {
+        const d = doc.data();
+        users.push({ uid: doc.id, name: d.displayName || d.name || '—', email: d.email || '—', phone: d.phone || '', createdAt: d.createdAt || null });
+      });
     }
-  } catch(e) {}
+  } catch(e) { console.warn('Firestore users load error', e); }
 
   if (users.length === 0) {
     tbody.innerHTML = '';

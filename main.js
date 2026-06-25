@@ -7,12 +7,18 @@ document.addEventListener('DOMContentLoaded', () => {
   /* --- Profile icon: redirect based on login state --- */
   const navAccount = document.querySelector('.nav-account');
   if (navAccount) {
-    try {
-      const user = JSON.parse(localStorage.getItem('zamimart_user') || 'null');
-      navAccount.href = user ? 'profile.html' : 'login.html';
-    } catch (e) {
-      navAccount.href = 'login.html';
+    navAccount.href = 'login.html'; // default
+    // Update once Firebase Auth is ready
+    function setNavAccount() {
+      if (window.fb && window.fb.auth && window.fb.onAuthStateChanged) {
+        window.fb.onAuthStateChanged(window.fb.auth, (user) => {
+          navAccount.href = user ? 'profile.html' : 'login.html';
+        });
+      } else {
+        window.addEventListener('fb-ready', setNavAccount, { once: true });
+      }
     }
+    setNavAccount();
   }
 
   /* --- Navbar scroll state --- */

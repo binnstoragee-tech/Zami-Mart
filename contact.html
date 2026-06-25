@@ -351,16 +351,22 @@
   }
   .cart-thankyou.show { display: flex; }
   @keyframes tyFadeIn { from { opacity:0; transform:scale(.92); } to { opacity:1; transform:none; } }
-  .ty-circle {
-    width: 80px; height: 80px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--teal), #0a9a60);
+  .ty-icon-wrap { position: relative; width: 96px; height: 96px; margin-bottom: 1.4rem; animation: tyBounce .5s cubic-bezier(.4,0,.2,1) .1s both; }
+  @keyframes tyBounce { 0%{transform:scale(0);} 70%{transform:scale(1.12);} 100%{transform:scale(1);} }
+  .ty-icon-pulse { position: absolute; inset: 0; }
+  .ty-icon-pulse circle { fill: none; stroke: var(--teal); stroke-width: 2; opacity: .4; transform-origin: 50% 50%; animation: tyPulse 1.8s ease-out .3s infinite; }
+  @keyframes tyPulse { 0%{ r: 34; opacity:.5; } 100%{ r: 46; opacity:0; } }
+  .ty-icon-circle {
+    position: absolute; inset: 0; margin: auto;
+    width: 76px; height: 76px; border-radius: 50%;
+    background: var(--teal);
     display: flex; align-items: center; justify-content: center;
-    margin-bottom: 1rem;
-    box-shadow: 0 8px 32px -8px rgba(6,59,63,.4);
-    animation: tyBounce .55s cubic-bezier(.4,0,.2,1) .05s both;
   }
-  @keyframes tyBounce { 0%{transform:scale(0);} 70%{transform:scale(1.18);} 100%{transform:scale(1);} }
-  .ty-check { font-size: 2rem; color: #fff; }
+  .ty-icon-circle svg path {
+    stroke-dasharray: 22; stroke-dashoffset: 22;
+    animation: checkDraw .4s ease .35s forwards;
+  }
+  @keyframes checkDraw { to { stroke-dashoffset: 0; } }
   .ty-confetti-row { display: flex; gap: 6px; margin-bottom: 1rem; }
   .ty-dot { width: 8px; height: 8px; border-radius: 50%; animation: tyDotPop .4s ease both; }
   .ty-dot:nth-child(1){background:var(--orange);animation-delay:.25s}
@@ -682,13 +688,22 @@
       </div>
     </div>
     <div class="cart-thankyou" id="cartThankyou">
-      <div class="ty-circle"><i class="fa-solid fa-check ty-check"></i></div>
+      <div class="ty-icon-wrap">
+        <svg class="ty-icon-pulse" viewBox="0 0 96 96" width="96" height="96">
+          <circle cx="48" cy="48" r="44"/>
+        </svg>
+        <div class="ty-icon-circle">
+          <svg viewBox="0 0 24 24" width="36" height="36" fill="none">
+            <path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
       <div class="ty-confetti-row">
         <span class="ty-dot"></span><span class="ty-dot"></span><span class="ty-dot"></span>
         <span class="ty-dot"></span><span class="ty-dot"></span>
       </div>
-      <div class="ty-title">Inquiry Sent! 🎉</div>
-      <div class="ty-sub">Thank you! We received your cart inquiry and will get back to you shortly.</div>
+      <div class="ty-title">Inquiry Sent!</div>
+      <div class="ty-sub">Thank you! We received your cart inquiry and will get back to you shortly via Viber or WhatsApp.</div>
       <button class="ty-browse-btn" id="tyBrowseBtn"><i class="fa-solid fa-magnifying-glass" style="margin-right:6px;"></i>Keep Browsing</button>
     </div>
     <div class="cart-footer" id="cartFooter" style="display:none;">
@@ -820,7 +835,7 @@
 
   document.getElementById('confirmYesBtn').addEventListener('click', () => {
     let senderName = 'Guest', senderEmail = '';
-    try { const u = JSON.parse(localStorage.getItem('zamimart_user') || 'null'); if (u) { senderName = u.name; senderEmail = u.email; } } catch(e) {}
+    try { const _u = window.fb && window.fb.auth ? window.fb.auth.currentUser : null; if (_u) { senderName = _u.displayName || _u.email || 'Guest'; senderEmail = _u.email || ''; } } catch(e) {}
     // Pass the customer's current chat session ID so admin replies reach the right thread
     let _inqChatSessionId = null;
     try { const _s = JSON.parse(localStorage.getItem('zm_cv_session') || 'null'); if (_s && _s.id) _inqChatSessionId = _s.id; } catch(e) {}
@@ -1011,7 +1026,11 @@ let sessionId=null,visitorName=null,visitorAvatar=null,visitorInitials='?';
 function escH(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 
 function getLoggedUser(){
-  try{return JSON.parse(localStorage.getItem('zamimart_user')||'null');}catch(e){return null;}
+  try{
+    const u = window.fb && window.fb.auth ? window.fb.auth.currentUser : null;
+    if (!u) return null;
+    return { name: u.displayName || u.email || 'User', email: u.email || '', photoURL: u.photoURL || null };
+  }catch(e){return null;}
 }
 
 function avatarHtml(){
@@ -1194,7 +1213,17 @@ sendBtn.addEventListener('click',doSend);
 input.addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
 input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,80)+'px';});
 
-ChatSystem.on('messages-updated',()=>{if(sessionId&&win.classList.contains('open'))renderMsgs();updateBadge();});
+function _playNotifSound(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();[880,1100].forEach((freq,i)=>{const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(freq,ctx.currentTime+i*0.12);g.gain.setValueAtTime(0,ctx.currentTime+i*0.12);g.gain.linearRampToValueAtTime(0.15,ctx.currentTime+i*0.12+0.02);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.12+0.25);o.start(ctx.currentTime+i*0.12);o.stop(ctx.currentTime+i*0.12+0.25);});}catch(e){}}
+let _lastAdminMsgCount=0;
+ChatSystem.on('messages-updated',()=>{
+  if(!sessionId)return;
+  const msgs=ChatSystem.getSessionMessages(sessionId);
+  const totalAdmin=msgs.filter(m=>m.senderType==='admin').length;
+  const isOpen=win.classList.contains('open');
+  if(isOpen){renderMsgs();_lastAdminMsgCount=totalAdmin;}
+  else if(totalAdmin>_lastAdminMsgCount){_playNotifSound();}
+  updateBadge();
+});
 
 ChatSystem.onReady(() => { if(!restoreSession()) showWelcome(); });
 updateBadge();
