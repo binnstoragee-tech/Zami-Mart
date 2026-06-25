@@ -836,6 +836,7 @@
   </div><!-- /.profile-container -->
 </main>
 
+<script type="module" src="firebase-init.js"></script>
 <script src="main.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -845,24 +846,72 @@ document.addEventListener('DOMContentLoaded', () => {
   // =============================================
   let currentUser = null; // will be set by onAuthStateChanged
 
-  // Wait for firebase-init.js
-  function waitForFb(cb) {
+  // Wait for firebase-init.js — with timeout fallback
+  function waitForFb(cb, onTimeout) {
     if (window.fb && window.fb.auth) { cb(); return; }
-    window.addEventListener('fb-ready', cb, { once: true });
+    let fired = false;
+    const timer = setTimeout(() => {
+      if (!fired) { fired = true; if (onTimeout) onTimeout(); }
+    }, 5000); // 5 second timeout
+    window.addEventListener('fb-ready', () => {
+      if (!fired) { fired = true; clearTimeout(timer); cb(); }
+    }, { once: true });
   }
 
-  waitForFb(() => {
-    window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
-      if (user) {
-        currentUser = user;
-        await loadExtraProfile();
+  waitForFb(
+    // Firebase loaded — normal flow
+    () => {
+      window.fb.onAuthStateChanged(window.fb.auth, async (user) => {
+        if (user) {
+          currentUser = user;
+          await loadExtraProfile();
+          renderProfile();
+        } else {
+          // Not logged in — redirect to login
+          window.location.href = 'login.html';
+        }
+      });
+    },
+    // Firebase timed out — show offline fallback using localStorage cache
+    () => {
+      // Try to restore cached user from localStorage
+      let cached = null;
+      try { cached = JSON.parse(localStorage.getItem('zm_cached_profile') || 'null'); } catch(e) {}
+
+      if (cached && cached.name) {
+        // We have cached data — show it with an offline notice
+        currentUser = {
+          displayName: cached.name,
+          email: cached.email || '',
+          photoURL: cached.photoURL || null,
+          uid: cached.uid || 'offline'
+        };
+        // Patch loadExtraProfile to use cache
+        extraProfile = { phone: cached.phone || '', address: cached.address || '', avatarColor: cached.avatarColor || '#063b3f', avatarPhoto: cached.avatarPhoto || null };
         renderProfile();
+        // Show offline warning toast
+        showToast('⚠️ Offline mode — data may not be current', 'info');
       } else {
-        // Not logged in — redirect to login
-        window.location.href = 'login.html';
+        // No cache — show friendly gate with offline message
+        pfGate.innerHTML = `
+          <div class="pf-gate-icon"><i class="fa-solid fa-wifi" style="opacity:.5"></i></div>
+          <h2 style="color:var(--teal)">Unable to connect</h2>
+          <p>Hindi naka-load ang Firebase. Posibleng dahilan:</p>
+          <ul style="text-align:left;font-size:.85rem;color:#5d7977;line-height:1.8;margin:0 0 1rem;padding-left:1.2rem;">
+            <li>Walang internet connection</li>
+            <li>Ad-blocker / extension naka-block ang <code>gstatic.com</code></li>
+            <li>Firewall naka-block ang Google domains</li>
+          </ul>
+          <button onclick="location.reload()" class="btn-go-login" style="background:var(--teal);">
+            <i class="fa-solid fa-rotate-right"></i> Try Again
+          </button>
+          <a href="login.html" class="btn-go-login" style="background:transparent;color:var(--teal);border:1.5px solid var(--teal);margin-top:.5rem;">
+            <i class="fa-solid fa-arrow-right-to-bracket"></i> Go to Login
+          </a>`;
+        pfGate.classList.add('show');
       }
-    });
-  });
+    }
+  );
 
   // =============================================
   // TOAST
@@ -947,6 +996,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function populatePage() {
     const u = buildProfile();
+
+    // Cache profile data in localStorage for offline fallback
+    try {
+      localStorage.setItem('zm_cached_profile', JSON.stringify({
+        name: u.name, email: u.email, phone: u.phone, address: u.address,
+        photoURL: u.avatarPhoto, avatarColor: u.avatarColor,
+        uid: currentUser ? currentUser.uid : ''
+      }));
+    } catch(e) {}
 
     // Header
     renderAvatar(document.getElementById('headerAvatar'), u);
