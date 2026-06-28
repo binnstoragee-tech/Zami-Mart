@@ -13,507 +13,571 @@
 <style>
 :root {
   --teal: #063b3f;
+  --teal-light: #0a5259;
   --orange: #FD4D02;
   --cream: #f6f5f0;
   --text: #1a2e2e;
-  --text-muted: #6a8080;
+  --text-muted: #8a9faa;
   --border: rgba(6,59,63,.1);
   --ease: cubic-bezier(.4,0,.2,1);
   font-family: 'Poppins', sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--cream); color: var(--text); font-size: 14px; }
+body { background: transparent; color: var(--text); font-size: 14px; }
 
-/* =============================================
-   CHAT WIDGET BUTTON
-   ============================================= */
+/* ── Chat Fab Button ── */
 .chat-widget-btn {
   position: fixed;
-  bottom: 28px;
-  right: 28px;
-  width: 60px;
-  height: 60px;
+  bottom: 24px; right: 24px;
+  width: 60px; height: 60px;
   border-radius: 50%;
   background: var(--orange);
   border: none;
-  color: #fff;
-  font-size: 1.4rem;
   cursor: pointer;
-  box-shadow: 0 8px 32px -8px rgba(253,77,2,.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .3s var(--ease);
-  z-index: 999;
+  box-shadow: 0 8px 28px -4px rgba(253,77,2,.45);
+  display: flex; align-items: center; justify-content: center;
+  transition: all .35s var(--ease);
+  z-index: 9999;
 }
-.chat-widget-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 12px 40px -8px rgba(253,77,2,.5);
-}
-.chat-widget-btn.open {
-  opacity: 0;
-  pointer-events: none;
-  transform: scale(0.8);
-}
-.chat-unread-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  background: #d6483a;
-  color: #fff;
-  width: 28px;
-  height: 28px;
+.chat-widget-btn:hover { transform: scale(1.1); box-shadow: 0 12px 36px -4px rgba(253,77,2,.5); }
+.chat-widget-btn.open { opacity: 0; pointer-events: none; transform: scale(0.75); }
+
+.chat-btn-logo-wrap {
+  width: 44px; height: 44px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .7rem;
-  font-weight: 700;
-  border: 2px solid #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  background: #fff;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative;
+}
+.chat-btn-logo { width: 38px; height: 38px; object-fit: contain; position: absolute; }
+.chat-btn-logo-fallback {
+  font-size: .65rem; font-weight: 900;
+  color: var(--orange); letter-spacing: -.03em;
 }
 
-/* =============================================
-   CHAT WINDOW
-   ============================================= */
+.chat-btn-status-dot {
+  position: absolute; bottom: 3px; right: 3px;
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2.5px solid #fff;
+  background: #22c55e;
+  transition: background .3s;
+}
+.chat-btn-status-dot.offline { background: #94a3b8; }
+
+.chat-unread-badge {
+  position: absolute; top: -3px; right: -3px;
+  background: #d6483a; color: #fff;
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .6rem; font-weight: 700;
+  border: 2px solid #fff;
+}
+
+/* ── Chat Window ── */
 .chat-widget-window {
   position: fixed;
-  bottom: 100px;
-  right: 28px;
-  width: 400px;
-  max-width: calc(100vw - 40px);
-  height: 600px;
+  bottom: 96px; right: 24px;
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  height: 580px;
   background: #fff;
-  border-radius: 20px;
-  box-shadow: 0 24px 80px -16px rgba(6,59,63,.3);
-  display: none;
-  flex-direction: column;
-  z-index: 998;
-  animation: slideUp .3s var(--ease);
+  border-radius: 22px;
+  box-shadow: 0 20px 70px -10px rgba(6,59,63,.25), 0 4px 20px rgba(0,0,0,.08);
+  display: none; flex-direction: column;
+  z-index: 9998;
+  overflow: hidden;
 }
 .chat-widget-window.open {
   display: flex;
+  animation: chatSlideUp .3s var(--ease);
 }
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+@keyframes chatSlideUp {
+  from { transform: translateY(16px) scale(.97); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-/* Header */
+/* ── Header ── */
 .chat-header {
-  padding: 20px;
-  background: var(--teal);
+  padding: 14px 16px;
+  background: linear-gradient(135deg, var(--teal) 0%, var(--teal-light) 100%);
   color: #fff;
-  border-radius: 20px 20px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0;
 }
-.chat-header-info {
-  flex: 1;
-}
-.chat-header-title {
-  font-size: .95rem;
-  font-weight: 700;
-  margin-bottom: 2px;
-}
-.chat-header-status {
-  font-size: .7rem;
-  opacity: .8;
-}
-.chat-header-close {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+.chat-header-logo-circle {
+  width: 42px; height: 42px; border-radius: 50%;
   background: rgba(255,255,255,.15);
-  border: none;
-  color: #fff;
-  font-size: .9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .2s var(--ease);
+  border: 2px solid rgba(255,255,255,.25);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; position: relative; flex-shrink: 0;
 }
-.chat-header-close:hover {
-  background: rgba(255,255,255,.25);
+.chat-header-logo { width: 34px; height: 34px; object-fit: contain; position: absolute; }
+.chat-header-logo-text { font-size: .65rem; font-weight: 900; color: #fff; }
+
+.chat-header-status-dot-wrap { position: relative; flex-shrink: 0; }
+.chat-header-status-dot {
+  position: absolute; bottom: 0; right: 0;
+  width: 12px; height: 12px; border-radius: 50%;
+  border: 2px solid var(--teal);
+  background: #22c55e;
+}
+.chat-header-status-dot.offline { background: #94a3b8; }
+
+.chat-header-info { flex: 1; }
+.chat-header-title { font-size: .92rem; font-weight: 700; }
+.chat-header-sub { font-size: .68rem; opacity: .8; margin-top: 1px; }
+
+.chat-header-close {
+  width: 30px; height: 30px; border-radius: 8px;
+  background: rgba(255,255,255,.12);
+  border: none; color: #fff; font-size: .85rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.chat-header-close:hover { background: rgba(255,255,255,.22); }
+
+/* ── Status pulse ── */
+.chat-header-status-dot.active,
+.chat-btn-status-dot.active {
+  animation: statusPulse 2s ease-in-out infinite;
+}
+@keyframes statusPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,.5); }
+  50%       { box-shadow: 0 0 0 5px rgba(34,197,94,0); }
 }
 
-/* Messages Area - Messenger Style */
+/* ── Messages Area ── */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 16px 12px;
+  padding: 16px 14px 10px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: #fff;
+  gap: 2px;
+  background: #f8fafa;
+  min-height: 0;
+}
+.chat-messages::-webkit-scrollbar { width: 4px; }
+.chat-messages::-webkit-scrollbar-track { background: transparent; }
+.chat-messages::-webkit-scrollbar-thumb { background: rgba(6,59,63,.12); border-radius: 4px; }
+
+/* ── Date/Time Divider ── */
+.chat-divider {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0; flex-shrink: 0;
+}
+.chat-divider-line {
+  flex: 1; height: 1px;
+  background: rgba(6,59,63,.1);
+}
+.chat-divider-label {
+  font-size: .63rem; color: var(--text-muted);
+  font-weight: 500; white-space: nowrap;
+  padding: 2px 8px;
+  background: rgba(6,59,63,.06);
+  border-radius: 20px;
 }
 
-/* Message Row */
+/* ── Message Row ── */
 .chat-message {
   display: flex;
   align-items: flex-end;
-  gap: 8px;
-  animation: messageIn .25s var(--ease);
-  margin-bottom: 0;
+  gap: 7px;
+  max-width: 100%;
+  animation: msgIn .2s var(--ease);
+  margin-bottom: 2px;
+}
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes messageIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+/* Consecutive messages — less gap */
+.chat-message + .chat-message.same-sender { margin-bottom: 0; }
+.chat-message.same-sender .chat-message-bubble { margin-top: 2px; }
+
+/* ── Avatar ── */
+.chat-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .62rem; font-weight: 700;
+  flex-shrink: 0; align-self: flex-end;
+  overflow: hidden;
+}
+.chat-avatar.admin-av {
+  background: var(--teal);
+  color: #fff;
+}
+.chat-avatar.hidden { visibility: hidden; }
+
+/* ── Bubble ── */
+.chat-message-content {
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 0; max-width: 75%;
 }
 
-/* ── Shared avatar style ── */
-.chat-message-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: .68rem;
-  font-weight: 700;
-  flex-shrink: 0;
-  align-self: flex-end;
-  margin-bottom: 20px;
-}
-
-/* ── Shared bubble style ── */
 .chat-message-bubble {
   padding: 9px 13px;
-  font-size: .82rem;
-  line-height: 1.5;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  display: inline-block;
-  max-width: 100%;
-  width: fit-content;
-  flex-shrink: 0;
+  font-size: .81rem; line-height: 1.55;
+  word-break: break-word; overflow-wrap: break-word;
+  white-space: pre-wrap;
+  width: fit-content; max-width: 100%;
+  position: relative;
 }
 
-/* ── Visitor (Customer) — LEFT side, orange bubble, orange avatar ── */
-.chat-message.visitor {
-  justify-content: flex-start;
-  align-items: flex-end;
+.chat-message-bubble img {
+  max-width: 190px; max-height: 180px;
+  border-radius: 10px; display: block;
 }
-.chat-message.visitor .chat-message-avatar {
-  background: #FD4D02;
-  color: #fff;
+
+/* ── VISITOR (right, orange) ── */
+.chat-message.visitor {
+  flex-direction: row-reverse;
+  justify-content: flex-start;
 }
 .chat-message.visitor .chat-message-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 3px;
-  max-width: 82%;
-  min-width: 0;
+  align-items: flex-end;
 }
 .chat-message.visitor .chat-message-bubble {
-  background: #FD4D02;
-  color: #fff;
-  border-radius: 18px 18px 18px 4px;
-}
-.chat-message.visitor .chat-message-time {
-  font-size: .63rem;
-  color: var(--text-muted);
-  padding-left: 4px;
-}
-
-/* ── Admin (Customer Service) — RIGHT side, dark teal bubble, no avatar ── */
-.chat-message.admin {
-  justify-content: flex-end;
-  align-items: flex-end;
-}
-.chat-message.admin .chat-message-avatar {
-  display: none;
-}
-.chat-message.admin .chat-message-content {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 3px;
-  max-width: 82%;
-  min-width: 0;
-}
-.chat-message.admin .chat-message-bubble {
-  background: #1a2e2e;
+  background: var(--orange);
   color: #fff;
   border-radius: 18px 18px 4px 18px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.12);
+  box-shadow: 0 2px 8px rgba(253,77,2,.2);
 }
-.chat-message.admin .chat-message-time {
-  font-size: .63rem;
-  color: var(--text-muted);
-  padding-right: 4px;
+/* Consecutive visitor bubbles */
+.chat-message.visitor.same-sender .chat-message-bubble {
+  border-radius: 18px 4px 4px 18px;
+}
+.chat-message.visitor.last-in-group .chat-message-bubble {
+  border-radius: 18px 4px 18px 18px;
 }
 
-/* Input Area */
-.chat-input-area {
-  padding: 12px 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  gap: 8px;
+/* ── ADMIN (left, dark) ── */
+.chat-message.admin {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.chat-message.admin .chat-message-content {
+  align-items: flex-start;
+}
+.chat-message.admin .chat-message-bubble {
   background: #fff;
-  align-items: flex-end;
+  color: var(--text);
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  border: 1px solid rgba(6,59,63,.07);
+}
+/* Consecutive admin bubbles */
+.chat-message.admin.same-sender .chat-message-bubble {
+  border-radius: 4px 18px 18px 4px;
+}
+.chat-message.admin.last-in-group .chat-message-bubble {
+  border-radius: 4px 18px 18px 18px;
 }
 
-.chat-input {
-  flex: 1;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  font-size: .82rem;
-  font-family: inherit;
-  outline: none;
-  transition: all .2s var(--ease);
-  resize: none;
-  max-height: 80px;
-  min-height: 38px;
+/* Time */
+.chat-message-time {
+  font-size: .6rem; color: var(--text-muted);
+  padding: 0 3px; margin-top: 1px;
+}
+.chat-message.visitor .chat-message-time { text-align: right; }
+.chat-message.admin .chat-message-time   { text-align: left; }
+
+/* ── Sender label (first in group) ── */
+.chat-sender-label {
+  font-size: .6rem; font-weight: 600;
+  color: var(--text-muted);
+  padding: 0 4px; margin-bottom: 1px;
 }
 
-.chat-input:focus {
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(6,59,63,.08);
-}
-
-.chat-send-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: var(--orange);
-  border: none;
-  color: #fff;
-  font-size: .9rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all .2s var(--ease);
+/* ── Welcome / Wave Screen ── */
+.chat-welcome {
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center;
+  padding: 18px 20px 10px;
   flex-shrink: 0;
 }
-
-.chat-send-btn:hover {
-  background: #e34602;
-  transform: scale(1.05);
-}
-
-.chat-send-btn:active {
-  transform: scale(0.95);
-}
-
-/* Welcome State */
-.chat-welcome {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 20px;
-  text-align: center;
-}
-
-.chat-welcome-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--orange);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  margin-bottom: 16px;
-}
-
-.chat-welcome h3 {
-  font-size: .95rem;
-  color: var(--teal);
+.chat-wave-emoji {
+  font-size: 2.2rem;
+  animation: wave 1.8s ease-in-out 2;
+  display: inline-block;
+  transform-origin: 70% 70%;
   margin-bottom: 6px;
 }
-
+@keyframes wave {
+  0%,60%,100% { transform: rotate(0deg); }
+  10%,30%     { transform: rotate(14deg); }
+  20%         { transform: rotate(-4deg); }
+  40%         { transform: rotate(10deg); }
+  50%         { transform: rotate(-2deg); }
+}
+.chat-welcome h3 {
+  font-size: .95rem; font-weight: 700;
+  color: var(--teal); margin-bottom: 4px;
+}
 .chat-welcome p {
-  font-size: .8rem;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-  line-height: 1.5;
+  font-size: .76rem; color: var(--text-muted);
+  line-height: 1.5; margin-bottom: 14px;
 }
 
 .chat-welcome-form {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  width: 100%; display: flex; flex-direction: column; gap: 8px;
 }
-
 .chat-welcome-form input {
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: .82rem;
-  font-family: inherit;
-  outline: none;
-  transition: all .2s var(--ease);
+  padding: 10px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  font-size: .82rem; font-family: inherit;
+  outline: none; transition: all .2s var(--ease);
+  background: #f8fafa;
 }
-
 .chat-welcome-form input:focus {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(6,59,63,.08);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(6,59,63,.07);
 }
-
 .chat-welcome-form button {
   padding: 10px 16px;
-  background: var(--orange);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  font-size: .82rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .2s var(--ease);
+  background: var(--orange); color: #fff;
+  border: none; border-radius: 10px;
+  font-size: .82rem; font-weight: 600;
+  cursor: pointer; transition: all .2s var(--ease);
+}
+.chat-welcome-form button:hover {
+  background: #e34602; transform: translateY(-1px);
 }
 
-.chat-welcome-form button:hover {
-  background: #e34602;
-  transform: translateY(-2px);
+/* ── Suggestion Chips ── */
+.chat-suggestions {
+  padding: 8px 14px 10px;
+  display: flex; flex-wrap: wrap; gap: 6px;
+  flex-shrink: 0;
+  border-top: 1px solid rgba(6,59,63,.07);
+  background: #f8fafa;
+}
+.chat-suggestions-label {
+  width: 100%;
+  font-size: .63rem; color: var(--text-muted); font-weight: 600;
+  margin-bottom: 2px; letter-spacing: .02em;
+}
+.chat-chip {
+  padding: 5px 12px;
+  border: 1.5px solid rgba(6,59,63,.15);
+  border-radius: 20px;
+  font-size: .72rem; font-weight: 500;
+  color: var(--teal); cursor: pointer;
+  background: #fff;
+  transition: all .18s var(--ease);
+  font-family: inherit;
+  white-space: nowrap;
+}
+.chat-chip:hover {
+  background: var(--teal); color: #fff;
+  border-color: var(--teal);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(6,59,63,.2);
+}
+
+/* ── Input Area ── */
+.chat-input-area {
+  padding: 10px 12px;
+  border-top: 1px solid rgba(6,59,63,.08);
+  display: flex; gap: 8px; align-items: flex-end;
+  background: #fff;
+  flex-shrink: 0;
+}
+.chat-img-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #f0f4f4; border: 1px solid var(--border);
+  color: var(--text-muted); font-size: .82rem;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  transition: all .2s; flex-shrink: 0;
+}
+.chat-img-btn:hover { background: #ddeaea; color: var(--teal); }
+
+.chat-input {
+  flex: 1; padding: 9px 13px;
+  border: 1.5px solid var(--border); border-radius: 18px;
+  font-size: .81rem; font-family: inherit;
+  outline: none; resize: none;
+  max-height: 80px; min-height: 36px;
+  overflow-y: auto; line-height: 1.4;
+  transition: border-color .2s, box-shadow .2s;
+  background: #f8fafa;
+}
+.chat-input:focus {
+  border-color: var(--teal); background: #fff;
+  box-shadow: 0 0 0 3px rgba(6,59,63,.07);
+}
+
+.chat-send-btn {
+  width: 36px; height: 36px; border-radius: 12px;
+  background: var(--orange); border: none;
+  color: #fff; font-size: .82rem;
+  cursor: pointer; display: flex;
+  align-items: center; justify-content: center;
+  transition: all .2s; flex-shrink: 0;
+}
+.chat-send-btn:hover { background: #e34602; transform: scale(1.07); }
+.chat-send-btn:active { transform: scale(.93); }
+
+/* ── Typing indicator ── */
+.chat-typing {
+  display: flex; align-items: center; gap: 7px;
+  padding: 4px 0;
+}
+.chat-typing-dots {
+  display: flex; gap: 3px; padding: 8px 12px;
+  background: #fff; border-radius: 18px;
+  border: 1px solid rgba(6,59,63,.07);
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.chat-typing-dots span {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--text-muted);
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+.chat-typing-dots span:nth-child(2) { animation-delay: .15s; }
+.chat-typing-dots span:nth-child(3) { animation-delay: .3s; }
+@keyframes typingBounce {
+  0%,60%,100% { transform: translateY(0); opacity:.4; }
+  30%         { transform: translateY(-5px); opacity:1; }
 }
 
 /* Mobile */
 @media (max-width: 480px) {
   .chat-widget-window {
-    max-width: calc(100% - 20px);
-    height: 500px;
-    bottom: 90px;
-    right: 10px;
+    bottom: 0; right: 0; left: 0;
+    width: 100%; max-width: 100%;
+    height: 100dvh; border-radius: 0;
   }
-  .chat-widget-btn {
-    bottom: 20px;
-    right: 20px;
-  }
-  .chat-message.visitor .chat-message-content,
-  .chat-message.admin .chat-message-content {
-    max-width: 85%;
-  }
-}
-
-/* Scrollbar */
-.chat-messages::-webkit-scrollbar {
-  width: 6px;
-}
-.chat-messages::-webkit-scrollbar-track {
-  background: transparent;
-}
-.chat-messages::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-.chat-messages::-webkit-scrollbar-thumb:hover {
-  background: rgba(6,59,63,.2);
+  .chat-widget-btn { bottom: 20px; right: 16px; }
 }
 </style>
 </head>
 <body>
 
-<!-- Chat Widget Button -->
-<button class="chat-widget-btn" id="chatWidgetBtn" title="Open Chat">
-  <i class="fa-solid fa-message"></i>
+<!-- Chat FAB -->
+<button class="chat-widget-btn" id="chatWidgetBtn" title="Chat with us">
+  <div class="chat-btn-logo-wrap">
+    <img src="img/logo.png" alt="Zami Mart" class="chat-btn-logo" onerror="this.style.display='none'">
+    <span class="chat-btn-logo-fallback">ZM</span>
+  </div>
   <div class="chat-unread-badge" id="chatUnreadBadge" style="display:none;">0</div>
+  <div class="chat-btn-status-dot" id="chatBtnStatusDot"></div>
 </button>
 
 <!-- Chat Window -->
 <div class="chat-widget-window" id="chatWindow">
+
+  <!-- Header -->
   <div class="chat-header">
+    <div class="chat-header-status-dot-wrap">
+      <div class="chat-header-logo-circle">
+        <img src="img/logo.png" alt="Zami Mart" class="chat-header-logo" onerror="this.style.display='none'">
+        <span class="chat-header-logo-text">ZM</span>
+      </div>
+      <div class="chat-header-status-dot" id="chatStatusDot"></div>
+    </div>
     <div class="chat-header-info">
       <div class="chat-header-title">Zami Mart Support</div>
-      <div class="chat-header-status">Usually replies instantly</div>
+      <div class="chat-header-sub" id="chatHeaderStatus">Checking status…</div>
     </div>
     <button class="chat-header-close" id="chatCloseBtn"><i class="fa-solid fa-xmark"></i></button>
   </div>
 
-  <!-- Messages Container -->
+  <!-- Messages -->
   <div class="chat-messages" id="chatMessages">
-    <div class="chat-welcome">
-      <div class="chat-welcome-icon"><i class="fa-solid fa-comment-dots"></i></div>
-      <h3>Welcome to Zami Mart!</h3>
-      <p>Have a question? We're here to help. Start a conversation below.</p>
+    <!-- Welcome shown before session starts -->
+    <div class="chat-welcome" id="chatWelcomeBlock">
+      <div class="chat-wave-emoji">👋</div>
+      <h3>Hi there! How can we help?</h3>
+      <p>We usually reply within minutes. Fill in your details below to get started.</p>
       <form class="chat-welcome-form" id="chatWelcomeForm">
-        <input type="text" id="visitorName" placeholder="Your name" required>
-        <input type="tel" id="visitorPhone" placeholder="Phone number" required>
-        <button type="submit">Start Chat</button>
+        <input type="text" id="visitorName" placeholder="Your name" required autocomplete="name">
+        <input type="tel" id="visitorPhone" placeholder="Phone number (optional)">
+        <button type="submit">Start Chatting <i class="fa-solid fa-arrow-right" style="margin-left:4px;font-size:.75rem;"></i></button>
       </form>
     </div>
   </div>
 
-  <!-- Input Area -->
-  <div class="chat-input-area">
-    <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1" style="display:none;"></textarea>
-    <button class="chat-send-btn" id="chatSendBtn" style="display:none;"><i class="fa-solid fa-paper-plane"></i></button>
+  <!-- Quick Suggestions (shown after session starts) -->
+  <div class="chat-suggestions" id="chatSuggestions" style="display:none;">
+    <div class="chat-suggestions-label">QUICK QUESTIONS</div>
+    <button class="chat-chip" onclick="sendChip(this)">👋 Hi there!</button>
+    <button class="chat-chip" onclick="sendChip(this)">🛒 How to order?</button>
+    <button class="chat-chip" onclick="sendChip(this)">📞 Contact details</button>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input-area" id="chatInputArea">
+    <button class="chat-img-btn" id="chatImgBtn" style="display:none;" title="Send image">
+      <i class="fa-solid fa-image"></i>
+    </button>
+    <input type="file" id="chatImgInput" accept="image/*" style="display:none;">
+    <textarea class="chat-input" id="chatInput" placeholder="Type a message…" rows="1" style="display:none;"></textarea>
+    <button class="chat-send-btn" id="chatSendBtn" style="display:none;">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
   </div>
 </div>
 
-
-
-<!-- Chat Widget Script -->
 <script>
 'use strict';
 
-const chatBtn = document.getElementById('chatWidgetBtn');
-const chatWindow = document.getElementById('chatWindow');
-const chatCloseBtn = document.getElementById('chatCloseBtn');
-const chatMessages = document.getElementById('chatMessages');
-const chatInput = document.getElementById('chatInput');
-const chatSendBtn = document.getElementById('chatSendBtn');
-const chatWelcomeForm = document.getElementById('chatWelcomeForm');
-const visitorNameInput = document.getElementById('visitorName');
-const visitorPhoneInput = document.getElementById('visitorPhone');
-const unreadBadge = document.getElementById('chatUnreadBadge');
+const chatBtn        = document.getElementById('chatWidgetBtn');
+const chatWindow     = document.getElementById('chatWindow');
+const chatCloseBtn   = document.getElementById('chatCloseBtn');
+const chatMessages   = document.getElementById('chatMessages');
+const chatInput      = document.getElementById('chatInput');
+const chatSendBtn    = document.getElementById('chatSendBtn');
+const chatImgBtn     = document.getElementById('chatImgBtn');
+const chatImgInput   = document.getElementById('chatImgInput');
+const chatWelcomeForm  = document.getElementById('chatWelcomeForm');
+const chatWelcomeBlock = document.getElementById('chatWelcomeBlock');
+const chatSuggestions  = document.getElementById('chatSuggestions');
+const unreadBadge    = document.getElementById('chatUnreadBadge');
 
 let currentSessionId = null;
-let visitorName = null;
+let visitorName      = null;
+let _lastSeenAdminMsgCount = 0;
 
-// ── SOUND EFFECTS ──
+// ── SOUNDS ──
 function _playSendSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
+    const o = ctx.createOscillator(), g = ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
     o.type = 'sine';
     o.frequency.setValueAtTime(600, ctx.currentTime);
     o.frequency.exponentialRampToValueAtTime(900, ctx.currentTime + 0.1);
-    g.gain.setValueAtTime(0.12, ctx.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.22);
-    o.start(ctx.currentTime);
-    o.stop(ctx.currentTime + 0.22);
+    g.gain.setValueAtTime(0.1, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+    o.start(); o.stop(ctx.currentTime + 0.2);
   } catch(e) {}
 }
-
-function _playCustomerNotifSound() {
+function _playReceiveSound() {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    // Two-tone ding for received message
     [880, 1100].forEach((freq, i) => {
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
+      const o = ctx.createOscillator(), g = ctx.createGain();
       o.connect(g); g.connect(ctx.destination);
       o.type = 'sine';
-      o.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.12);
-      g.gain.setValueAtTime(0, ctx.currentTime + i * 0.12);
-      g.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.12 + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.12 + 0.25);
-      o.start(ctx.currentTime + i * 0.12);
-      o.stop(ctx.currentTime + i * 0.12 + 0.25);
+      const t = ctx.currentTime + i * 0.12;
+      o.frequency.setValueAtTime(freq, t);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.12, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.22);
+      o.start(t); o.stop(t + 0.22);
     });
   } catch(e) {}
 }
 
-// Track how many admin messages the customer has already seen
-let _lastSeenAdminMsgCount = 0;
-
-// Toggle chat window
+// ── TOGGLE ──
 chatBtn.addEventListener('click', () => {
   chatWindow.classList.toggle('open');
   chatBtn.classList.toggle('open');
@@ -521,196 +585,245 @@ chatBtn.addEventListener('click', () => {
     chatInput.focus();
     ChatSystem.markSessionAsRead(currentSessionId);
     unreadBadge.style.display = 'none';
-    // Sync seen count so no false notifications after opening
     const msgs = ChatSystem.getSessionMessages(currentSessionId);
     _lastSeenAdminMsgCount = msgs.filter(m => m.senderType === 'admin').length;
   }
 });
-
 chatCloseBtn.addEventListener('click', () => {
   chatWindow.classList.remove('open');
   chatBtn.classList.remove('open');
 });
 
-// Welcome form submission
-chatWelcomeForm.addEventListener('submit', (e) => {
+// ── WELCOME FORM ──
+chatWelcomeForm.addEventListener('submit', e => {
   e.preventDefault();
-  const name = visitorNameInput.value.trim();
-  const phone = visitorPhoneInput.value.trim();
+  const name  = document.getElementById('visitorName').value.trim();
+  const phone = document.getElementById('visitorPhone').value.trim();
+  if (!name) { document.getElementById('visitorName').focus(); return; }
 
-  if (!name) {
-    visitorNameInput.focus();
-    return;
-  }
-
-  visitorName = name;
+  visitorName      = name;
   currentSessionId = ChatSystem.createSession(name, phone);
-
-  // Hide welcome, show chat
-  chatMessages.innerHTML = '';
-  chatInput.style.display = 'block';
-  chatSendBtn.style.display = 'flex';
-  chatWelcomeForm.style.display = 'none';
-
-  // Load existing messages
-  renderMessages();
+  _activateChat();
   saveSession();
   chatInput.focus();
 });
 
-// Send message
+function _activateChat() {
+  // Remove welcome from messages area
+  chatWelcomeBlock.style.display = 'none';
+  // Show input controls
+  chatInput.style.display       = 'block';
+  chatSendBtn.style.display     = 'flex';
+  chatImgBtn.style.display      = 'flex';
+  // Show suggestion chips
+  chatSuggestions.style.display = 'flex';
+  renderMessages();
+}
+
+// ── SUGGESTION CHIPS ──
+window.sendChip = function(btn) {
+  const text = btn.textContent.trim().replace(/^[\p{Emoji}\s]+/u, '').trim();
+  if (!text || !currentSessionId) return;
+  ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, btn.textContent.trim());
+  _playSendSound();
+  renderMessages();
+  chatSuggestions.style.display = 'none';
+};
+
+// ── SEND ──
 chatSendBtn.addEventListener('click', sendMessage);
-chatInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+chatInput.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+chatInput.addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = this.scrollHeight + 'px';
+});
+
+chatImgBtn.addEventListener('click', () => chatImgInput.click());
+chatImgInput.addEventListener('change', () => {
+  const file = chatImgInput.files[0];
+  if (!file || !currentSessionId) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, '', e.target.result);
+    _playSendSound();
+    chatSuggestions.style.display = 'none';
+    renderMessages();
+  };
+  reader.readAsDataURL(file);
+  chatImgInput.value = '';
 });
 
 function sendMessage() {
   const text = chatInput.value.trim();
   if (!text || !currentSessionId) return;
-
   ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, text);
   _playSendSound();
   chatInput.value = '';
   chatInput.style.height = 'auto';
+  chatSuggestions.style.display = 'none';
   renderMessages();
 }
 
-// Render messages
+// ── RENDER ──
 function renderMessages() {
   if (!currentSessionId) return;
-  const messages = ChatSystem.getSessionMessages(currentSessionId);
-  
-  chatMessages.innerHTML = messages.map(msg => {
-    const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const isAdmin = msg.senderType === 'admin';
-    
-    if (isAdmin) {
-      return `
-        <div class="chat-message admin">
-          <div class="chat-message-content">
-            <div class="chat-message-bubble">${escapeHtml(msg.text)}</div>
-            <div class="chat-message-time">${time}</div>
-          </div>
-        </div>
-      `;
-    } else {
-      const initials = (visitorName || 'V').charAt(0).toUpperCase();
-      return `
-        <div class="chat-message visitor">
-          <div class="chat-message-avatar">${initials}</div>
-          <div class="chat-message-content">
-            <div class="chat-message-bubble">${escapeHtml(msg.text)}</div>
-            <div class="chat-message-time">${time}</div>
-          </div>
-        </div>
-      `;
+  const messages = ChatSystem.getSessionMessages(currentSessionId).filter(m => !m.deleted);
+
+  // Group messages by sender to apply consecutive bubble styling
+  const rows = messages.map((msg, i) => {
+    const prev = messages[i - 1];
+    const next = messages[i + 1];
+    const samePrev = prev && prev.senderType === msg.senderType;
+    const sameNext = next && next.senderType === msg.senderType;
+    return { msg, isFirst: !samePrev, isLast: !sameNext };
+  });
+
+  const todayStr  = _dayLabel(new Date());
+  let lastDivider = null;
+
+  chatMessages.innerHTML = '';
+
+  rows.forEach(({ msg, isFirst, isLast }) => {
+    const msgDate   = new Date(msg.timestamp);
+    const dayLabel  = _dayLabel(msgDate);
+
+    // Date divider
+    if (dayLabel !== lastDivider) {
+      lastDivider = dayLabel;
+      const div = document.createElement('div');
+      div.className = 'chat-divider';
+      div.innerHTML = `<div class="chat-divider-line"></div><div class="chat-divider-label">${dayLabel}</div><div class="chat-divider-line"></div>`;
+      chatMessages.appendChild(div);
     }
-  }).join('');
-  
+
+    const isAdmin  = msg.senderType === 'admin';
+    const time     = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const bubbleContent = msg.imageData
+      ? `<img src="${msg.imageData}" alt="image" style="max-width:190px;max-height:180px;border-radius:10px;display:block;">`
+      : escapeHtml(msg.text);
+
+    const el = document.createElement('div');
+    el.className = [
+      'chat-message',
+      isAdmin ? 'admin' : 'visitor',
+      !isFirst  ? 'same-sender' : '',
+      isLast && !isFirst ? 'last-in-group' : ''
+    ].filter(Boolean).join(' ');
+
+    if (isAdmin) {
+      el.innerHTML = `
+        <div class="chat-avatar admin-av ${isLast ? '' : 'hidden'}" title="Zami Mart">ZM</div>
+        <div class="chat-message-content">
+          ${isFirst ? '<div class="chat-sender-label">Zami Mart</div>' : ''}
+          <div class="chat-message-bubble">${bubbleContent}</div>
+          ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
+        </div>`;
+    } else {
+      el.innerHTML = `
+        <div class="chat-message-content">
+          <div class="chat-message-bubble">${bubbleContent}</div>
+          ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
+        </div>`;
+    }
+
+    chatMessages.appendChild(el);
+  });
+
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// Unread badge
-function updateUnreadBadge() {
-  if (!currentSessionId) return;
-  const count = ChatSystem.getUnreadCount(currentSessionId);
-  if (count > 0) {
-    unreadBadge.textContent = count;
-    unreadBadge.style.display = 'flex';
-  } else {
-    unreadBadge.style.display = 'none';
-  }
+function _dayLabel(date) {
+  const today = new Date();
+  const d = new Date(date);
+  const diff = Math.floor((new Date(today.toDateString()) - new Date(d.toDateString())) / 86400000);
+  if (diff === 0) return 'Today';
+  if (diff === 1) return 'Yesterday';
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// Restore session from localStorage (UNIFIED KEY: zm_cv_session)
+// ── SESSION SAVE / RESTORE ──
+function saveSession() {
+  if (currentSessionId && visitorName) {
+    localStorage.setItem('zm_cv_session', JSON.stringify({ id: currentSessionId, name: visitorName }));
+  }
+}
 function restoreSession() {
   const stored = localStorage.getItem('zm_cv_session');
-  if (stored) {
-    try {
-      const session = JSON.parse(stored);
-      if (session && session.id && ChatSystem.getSession(session.id)) {
-        currentSessionId = session.id;
-        visitorName = session.name;
-        
-        // Hide welcome, show chat
-        chatMessages.innerHTML = '';
-        chatInput.style.display = 'block';
-        chatSendBtn.style.display = 'flex';
-        chatWelcomeForm.style.display = 'none';
-        
-        renderMessages();
-        // Treat all existing admin messages as already seen on restore
-        const existingMsgs = ChatSystem.getSessionMessages(currentSessionId);
-        _lastSeenAdminMsgCount = existingMsgs.filter(m => m.senderType === 'admin').length;
-        return true;
-      }
-    } catch (e) {
-      console.warn('Failed to restore session', e);
+  if (!stored) return false;
+  try {
+    const s = JSON.parse(stored);
+    if (s && s.id && ChatSystem.getSession(s.id)) {
+      currentSessionId = s.id;
+      visitorName      = s.name;
+      _activateChat();
+      const msgs = ChatSystem.getSessionMessages(currentSessionId);
+      const hasVisitorMsg = msgs.some(m => m.senderType === 'visitor');
+      if (hasVisitorMsg) chatSuggestions.style.display = 'none';
+      _lastSeenAdminMsgCount = msgs.filter(m => m.senderType === 'admin').length;
+      return true;
     }
-  }
+  } catch(e) { console.warn(e); }
   return false;
 }
 
-// Save session (UNIFIED KEY: zm_cv_session)
-function saveSession() {
-  if (currentSessionId && visitorName) {
-    localStorage.setItem('zm_cv_session', JSON.stringify({
-      id: currentSessionId,
-      name: visitorName
-    }));
+// ── STATUS ──
+function updateChatStatus() {
+  const now  = new Date();
+  const utc  = now.getTime() + now.getTimezoneOffset() * 60000;
+  const mv   = new Date(utc + 5 * 3600000);
+  const isOpen = mv.getDay() >= 1 && mv.getDay() <= 6 && mv.getHours() >= 8 && mv.getHours() < 21;
+
+  const hdr = document.getElementById('chatHeaderStatus');
+  const hDot = document.getElementById('chatStatusDot');
+  const bDot = document.getElementById('chatBtnStatusDot');
+
+  if (isOpen) {
+    hdr.textContent = '● Active now';
+    hdr.style.color = '#86efac';
+    hDot.classList.remove('offline'); hDot.classList.add('active');
+    bDot.classList.remove('offline'); bDot.classList.add('active');
+  } else {
+    hdr.textContent = 'Offline — leave a message';
+    hdr.style.color = 'rgba(255,255,255,.6)';
+    hDot.classList.add('offline'); hDot.classList.remove('active');
+    bDot.classList.add('offline'); bDot.classList.remove('active');
   }
 }
+updateChatStatus();
+setInterval(updateChatStatus, 60000);
 
-// Utility
-function escapeHtml(text) {
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
+// ── INIT ──
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
 }
 
-// Initialize
 ChatSystem.onReady(() => {
-  if (!restoreSession()) {
-    // Show welcome form
-  }
-  
-  // Listen for updates
+  restoreSession();
+
   ChatSystem.on('messages-updated', () => {
     if (!currentSessionId) return;
-
-    const messages = ChatSystem.getSessionMessages(currentSessionId);
+    const msgs   = ChatSystem.getSessionMessages(currentSessionId);
     const isOpen = chatWindow.classList.contains('open');
-
-    // Count total admin messages in this session
-    const totalAdminMsgs = messages.filter(m => m.senderType === 'admin').length;
-    const newAdminMsgs = totalAdminMsgs - _lastSeenAdminMsgCount;
+    const totalAdmin = msgs.filter(m => m.senderType === 'admin').length;
+    const newAdmin   = totalAdmin - _lastSeenAdminMsgCount;
 
     renderMessages();
 
     if (isOpen) {
-      // Window open — update seen count, hide badge
-      _lastSeenAdminMsgCount = totalAdminMsgs;
+      _lastSeenAdminMsgCount = totalAdmin;
       ChatSystem.markSessionAsRead(currentSessionId);
       unreadBadge.style.display = 'none';
-    } else if (newAdminMsgs > 0) {
-      // Window closed and admin sent new messages — notify customer
-      const unseen = totalAdminMsgs - _lastSeenAdminMsgCount;
-      unreadBadge.textContent = unseen;
+    } else if (newAdmin > 0) {
+      unreadBadge.textContent = totalAdmin - _lastSeenAdminMsgCount;
       unreadBadge.style.display = 'flex';
-      _playCustomerNotifSound();
+      _playReceiveSound();
     }
   });
 });
-
-// Auto-expand textarea
-chatInput.addEventListener('input', function() {
-  this.style.height = 'auto';
-  this.style.height = (this.scrollHeight) + 'px';
-});
-
 </script>
 </body>
 </html>

@@ -688,56 +688,347 @@ select {
   .topbar-right { gap: 6px; }
 }
 
-/* ─── CHAT BUBBLES ─────────────────────────── */
-.zm-chat-msg {
-  display: flex; align-items: flex-end; gap: 7px;
-  margin-bottom: 2px;
+/* ─── LIVE CHAT REDESIGN ───────────────────── */
+
+/* Chat layout wrapper */
+#sec-chat .chat-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 0;
+  height: calc(100vh - 140px);
+  min-height: 520px;
+  max-height: 820px;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(6,59,63,.08);
 }
+
+/* Session list sidebar */
+#sec-chat .chat-sidebar {
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  background: #fafbfc;
+  overflow: hidden;
+}
+
+#sec-chat .chat-sidebar-header {
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+#sec-chat .chat-sidebar-title {
+  font-size: .78rem;
+  font-weight: 800;
+  color: var(--teal);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+#sec-chat .chat-session-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+#sec-chat .chat-session-list::-webkit-scrollbar { width: 3px; }
+#sec-chat .chat-session-list::-webkit-scrollbar-thumb { background: rgba(6,59,63,.12); border-radius: 3px; }
+
+#sec-chat .chat-session-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background .15s;
+  border-left: 3px solid transparent;
+  position: relative;
+}
+#sec-chat .chat-session-item:hover { background: rgba(6,59,63,.04); }
+#sec-chat .chat-session-item.active {
+  background: rgba(6,59,63,.07);
+  border-left-color: var(--teal);
+}
+
+#sec-chat .chat-session-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), #ff7b3a);
+  color: #fff; font-size: .85rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+}
+#sec-chat .chat-session-avatar .unread-dot {
+  position: absolute; top: -2px; right: -2px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: #ef4444; border: 2px solid #fafbfc;
+}
+
+#sec-chat .chat-session-info { flex: 1; min-width: 0; }
+#sec-chat .chat-session-name {
+  font-size: .82rem; font-weight: 600; color: var(--teal);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#sec-chat .chat-session-preview {
+  font-size: .72rem; color: var(--text-muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-top: 2px;
+}
+#sec-chat .chat-session-meta {
+  font-size: .65rem; color: var(--text-muted);
+  text-align: right; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
+}
+#sec-chat .chat-unread-pill {
+  background: var(--orange); color: #fff;
+  font-size: .6rem; font-weight: 700;
+  padding: 1px 6px; border-radius: 20px; min-width: 18px; text-align: center;
+}
+
+#sec-chat .chat-session-item .session-delete-btn {
+  display: none;
+  width: 26px; height: 26px; border-radius: 7px;
+  background: #fff0f0; border: 1px solid rgba(214,48,48,.2);
+  color: #d63030; font-size: .68rem;
+  align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: all .15s;
+}
+#sec-chat .chat-session-item:hover .session-delete-btn { display: flex; }
+#sec-chat .chat-session-item .session-delete-btn:hover {
+  background: #d63030; color: #fff; border-color: #d63030;
+}
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 8px; padding: 40px 20px;
+  color: var(--text-muted); text-align: center; flex: 1;
+}
+#sec-chat .chat-sessions-empty i { font-size: 2rem; opacity: .3; }
+#sec-chat .chat-sessions-empty p { font-size: .8rem; line-height: 1.5; }
+
+/* Chat panel (right) */
+#sec-chat .chat-panel {
+  display: flex; flex-direction: column; overflow: hidden;
+  background: #fff;
+}
+
+#sec-chat .chat-panel-empty {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px; flex: 1;
+  color: var(--text-muted); text-align: center; padding: 40px;
+}
+#sec-chat .chat-panel-empty i { font-size: 2.5rem; opacity: .18; }
+#sec-chat .chat-panel-empty h3 { font-size: .95rem; color: var(--teal); opacity: .5; font-weight: 600; }
+#sec-chat .chat-panel-empty p  { font-size: .78rem; opacity: .6; }
+
+/* Chat panel header */
+#sec-chat .chat-panel-header {
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 12px;
+  flex-shrink: 0;
+  background: #fff;
+}
+#sec-chat .chat-panel-header-avatar {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), #ff7b3a);
+  color: #fff; font-size: .85rem; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+#sec-chat .chat-panel-header-info { flex: 1; }
+#sec-chat .chat-panel-header-name { font-size: .9rem; font-weight: 700; color: var(--teal); }
+#sec-chat .chat-panel-header-sub  { font-size: .7rem; color: var(--text-muted); margin-top: 1px; }
+#sec-chat .chat-panel-header-actions { display: flex; gap: 6px; }
+
+/* Messages area */
+#sec-chat .chat-messages-area {
+  flex: 1; overflow-y: auto;
+  padding: 20px 20px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+  background: #f7f8fa;
+  min-height: 0;
+}
+#sec-chat .chat-messages-area::-webkit-scrollbar { width: 4px; }
+#sec-chat .chat-messages-area::-webkit-scrollbar-thumb { background: rgba(6,59,63,.1); border-radius: 4px; }
+
+/* Message rows */
+.zm-chat-msg {
+  display: flex; align-items: flex-end; gap: 8px;
+  margin-bottom: 2px; animation: zmMsgIn .2s ease;
+  width: 100%; min-width: 0;
+}
+@keyframes zmMsgIn {
+  from { opacity:0; transform:translateY(6px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* Admin = right (teal) */
 .zm-chat-msg.admin { flex-direction: row-reverse; }
 .zm-chat-msg.admin .zm-chat-bubble {
-  background: #fff; color: var(--text);
+  background: var(--teal); color: #fff;
   border-radius: 16px 16px 4px 16px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.07);
+  box-shadow: 0 2px 10px rgba(6,59,63,.22);
 }
+.zm-chat-msg.admin.same-sender .zm-chat-bubble { border-radius: 16px 4px 4px 16px; }
+.zm-chat-msg.admin.last-in-group .zm-chat-bubble { border-radius: 16px 4px 16px 16px; }
+
+/* Visitor = left (orange) */
 .zm-chat-msg.visitor .zm-chat-bubble {
   background: var(--orange); color: #fff;
   border-radius: 16px 16px 16px 4px;
+  box-shadow: 0 2px 10px rgba(253,77,2,.18);
 }
+.zm-chat-msg.visitor.same-sender .zm-chat-bubble { border-radius: 4px 16px 16px 4px; }
+.zm-chat-msg.visitor.last-in-group .zm-chat-bubble { border-radius: 4px 16px 16px 16px; }
+
+/* Content wrapper — constrains bubble width */
+.zm-chat-content {
+  display: flex; flex-direction: column; gap: 2px;
+  max-width: calc(100% - 44px); /* full width minus avatar+gap */
+  min-width: 0;
+}
+.zm-chat-msg.admin .zm-chat-content { align-items: flex-end; }
+.zm-chat-msg.visitor .zm-chat-content { align-items: flex-start; }
+
 .zm-chat-bubble {
-  max-width: 70%; padding: 8px 13px;
-  font-size: .8rem; line-height: 1.5;
+  max-width: 100%; padding: 10px 14px;
+  font-size: .82rem; line-height: 1.55;
   word-break: break-word; white-space: pre-wrap; overflow-wrap: anywhere;
 }
 .zm-chat-bubble.deleted {
-  font-style: italic; opacity: .52; font-size: .72rem;
-  background: #ddd !important; color: #666 !important;
+  font-style: italic; opacity: .45; font-size: .73rem;
+  background: #e2e8e8 !important; color: #7a9090 !important;
+  border-radius: 10px !important; box-shadow: none !important;
 }
+.zm-chat-bubble img {
+  max-width: 180px; max-height: 140px;
+  border-radius: 10px; display: block; cursor: zoom-in; margin-top: 4px;
+}
+
+/* Date divider */
+.zm-chat-divider {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 0; flex-shrink: 0;
+}
+.zm-chat-divider-line { flex:1; height:1px; background:rgba(6,59,63,.08); }
+.zm-chat-divider-label {
+  font-size:.62rem; color:var(--text-muted); font-weight:600;
+  padding:3px 10px; background:#efefef;
+  border-radius:20px; white-space:nowrap; letter-spacing:.03em;
+}
+
+/* Context menu */
 .zm-ctx-menu {
   position: fixed; background: #1a2e2e; color: #fff;
-  border-radius: 9px; padding: 4px 0; min-width: 150px;
-  box-shadow: 0 6px 20px rgba(0,0,0,.28);
+  border-radius: 10px; padding: 5px 0; min-width: 158px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.28);
   z-index: 999999; font-family: 'Poppins', sans-serif; font-size: .76rem;
 }
-.zm-ctx-item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; cursor: pointer; transition: background .12s; }
+.zm-ctx-item { display: flex; align-items: center; gap: 8px; padding: 9px 15px; cursor: pointer; transition: background .12s; }
 .zm-ctx-item:hover { background: rgba(255,255,255,.08); }
-.zm-ctx-item.danger { color: #ff6b6b; }
+.zm-ctx-item.danger { color: #ff7b7b; }
 .zm-ctx-item.danger:hover { background: rgba(255,107,107,.12); }
-.zm-chat-bubble img {
-  max-width: 160px; max-height: 120px;
-  border-radius: 7px; display: block; cursor: zoom-in; margin-top: 4px;
-}
+
 .zm-chat-time {
-  font-size: .63rem; color: var(--text-muted);
-  margin-top: 2px; padding: 0 3px;
+  font-size: .6rem; color: var(--text-muted);
+  margin-top: 2px; padding: 0 2px;
 }
 .zm-chat-msg.admin .zm-chat-time   { text-align: right; }
 .zm-chat-msg.visitor .zm-chat-time { text-align: left; }
+
 .zm-chat-avatar {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: #1a2e2e; color: #fff;
-  font-size: .66rem; font-weight: 700;
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--orange), #ff7b3a); color: #fff;
+  font-size: .64rem; font-weight: 700;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; margin-bottom: 18px;
+  flex-shrink: 0;
+}
+.zm-chat-avatar.hidden { visibility: hidden; }
+.zm-chat-sender-label {
+  font-size:.6rem; font-weight:600; color:var(--text-muted);
+  padding:0 2px; margin-bottom:2px;
+}
+
+/* ─── QUICK REPLIES BAR ─────────────────────── */
+#sec-chat .chat-quick-replies {
+  padding: 10px 16px 8px;
+  border-top: 1px solid var(--border);
+  background: #fff;
+  flex-shrink: 0;
+}
+#sec-chat .chat-quick-replies-label {
+  font-size: .58rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--text-muted); margin-bottom: 7px;
+}
+#sec-chat .chat-quick-replies-chips {
+  display: flex; flex-wrap: wrap; gap: 5px;
+}
+.zm-reply-suggestions {
+  display: flex; flex-wrap: wrap; gap: 5px;
+  padding: 8px 12px 4px;
+  border-top: 1px solid var(--border);
+  background: #f8fafa;
+}
+.zm-reply-suggestions-label {
+  width:100%; font-size:.6rem; font-weight:600;
+  color:var(--text-muted); letter-spacing:.03em; margin-bottom:2px;
+}
+.zm-reply-chip {
+  padding: 5px 11px;
+  border: 1.5px solid rgba(6,59,63,.13);
+  border-radius: 20px; font-size:.71rem; font-weight:500;
+  color: var(--teal); cursor: pointer;
+  background: #f4f7f7; font-family: inherit;
+  transition: all .15s ease; white-space: nowrap;
+}
+.zm-reply-chip:hover {
+  background: var(--teal); color: #fff; border-color: var(--teal);
+  box-shadow: 0 2px 8px rgba(6,59,63,.18); transform: translateY(-1px);
+}
+
+/* ─── CHAT INPUT ROW ─────────────────────────── */
+#sec-chat .chat-input-row {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+  display: flex; gap: 8px; align-items: flex-end;
+  background: #fff; flex-shrink: 0;
+}
+#sec-chat .chat-input-row textarea {
+  flex: 1; padding: 10px 14px;
+  border: 1.5px solid var(--border); border-radius: 14px;
+  font-size: .83rem; font-family: inherit; font-weight: 400;
+  outline: none; resize: none;
+  max-height: 90px; min-height: 40px; line-height: 1.45;
+  background: #f4f7f7; color: var(--text);
+  transition: border-color .2s, background .2s, box-shadow .2s;
+}
+#sec-chat .chat-input-row textarea:focus {
+  border-color: var(--teal); background: #fff;
+  box-shadow: 0 0 0 3px rgba(6,59,63,.07);
+}
+#sec-chat .chat-send-btn {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--orange); border: none; color: #fff;
+  font-size: .85rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .18s;
+  box-shadow: 0 3px 12px rgba(253,77,2,.3);
+}
+#sec-chat .chat-send-btn:hover { background: #e34602; transform: scale(1.06); }
+#sec-chat .chat-send-btn:active { transform: scale(.94); }
+
+@media (max-width: 768px) {
+  #sec-chat .chat-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    max-height: none;
+  }
+  #sec-chat .chat-sidebar { height: 240px; border-right: none; border-bottom: 1px solid var(--border); }
+  #sec-chat .chat-panel   { height: 480px; }
 }
 </style>
 </head>
@@ -1122,51 +1413,71 @@ select {
 
     <!-- ==================== LIVE CHAT ==================== -->
     <section class="section" id="sec-chat">
-      <div class="card">
-        <div class="card-header">
-          <span class="card-title"><i class="fa-solid fa-comments" style="color:var(--orange);margin-right:8px;"></i>Live Chat Sessions</span>
-          <button class="btn btn-sm" onclick="deleteAllChats()" style="background:#fff0f0;color:#d63030;border:1.5px solid #d63030;font-weight:600;"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Delete All</button>
-        </div>
-        <div class="card-body" style="padding:0;">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Visitor Name</th>
-                  <th>Contact</th>
-                  <th>Sessions</th>
-                  <th>Last Message</th>
-                  <th>Unread</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="chatSessionsTableBody"></tbody>
-            </table>
-          </div>
-          <div id="chatSessionsEmpty" class="empty-state" style="display:none;">
-            <div class="empty-icon"><i class="fa-solid fa-comments"></i></div>
-            <h3>No active chats</h3>
-            <p>Customer chat sessions will appear here.</p>
-          </div>
-        </div>
-      </div>
+      <div class="chat-layout">
 
-      <!-- Chat Detail View -->
-      <div class="card" style="margin-top:20px;display:none;" id="chatDetailCard">
-        <div class="card-header">
-          <span class="card-title" id="chatDetailTitle">Chat with Visitor</span>
-          <button class="btn btn-outline" onclick="closeChatDetail()"><i class="fa-solid fa-arrow-left"></i> Back</button>
-        </div>
-        <div class="card-body" style="display:flex;flex-direction:column;gap:16px;">
-          <!-- Messages Display -->
-          <div id="chatDetailMessages" style="height:400px;overflow-y:auto;border:1px solid var(--border);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--cream);"></div>
-          
-          <!-- Message Input -->
-          <div style="display:flex;gap:10px;">
-            <input type="text" id="chatDetailInput" placeholder="Type your response..." style="flex:1;padding:10px 14px;border:1px solid var(--border);border-radius:10px;font-size:.84rem;">
-            <button class="btn btn-orange" onclick="sendChatReply()"><i class="fa-solid fa-paper-plane"></i> Send</button>
+        <!-- ── LEFT: Session List ── -->
+        <div class="chat-sidebar">
+          <div class="chat-sidebar-header">
+            <span class="chat-sidebar-title">Conversations</span>
           </div>
+          <div class="chat-session-list" id="chatSessionList">
+            <div class="chat-sessions-empty" id="chatSessionsEmpty">
+              <i class="fa-solid fa-comments"></i>
+              <p>No conversations yet.<br>Customer chats will appear here.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── RIGHT: Chat Panel ── -->
+        <div class="chat-panel" id="chatPanel">
+
+          <!-- Empty state (no session selected) -->
+          <div class="chat-panel-empty" id="chatPanelEmpty">
+            <i class="fa-solid fa-comment-dots"></i>
+            <h3>Select a conversation</h3>
+            <p>Choose a chat from the left to start replying.</p>
+          </div>
+
+          <!-- Active chat (hidden until selected) -->
+          <div id="chatDetailCard" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+            <!-- Header -->
+            <div class="chat-panel-header">
+              <div class="chat-panel-header-avatar" id="chatHeaderAvatar">?</div>
+              <div class="chat-panel-header-info">
+                <div class="chat-panel-header-name" id="chatDetailTitle">Visitor</div>
+                <div class="chat-panel-header-sub" id="chatHeaderSub">Live Chat</div>
+              </div>
+              <div class="chat-panel-header-actions">
+              </div>
+            </div>
+
+            <!-- Messages -->
+            <div class="chat-messages-area" id="chatDetailMessages"></div>
+
+            <!-- Quick replies -->
+            <div class="zm-reply-suggestions" id="zmReplySuggestions">
+              <div class="zm-reply-suggestions-label">QUICK REPLIES</div>
+              <button class="zm-reply-chip" onclick="useReplyChip(this)">Hi! How can I help you? 😊</button>
+              <button class="zm-reply-chip" onclick="useReplyChip(this)">Sure, let me check that for you!</button>
+              <button class="zm-reply-chip" onclick="useReplyChip(this)">We deliver within Malé. 🚚</button>
+              <button class="zm-reply-chip" onclick="useReplyChip(this)">Please send your order list.</button>
+              <button class="zm-reply-chip" onclick="useReplyChip(this)">Thank you for contacting Zami Mart!</button>
+              <button class="zm-reply-chip" onclick="useReplyChip(this)">Wholesale pricing available — DM us!</button>
+              <button class="zm-reply-chip" onclick="useReplyChip(this)">Your order is being processed. ✅</button>
+              <button class="zm-reply-chip" onclick="useReplyChip(this)">We'll get back to you shortly!</button>
+            </div>
+
+            <!-- Input -->
+            <div class="chat-input-row">
+              <textarea id="chatDetailInput" placeholder="Type your response…" rows="1"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatReply();}"
+                oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px';"></textarea>
+              <button class="chat-send-btn" onclick="sendChatReply()" title="Send">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -2281,87 +2592,79 @@ let currentChatSessionId = null;
 
 function renderChatSessions() {
   const sessions = ChatSystem.getSessions();
-  const tbody = document.getElementById('chatSessionsTableBody');
+  const list  = document.getElementById('chatSessionList');
   const empty = document.getElementById('chatSessionsEmpty');
 
   if (sessions.length === 0) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block';
-    tbody.closest('.table-wrap').style.display = 'none';
+    empty.style.display = 'flex';
+    // remove any session items
+    list.querySelectorAll('.chat-session-item').forEach(el => el.remove());
     return;
   }
   empty.style.display = 'none';
-  tbody.closest('.table-wrap').style.display = 'block';
 
-  // Group by customer — key = email/phone if available, else name
+  // Group by visitor name/contact key
   const grouped = [];
-  const keyMap = {};
+  const keyMap  = {};
   sessions.forEach(s => {
     const key = (s.email || s.name || 'guest').toLowerCase().trim();
     if (!keyMap[key]) {
-      keyMap[key] = { name: s.name, contact: s.email || '—', sessions: [], totalUnread: 0 };
+      keyMap[key] = { name: s.name, contact: s.email || '', sessions: [], totalUnread: 0 };
       grouped.push(keyMap[key]);
     }
     keyMap[key].sessions.push(s);
     keyMap[key].totalUnread += ChatSystem.getUnreadCount(s.id);
-    // Keep most recent contact info
     if (s.email) keyMap[key].contact = s.email;
   });
 
-  tbody.innerHTML = grouped.map((g, i) => {
-    // Use the most recent session for last message time
+  // Sort by most recent message
+  grouped.sort((a, b) => {
+    const la = a.sessions.reduce((x, y) => new Date(x.lastMessageAt) > new Date(y.lastMessageAt) ? x : y);
+    const lb = b.sessions.reduce((x, y) => new Date(x.lastMessageAt) > new Date(y.lastMessageAt) ? x : y);
+    return new Date(lb.lastMessageAt) - new Date(la.lastMessageAt);
+  });
+
+  // Clear existing items
+  list.querySelectorAll('.chat-session-item').forEach(el => el.remove());
+
+  grouped.forEach(g => {
     const latest = g.sessions.reduce((a, b) => new Date(a.lastMessageAt) > new Date(b.lastMessageAt) ? a : b);
-    const lastMsg = new Date(latest.lastMessageAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    const sessionCount = g.sessions.length;
-    const unread = g.totalUnread;
+    const msgs   = ChatSystem.getSessionMessages(latest.id);
+    const lastMsg = msgs.length ? msgs[msgs.length - 1] : null;
+    const preview = lastMsg ? (lastMsg.imageData ? '📷 Image' : lastMsg.text) : 'No messages yet';
+    const timeStr = latest.lastMessageAt
+      ? new Date(latest.lastMessageAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+      : '';
+    const initials = (g.name || '?').charAt(0).toUpperCase();
+    const unread   = g.totalUnread;
+    const isActive = latest.id === currentChatSessionId;
 
-    // Sub-rows per session (hidden by default if >1)
-    const subRows = sessionCount > 1 ? g.sessions.map(s => {
-      const sStarted = new Date(s.createdAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' });
-      const sUnread = ChatSystem.getUnreadCount(s.id);
-      return `<tr class="chat-subrow chat-subrow-${i}" style="display:none;background:#fafcfc;">
-        <td style="padding-left:32px;color:var(--text-muted);font-size:.72rem;">↳</td>
-        <td colspan="3" style="font-size:.76rem;color:var(--text-muted);">Session started ${sStarted}</td>
-        <td>${sUnread > 0 ? `<span class="badge badge-orange">${sUnread}</span>` : '<span class="badge badge-gray">—</span>'}</td>
-        <td colspan="2">
-          <div class="td-actions">
-            <button class="btn btn-sm btn-outline btn-icon" title="Open Chat" onclick="openChatDetail('${s.id}')"><i class="fa-solid fa-comment-dots"></i></button>
-            <button class="btn btn-sm btn-danger btn-icon" title="Delete" onclick="deleteChatSession('${s.id}')"><i class="fa-solid fa-trash"></i></button>
-          </div>
-        </td>
-      </tr>`;
-    }).join('') : '';
-
-    return `<tr>
-      <td style="color:var(--text-muted);font-size:.75rem;">${i + 1}</td>
-      <td style="font-weight:600;color:var(--teal);">
-        ${escHtml(g.name)}
-        ${sessionCount > 1 ? `<span style="margin-left:6px;background:var(--teal-soft);color:var(--teal);padding:1px 7px;border-radius:100px;font-size:.67rem;font-weight:700;">${sessionCount}</span>` : ''}
-      </td>
-      <td style="color:var(--text-muted);font-size:.82rem;">${escHtml(g.contact)}</td>
-      <td style="color:var(--text-muted);font-size:.8rem;">${sessionCount > 1 ? sessionCount + ' sessions' : '1 session'}</td>
-      <td style="color:var(--text-muted);font-size:.8rem;">${lastMsg}</td>
-      <td>${unread > 0 ? `<span class="badge badge-orange">${unread}</span>` : '<span class="badge badge-gray">—</span>'}</td>
-      <td>
-        <div class="td-actions">
-          <button class="btn btn-sm btn-outline btn-icon" title="Open Chat" onclick="openChatDetail('${latest.id}')"><i class="fa-solid fa-comment-dots"></i></button>
-          ${sessionCount > 1
-            ? `<button class="btn btn-sm btn-outline btn-icon" title="Show sessions" onclick="toggleChatSubrows(${i}, event)"><i class="fa-solid fa-chevron-down" id="chatChevron${i}" style="font-size:.7rem;transition:transform .2s;"></i></button>`
-            : `<button class="btn btn-sm btn-danger btn-icon" title="Delete" onclick="deleteChatSession('${latest.id}')"><i class="fa-solid fa-trash"></i></button>`
-          }
-        </div>
-      </td>
-    </tr>${subRows}`;
-  }).join('');
-}
-
-function toggleChatSubrows(groupIdx, event) {
-  if (event) event.stopPropagation();
-  const rows = document.querySelectorAll(`.chat-subrow-${groupIdx}`);
-  const chevron = document.getElementById(`chatChevron${groupIdx}`);
-  const visible = rows.length > 0 && rows[0].style.display !== 'none';
-  rows.forEach(r => r.style.display = visible ? 'none' : '');
-  if (chevron) chevron.style.transform = visible ? '' : 'rotate(180deg)';
+    const item = document.createElement('div');
+    item.className = 'chat-session-item' + (isActive ? ' active' : '');
+    item.dataset.sessionId = latest.id;
+    item.innerHTML = `
+      <div class="chat-session-avatar">
+        ${initials}
+        ${unread > 0 ? '<span class="unread-dot"></span>' : ''}
+      </div>
+      <div class="chat-session-info">
+        <div class="chat-session-name">${escHtml(g.name)}</div>
+        <div class="chat-session-preview">${escHtml(preview)}</div>
+      </div>
+      <div class="chat-session-meta">
+        <span>${timeStr}</span>
+        ${unread > 0 ? `<span class="chat-unread-pill">${unread}</span>` : ''}
+      </div>
+      <button class="session-delete-btn" title="Delete chat" data-sid="${latest.id}">
+        <i class="fa-solid fa-trash"></i>
+      </button>`;
+    item.addEventListener('click', () => openChatDetail(latest.id));
+    item.querySelector('.session-delete-btn').addEventListener('click', e => {
+      e.stopPropagation();
+      deleteChatSession(latest.id);
+    });
+    list.appendChild(item);
+  });
 }
 
 function openChatDetail(sessionId) {
@@ -2369,19 +2672,42 @@ function openChatDetail(sessionId) {
   const session = ChatSystem.getSession(sessionId);
   if (!session) return;
 
-  document.getElementById('chatDetailTitle').textContent = `Chat with ${escHtml(session.name)}`;
-  document.getElementById('chatDetailCard').style.display = 'block';
-  document.getElementById('chatDetailInput').focus();
+  const initials = (session.name || '?').charAt(0).toUpperCase();
+  document.getElementById('chatHeaderAvatar').textContent = initials;
+  document.getElementById('chatDetailTitle').textContent  = session.name || 'Visitor';
+  document.getElementById('chatHeaderSub').textContent    = session.email || 'Live Chat';
+
+  // Show detail panel
+  document.getElementById('chatPanelEmpty').style.display = 'none';
+  const detail = document.getElementById('chatDetailCard');
+  detail.style.display = 'flex';
+
+  // Highlight active session in sidebar
+  document.querySelectorAll('.chat-session-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.sessionId === sessionId);
+  });
 
   renderChatMessages();
   ChatSystem.markSessionAsRead(sessionId);
   updateChatBadge();
+
+  setTimeout(() => {
+    const input = document.getElementById('chatDetailInput');
+    if (input) input.focus();
+  }, 50);
 }
 
 function closeChatDetail() {
   currentChatSessionId = null;
   document.getElementById('chatDetailCard').style.display = 'none';
+  document.getElementById('chatPanelEmpty').style.display = 'flex';
+  document.querySelectorAll('.chat-session-item').forEach(el => el.classList.remove('active'));
   renderChatSessions();
+}
+
+function deleteCurrentChat() {
+  if (!currentChatSessionId) return;
+  deleteChatSession(currentChatSessionId);
 }
 
 // ── Admin context menu (delete for all) ───────────────
@@ -2422,38 +2748,89 @@ function bindAdminMsgEvents(){
 
 function renderChatMessages() {
   if (!currentChatSessionId) return;
-
-  const messages = ChatSystem.getSessionMessages(currentChatSessionId);
   const container = document.getElementById('chatDetailMessages');
   const scrolledToBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 60;
 
-  container.innerHTML = messages.map(msg => {
-    const time = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    const isAdmin = msg.senderType === 'admin';
-    const isDeleted = !!msg.deleted;
-    const role    = isAdmin ? 'admin' : 'visitor';
-    const txtH    = isDeleted
-      ? `<span><i class="fa-solid fa-ban" style="font-size:.7rem;margin-right:4px;opacity:.6;"></i>This message was deleted</span>`
-      : (msg.text ? escHtml(msg.text) : '');
-    const imgH    = (!isDeleted && msg.imageData) ? `<img src="${msg.imageData}" alt="image">` : '';
-    const bubbleCls = `zm-chat-bubble${isDeleted ? ' deleted' : ''}`;
-    const initials = (msg.senderName || 'C').charAt(0).toUpperCase();
-    const avatarHtml = !isAdmin
-      ? `<div class="zm-chat-avatar">${initials}</div>`
-      : '';
-    return `
-    <div class="zm-chat-msg ${role}" data-msgid="${msg.id}">
-      ${avatarHtml}
-      <div>
-        <div class="${bubbleCls}">${txtH}${imgH}</div>
-        <div class="zm-chat-time">${time}</div>
-      </div>
-    </div>
-    `;
-  }).join('');
+  const messages = ChatSystem.getSessionMessages(currentChatSessionId);
+  const rows = messages.map((msg, i) => {
+    const prev = messages[i - 1];
+    const next = messages[i + 1];
+    return {
+      msg,
+      isFirst: !prev || prev.senderType !== msg.senderType,
+      isLast:  !next || next.senderType !== msg.senderType
+    };
+  });
 
-  if(scrolledToBottom) container.scrollTop = container.scrollHeight;
+  function _dayLabel(date) {
+    const d    = new Date(date);
+    const today = new Date();
+    const diff  = Math.floor((new Date(today.toDateString()) - new Date(d.toDateString())) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  container.innerHTML = '';
+  let lastDay = null;
+
+  rows.forEach(({ msg, isFirst, isLast }) => {
+    const dayLabel = _dayLabel(msg.timestamp);
+    if (dayLabel !== lastDay) {
+      lastDay = dayLabel;
+      const div = document.createElement('div');
+      div.className = 'zm-chat-divider';
+      div.innerHTML = `<div class="zm-chat-divider-line"></div><div class="zm-chat-divider-label">${dayLabel}</div><div class="zm-chat-divider-line"></div>`;
+      container.appendChild(div);
+    }
+
+    const time      = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const isAdmin   = msg.senderType === 'admin';
+    const isDeleted = !!msg.deleted;
+    const role      = isAdmin ? 'admin' : 'visitor';
+    const txtH = isDeleted
+      ? '<span><i class="fa-solid fa-ban" style="font-size:.7rem;margin-right:4px;opacity:.6;"></i>This message was deleted</span>'
+      : (msg.text ? escHtml(msg.text) : '');
+    const imgH = (!isDeleted && msg.imageData) ? `<img src="${msg.imageData}" alt="image">` : '';
+    const bubbleCls = `zm-chat-bubble${isDeleted ? ' deleted' : ''}`;
+    const initials  = (msg.senderName || 'C').charAt(0).toUpperCase();
+
+    const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
+
+    const el = document.createElement('div');
+    el.className = classList;
+    el.dataset.msgid = msg.id;
+
+    if (isAdmin) {
+      el.innerHTML = `
+        <div class="zm-chat-content">
+          ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
+          <div class="${bubbleCls}">${txtH}${imgH}</div>
+          ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
+        </div>`;
+    } else {
+      const avatarHtml = `<div class="zm-chat-avatar${isLast ? '' : ' hidden'}" title="${escHtml(msg.senderName||'Visitor')}">${initials}</div>`;
+      el.innerHTML = `
+        ${avatarHtml}
+        <div class="zm-chat-content">
+          ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Visitor')}</div>` : ''}
+          <div class="${bubbleCls}">${txtH}${imgH}</div>
+          ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}
+        </div>`;
+    }
+    container.appendChild(el);
+  });
+
+  if (scrolledToBottom) container.scrollTop = container.scrollHeight;
   bindAdminMsgEvents();
+}
+
+function useReplyChip(btn) {
+  const input = document.getElementById('chatDetailInput');
+  if (input) {
+    input.value = btn.textContent.trim();
+    input.focus();
+  }
 }
 
 function sendChatReply() {
@@ -2465,7 +2842,9 @@ function sendChatReply() {
 
   ChatSystem.sendMessage(currentChatSessionId, 'admin', 'Admin', text);
   input.value = '';
+  input.style.height = 'auto';
   renderChatMessages();
+  renderChatSessions();
   input.focus();
   showToast('Message sent!', 'success');
 }
@@ -2925,31 +3304,68 @@ function renderInqChat() {
   if (!_inqSessionId) return;
   const msgs = ChatSystem.getSessionMessages(_inqSessionId);
   const container = document.getElementById('inqChatMessages');
+  container.innerHTML = '';
 
   if (msgs.length === 0) {
     container.innerHTML = `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.82rem;">No messages yet. Start the conversation!</div>`;
     return;
   }
 
-  container.innerHTML = msgs.map(msg => {
+  function _dayLabelInq(date) {
+    const d = new Date(date), today = new Date();
+    const diff = Math.floor((new Date(today.toDateString()) - new Date(d.toDateString())) / 86400000);
+    if (diff === 0) return 'Today';
+    if (diff === 1) return 'Yesterday';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  const rows = msgs.map((msg, i) => ({
+    msg,
+    isFirst: !msgs[i-1] || msgs[i-1].senderType !== msg.senderType,
+    isLast:  !msgs[i+1] || msgs[i+1].senderType !== msg.senderType
+  }));
+
+  let lastDay = null;
+  rows.forEach(({ msg, isFirst, isLast }) => {
+    const day = _dayLabelInq(msg.timestamp);
+    if (day !== lastDay) {
+      lastDay = day;
+      const div = document.createElement('div');
+      div.className = 'zm-chat-divider';
+      div.innerHTML = `<div class="zm-chat-divider-line"></div><div class="zm-chat-divider-label">${day}</div><div class="zm-chat-divider-line"></div>`;
+      container.appendChild(div);
+    }
     const isAdmin = msg.senderType === 'admin';
-    const time = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+    const time    = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
     const imgHtml = msg.imageData
       ? `<img src="${msg.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${msg.text?'6px':'0'};" data-src="${msg.imageData}">`
       : '';
-    const textHtml = msg.text ? `<div style="font-size:.82rem;line-height:1.5;white-space:pre-wrap;">${escHtml(msg.text)}</div>` : '';
-    const role = isAdmin ? 'admin' : 'visitor';
-    const initials = (msg.senderName||'C').charAt(0).toUpperCase();
-    const avatarHtml = !isAdmin ? `<div class="zm-chat-avatar">${initials}</div>` : '';
-    return `
-    <div class="zm-chat-msg ${role}">
-      ${avatarHtml}
-      <div>
-        <div class="zm-chat-bubble">${textHtml}${imgHtml}</div>
-        <div class="zm-chat-time">${isAdmin?'You':'Customer'} · ${time}</div>
-      </div>
-    </div>`;
-  }).join('');
+    const textHtml = msg.text ? `<div>${escHtml(msg.text)}</div>` : '';
+    const role      = isAdmin ? 'admin' : 'visitor';
+    const initials  = (msg.senderName||'C').charAt(0).toUpperCase();
+    const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
+
+    const el = document.createElement('div');
+    el.className = classList;
+    if (isAdmin) {
+      el.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:68%;">
+          ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
+          <div class="zm-chat-bubble">${textHtml}${imgHtml}</div>
+          ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
+        </div>`;
+    } else {
+      const avatarHtml = `<div class="zm-chat-avatar${isLast ? '' : ' hidden'}">${initials}</div>`;
+      el.innerHTML = `
+        ${avatarHtml}
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:68%;">
+          ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Customer')}</div>` : ''}
+          <div class="zm-chat-bubble">${textHtml}${imgHtml}</div>
+          ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}
+        </div>`;
+    }
+    container.appendChild(el);
+  });
 
   container.scrollTop = container.scrollHeight;
 }

@@ -898,62 +898,91 @@
 <script src="inquiry-system.js"></script>
 <script src="chat-system.js"></script>
 <style>
-.zm-chat-btn{position:fixed;bottom:28px;right:28px;width:60px;height:60px;border-radius:50%;background:#FD4D02;border:none;color:#fff;font-size:1.4rem;cursor:pointer;box-shadow:0 8px 32px -8px rgba(253,77,2,.4);display:flex;align-items:center;justify-content:center;transition:all .3s cubic-bezier(.4,0,.2,1);z-index:9999;}
-.zm-chat-btn:hover{transform:scale(1.1);box-shadow:0 12px 40px -8px rgba(253,77,2,.5);}
-.zm-chat-btn.open{background:#063b3f;}
-.zm-chat-unread{position:absolute;top:-6px;right:-6px;background:#d6483a;color:#fff;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.2);}
-.zm-chat-win{position:fixed;bottom:100px;right:28px;width:100%;max-width:380px;height:min(560px,calc(100vh - 130px));background:#fff;border-radius:20px;box-shadow:0 24px 80px -16px rgba(6,59,63,.3);display:none;flex-direction:column;z-index:9998;animation:zmChatUp .3s cubic-bezier(.4,0,.2,1);}
-.zm-chat-win.open{display:flex;}
-@keyframes zmChatUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.zm-chat-head{padding:18px 20px;background:#063b3f;color:#fff;border-radius:20px 20px 0 0;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.zm-chat-head-avatar{width:38px;height:38px;border-radius:50%;background:#FD4D02;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.zm-chat-btn{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:#FD4D02;border:none;color:#fff;font-size:1.4rem;cursor:pointer;box-shadow:0 8px 28px -4px rgba(253,77,2,.45);display:flex;align-items:center;justify-content:center;transition:all .35s cubic-bezier(.4,0,.2,1);z-index:9999;}
+.zm-chat-btn:hover{transform:scale(1.1);box-shadow:0 12px 36px -4px rgba(253,77,2,.5);}
+.zm-chat-btn.open{opacity:0;pointer-events:none;transform:scale(.75);}
+.zm-chat-unread{position:absolute;top:-3px;right:-3px;background:#d6483a;color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;border:2px solid #fff;}
+.zm-chat-win{position:fixed;bottom:96px;right:24px;width:380px;max-width:calc(100vw - 32px);height:580px;background:#fff;border-radius:22px;box-shadow:0 20px 70px -10px rgba(6,59,63,.25),0 4px 20px rgba(0,0,0,.08);display:none;flex-direction:column;z-index:9998;overflow:hidden;}
+.zm-chat-win.open{display:flex;animation:zmChatUp .3s cubic-bezier(.4,0,.2,1);}
+@keyframes zmChatUp{from{transform:translateY(16px) scale(.97);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.zm-chat-head{padding:14px 16px;background:linear-gradient(135deg,#063b3f 0%,#0a5259 100%);color:#fff;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.zm-chat-head-avatar{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.15);border:2px solid rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
 .zm-chat-head-info{flex:1;}
 .zm-chat-head-title{font-size:.92rem;font-weight:700;font-family:'Poppins',sans-serif;}
-.zm-chat-head-sub{font-size:.68rem;opacity:.75;font-family:'Poppins',sans-serif;}
-.zm-chat-head-close{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
-.zm-chat-head-close:hover{background:rgba(255,255,255,.28);}
-.zm-chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;font-family:'Poppins',sans-serif;}
-.zm-chat-msgs::-webkit-scrollbar{width:5px;}
-.zm-chat-msgs::-webkit-scrollbar-thumb{background:rgba(6,59,63,.15);border-radius:3px;}
-.zm-chat-msg{display:flex;animation:zmMsgIn .22s cubic-bezier(.4,0,.2,1);}
+.zm-chat-head-sub{font-size:.68rem;opacity:.8;font-family:'Poppins',sans-serif;margin-top:1px;}
+.zm-chat-head-close{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;flex-shrink:0;}
+.zm-chat-head-close:hover{background:rgba(255,255,255,.22);}
+/* messages */
+.zm-chat-msgs{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 12px 8px;display:flex;flex-direction:column;gap:2px;background:#f8fafa;font-family:'Poppins',sans-serif;min-height:0;}
+.zm-chat-msgs::-webkit-scrollbar{width:4px;}
+.zm-chat-msgs::-webkit-scrollbar-thumb{background:rgba(6,59,63,.12);border-radius:4px;}
+/* date divider */
+.zm-chat-divider{display:flex;align-items:center;gap:10px;padding:8px 0;flex-shrink:0;}
+.zm-chat-divider-line{flex:1;height:1px;background:rgba(6,59,63,.1);}
+.zm-chat-divider-label{font-size:.62rem;color:#8a9faa;font-weight:600;padding:2px 10px;background:rgba(6,59,63,.06);border-radius:20px;white-space:nowrap;}
+/* message row */
+.zm-chat-msg{display:flex;align-items:flex-end;gap:7px;margin-bottom:2px;animation:zmMsgIn .2s cubic-bezier(.4,0,.2,1);}
 @keyframes zmMsgIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.zm-chat-msg.visitor{justify-content:flex-start;}
-.zm-chat-msg.admin{justify-content:flex-end;}
-.zm-chat-bubble{max-width:76%;padding:9px 13px;border-radius:13px;font-size:.8rem;line-height:1.5;word-break:break-word;white-space:pre-wrap;overflow-wrap:anywhere;}
-.zm-chat-msg.visitor{justify-content:flex-end;}
-.zm-chat-msg.visitor .zm-chat-bubble{background:#FD4D02;color:#fff;border-bottom-right-radius:4px;}
-.zm-chat-msg.admin{justify-content:flex-start;}
-.zm-chat-msg.admin .zm-chat-bubble{background:#063b3f;color:#fff;border-bottom-left-radius:4px;}
+.zm-chat-msg.visitor{flex-direction:row-reverse;}
+/* avatar */
+.zm-chat-avatar-admin{width:28px;height:28px;min-width:28px;border-radius:50%;background:#063b3f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.65rem;flex-shrink:0;}
+.zm-chat-avatar-admin.hidden{visibility:hidden;}
+/* bubble */
+.zm-chat-bubble{padding:9px 13px;font-size:.81rem;line-height:1.55;word-break:break-word;overflow-wrap:break-word;width:fit-content;max-width:100%;}
+.zm-chat-msg-content{display:flex;flex-direction:column;gap:2px;max-width:75%;min-width:0;}
+.zm-chat-msg.visitor .zm-chat-msg-content{align-items:flex-end;}
+.zm-chat-msg.admin  .zm-chat-msg-content{align-items:flex-start;}
+/* visitor bubbles (orange, right) */
+.zm-chat-msg.visitor .zm-chat-bubble{background:#FD4D02;color:#fff;border-radius:18px 18px 4px 18px;box-shadow:0 2px 8px rgba(253,77,2,.2);}
+.zm-chat-msg.visitor.same-sender .zm-chat-bubble{border-radius:18px 4px 4px 18px;}
+.zm-chat-msg.visitor.last-in-group .zm-chat-bubble{border-radius:18px 4px 18px 18px;}
+/* admin bubbles (white card, left) */
+.zm-chat-msg.admin .zm-chat-bubble{background:#fff;color:#1a2e2e;border-radius:18px 18px 18px 4px;box-shadow:0 1px 4px rgba(0,0,0,.08);border:1px solid rgba(6,59,63,.07);}
+.zm-chat-msg.admin.same-sender .zm-chat-bubble{border-radius:4px 18px 18px 4px;}
+.zm-chat-msg.admin.last-in-group .zm-chat-bubble{border-radius:4px 18px 18px 18px;}
+/* deleted */
+.zm-chat-bubble.deleted{font-style:italic;font-size:.74rem;background:rgba(0,0,0,0)!important;color:#aaa!important;border:1.5px dashed #ccc!important;padding:7px 11px;display:flex;align-items:center;gap:5px;border-radius:10px!important;}
+/* time + sender label */
+.zm-chat-time{font-size:.6rem;color:#8a9faa;padding:0 3px;margin-top:1px;}
+.zm-chat-sender-label{font-size:.6rem;font-weight:600;color:#8a9faa;padding:0 4px;margin-bottom:1px;}
 .zm-chat-msg.visitor .zm-chat-time{text-align:right;}
-.zm-chat-msg.admin .zm-chat-time{text-align:left;}
+.zm-chat-msg.admin  .zm-chat-time{text-align:left;}
+/* ctx menu */
 .zm-ctx-menu{position:fixed;background:#1a2e2e;color:#fff;border-radius:10px;padding:4px 0;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:999999;font-family:'Poppins',sans-serif;font-size:.78rem;}
 .zm-ctx-item{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;transition:background .15s;}
 .zm-ctx-item:hover{background:rgba(255,255,255,.1);}
 .zm-ctx-item.danger{color:#ff6b6b;}
 .zm-ctx-item.danger:hover{background:rgba(255,107,107,.15);}
-.zm-chat-bubble.deleted{font-style:italic;opacity:.55;font-size:.74rem;background:#ddd!important;color:#666!important;}
-.zm-chat-time{font-size:.62rem;color:#6a8080;margin-top:3px;}
-.zm-chat-welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:24px;text-align:center;font-family:'Poppins',sans-serif;}
-.zm-chat-welcome-icon{width:52px;height:52px;border-radius:50%;background:#FD4D02;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:14px;}
-.zm-chat-welcome h3{font-size:.92rem;color:#063b3f;margin-bottom:6px;font-weight:700;}
-.zm-chat-welcome p{font-size:.78rem;color:#6a8080;margin-bottom:18px;line-height:1.6;}
-.zm-chat-form{width:100%;display:flex;flex-direction:column;gap:9px;}
-.zm-chat-form input{padding:9px 12px;border:1px solid rgba(6,59,63,.12);border-radius:8px;font-size:.8rem;font-family:'Poppins',sans-serif;outline:none;transition:border-color .2s;}
-.zm-chat-form input:focus{border-color:#063b3f;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
-.zm-chat-form button{padding:9px 16px;background:#FD4D02;color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .2s;}
-.zm-chat-form button:hover{background:#e34602;}
-.zm-chat-input-area{padding:10px 14px;border-top:1px solid rgba(6,59,63,.1);display:flex;gap:8px;}
-.zm-chat-input{flex:1;padding:9px 12px;border:1px solid rgba(6,59,63,.12);border-radius:10px;font-size:.8rem;font-family:'Poppins',sans-serif;outline:none;resize:none;}
-.zm-chat-input:focus{border-color:#063b3f;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
-.zm-chat-send{width:36px;height:36px;border-radius:9px;background:#FD4D02;border:none;color:#fff;font-size:.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
-.zm-chat-send:hover{background:#e34602;transform:translateY(-2px);}
-.zm-chat-img-btn{width:34px;height:34px;border-radius:9px;background:rgba(6,59,63,.07);border:1px solid rgba(6,59,63,.12);color:#6a8080;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
-.zm-chat-img-btn:hover{background:rgba(6,59,63,.12);color:#063b3f;}
-.zm-chat-img-preview{display:none;padding:6px 14px 0;position:relative;width:fit-content;}
+/* bubble images */
+.zm-chat-bubble img{max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:4px;}
+/* welcome */
+.zm-chat-welcome{display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 20px 10px;font-family:'Poppins',sans-serif;flex-shrink:0;}
+.zm-chat-wave{font-size:2.2rem;animation:zmWave 1.8s ease-in-out 2;display:inline-block;transform-origin:70% 70%;margin-bottom:6px;}
+@keyframes zmWave{0%,60%,100%{transform:rotate(0)}10%,30%{transform:rotate(14deg)}20%{transform:rotate(-4deg)}40%{transform:rotate(10deg)}50%{transform:rotate(-2deg)}}
+.zm-chat-welcome h3{font-size:.95rem;font-weight:700;color:#063b3f;margin-bottom:4px;}
+.zm-chat-welcome p{font-size:.76rem;color:#8a9faa;margin-bottom:14px;line-height:1.5;}
+.zm-chat-form{width:100%;display:flex;flex-direction:column;gap:8px;}
+.zm-chat-form input{padding:10px 13px;border:1.5px solid rgba(6,59,63,.12);border-radius:10px;font-size:.82rem;font-family:'Poppins',sans-serif;outline:none;transition:all .2s;background:#f8fafa;}
+.zm-chat-form input:focus{border-color:#063b3f;background:#fff;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
+.zm-chat-form button{padding:10px 16px;background:#FD4D02;color:#fff;border:none;border-radius:10px;font-size:.82rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .2s;}
+.zm-chat-form button:hover{background:#e34602;transform:translateY(-1px);}
+/* suggestion chips */
+.zm-chat-chips{padding:8px 12px 10px;display:flex;flex-wrap:wrap;gap:6px;flex-shrink:0;border-top:1px solid rgba(6,59,63,.07);background:#f8fafa;}
+.zm-chat-chips-label{width:100%;font-size:.62rem;color:#8a9faa;font-weight:600;margin-bottom:2px;letter-spacing:.03em;}
+.zm-chip{padding:5px 12px;border:1.5px solid rgba(6,59,63,.15);border-radius:20px;font-size:.72rem;font-weight:500;color:#063b3f;cursor:pointer;background:#fff;transition:all .18s;font-family:'Poppins',sans-serif;white-space:nowrap;}
+.zm-chip:hover{background:#063b3f;color:#fff;border-color:#063b3f;transform:translateY(-1px);box-shadow:0 3px 10px rgba(6,59,63,.2);}
+/* input area */
+.zm-chat-input-area{padding:10px 12px;border-top:1px solid rgba(6,59,63,.08);display:flex;gap:8px;align-items:flex-end;background:#fff;flex-shrink:0;}
+.zm-chat-img-btn{width:36px;height:36px;border-radius:50%;background:#f0f4f4;border:1px solid rgba(6,59,63,.1);color:#8a9faa;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.zm-chat-img-btn:hover{background:#ddeaea;color:#063b3f;}
+.zm-chat-input{flex:1;padding:9px 13px;border:1.5px solid rgba(6,59,63,.12);border-radius:18px;font-size:.81rem;font-family:'Poppins',sans-serif;outline:none;resize:none;max-height:80px;min-height:36px;overflow-y:auto;line-height:1.4;transition:border-color .2s,box-shadow .2s;background:#f8fafa;}
+.zm-chat-input:focus{border-color:#063b3f;background:#fff;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
+.zm-chat-send{width:36px;height:36px;border-radius:12px;background:#FD4D02;border:none;color:#fff;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
+.zm-chat-send:hover{background:#e34602;transform:scale(1.07);}
+.zm-chat-send:active{transform:scale(.93);}
+.zm-chat-img-preview{display:none;padding:6px 12px 0;position:relative;width:fit-content;}
 .zm-chat-img-preview img{max-height:60px;border-radius:8px;border:1px solid rgba(6,59,63,.12);}
 .zm-chat-img-preview-close{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#d63030;color:#fff;border:none;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
-.zm-chat-bubble img{max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:4px;}
-/* ---- Responsive chat widget ---- */
 @media(max-width:480px){
   .zm-chat-btn{bottom:16px;right:16px;width:52px;height:52px;font-size:1.2rem;}
   .zm-chat-win{position:fixed;inset:0;width:100%;max-width:100%;height:100%;border-radius:0;bottom:0;right:0;}
@@ -966,7 +995,7 @@
   .zm-chat-head-avatar{width:30px;height:30px;font-size:.8rem;}
   .zm-chat-head-title{font-size:.8rem;}
   .zm-chat-head-sub{font-size:.6rem;}
-  .zm-chat-msgs{padding:10px 12px;gap:8px;}
+  .zm-chat-msgs{padding:10px 8px;gap:2px;}
   .zm-chat-bubble{font-size:.75rem;padding:7px 10px;}
   .zm-chat-input-area{padding:7px 10px;}
   .zm-chat-input{font-size:.75rem;padding:7px 10px;}
@@ -976,11 +1005,11 @@
   .zm-chat-win{max-width:340px;width:calc(100vw - 40px);height:min(520px,calc(100vh - 120px));bottom:90px;right:20px;}
 }
 @media(min-width:769px){
-  .zm-chat-win{max-width:380px;width:100%;height:min(560px,calc(100vh - 130px));bottom:100px;right:28px;}
+  .zm-chat-win{max-width:380px;width:100%;height:min(580px,calc(100vh - 130px));bottom:96px;right:24px;}
 }
 </style>
 
-<!-- Chat Button -->
+<!-- Chat FAB -->
 <button class="zm-chat-btn" id="zmChatBtn" title="Chat with us">
   <i class="fa-solid fa-message"></i>
   <div class="zm-chat-unread" id="zmChatUnread" style="display:none">0</div>
@@ -988,20 +1017,30 @@
 
 <!-- Chat Window -->
 <div class="zm-chat-win" id="zmChatWin">
+  <!-- Header -->
   <div class="zm-chat-head">
     <div class="zm-chat-head-avatar"><i class="fa-solid fa-headset"></i></div>
     <div class="zm-chat-head-info">
       <div class="zm-chat-head-title">Zami Mart Support</div>
-      <div class="zm-chat-head-sub">Usually replies quickly</div>
+      <div class="zm-chat-head-sub">Usually replies within minutes</div>
     </div>
     <button class="zm-chat-head-close" id="zmChatClose"><i class="fa-solid fa-xmark"></i></button>
   </div>
+  <!-- Messages -->
   <div class="zm-chat-msgs" id="zmChatMsgs"></div>
-  <!-- image preview strip -->
+  <!-- Quick suggestion chips (shown after chat starts) -->
+  <div class="zm-chat-chips" id="zmChatChips" style="display:none;">
+    <div class="zm-chat-chips-label">QUICK QUESTIONS</div>
+    <button class="zm-chip">👋 Hi there!</button>
+    <button class="zm-chip">🛒 How to order?</button>
+    <button class="zm-chip">📞 Contact details</button>
+  </div>
+  <!-- Image preview strip -->
   <div class="zm-chat-img-preview" id="zmImgPreview">
     <img id="zmImgPreviewImg" src="">
-    <button class="zm-chat-img-preview-close" onclick="zmClearImg()"><i class="fa-solid fa-xmark"></i></button>
+    <button class="zm-chat-img-preview-close"><i class="fa-solid fa-xmark"></i></button>
   </div>
+  <!-- Input -->
   <div class="zm-chat-input-area" id="zmChatInputArea" style="display:none">
     <label for="zmImgUpload" class="zm-chat-img-btn" title="Attach image"><i class="fa-solid fa-image"></i></label>
     <input type="file" id="zmImgUpload" accept="image/*" style="display:none">
@@ -1021,36 +1060,35 @@ const inputArea=document.getElementById('zmChatInputArea');
 const input=document.getElementById('zmChatInput');
 const sendBtn=document.getElementById('zmChatSend');
 const unreadBadge=document.getElementById('zmChatUnread');
-let sessionId=null,visitorName=null,visitorAvatar=null,visitorInitials='?';
-
+let sessionId=null,visitorName=null,visitorAvatar=null;
 function escH(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
 
 function getLoggedUser(){
   try{
     const u = window.fb && window.fb.auth ? window.fb.auth.currentUser : null;
     if (!u) return null;
-    return { name: u.displayName || u.email || 'User', email: u.email || '', photoURL: u.photoURL || null };
+    return { name: u.displayName || u.email || 'User', email: u.email || '' };
   }catch(e){return null;}
 }
 
 function avatarHtml(){
-  const AVS='width:28px;height:28px;min-width:28px;min-height:28px;border-radius:50%;flex-shrink:0;align-self:flex-end;box-shadow:0 1px 6px rgba(0,0,0,.22);';
+  const AVS='width:28px;height:28px;min-width:28px;min-height:28px;border-radius:50%;flex-shrink:0;box-shadow:0 1px 6px rgba(0,0,0,.22);';
   if(visitorAvatar){
     return`<img src="${escH(visitorAvatar)}" style="${AVS}object-fit:cover;border:2px solid rgba(255,255,255,.6);">`;
   }
-  // Single initial only — avoids multi-char stacking
-  const initial = visitorInitials ? visitorInitials.charAt(0) : '?';
-  return`<div style="${AVS}background:#063b3f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;border:2px solid rgba(255,255,255,.5);line-height:1;">${escH(initial)}</div>`;
+  const initial = visitorName ? visitorName.trim().split(' ')[0].charAt(0).toUpperCase() : 'V';
+  return`<div style="${AVS}background:#FD4D02;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;border:2px solid rgba(255,255,255,.5);line-height:1;">${escH(initial)}</div>`;
 }
 
 function startChat(name,phone){
   visitorName=name;
-  const parts=name.trim().split(' ');
-  visitorInitials=(parts[0][0]+(parts[1]?parts[1][0]:'')).toUpperCase();
   sessionId=ChatSystem.createSession(name,phone);
   localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name,avatar:visitorAvatar}));
   msgsEl.innerHTML='';
   inputArea.style.display='flex';
+  // Show suggestion chips
+  const chips=document.getElementById('zmChatChips');
+  if(chips)chips.style.display='flex';
   setTimeout(()=>{
     ChatSystem.sendMessage(sessionId,'admin','Zami Mart','Hi '+name+'! \u{1F44B} Thanks for reaching out. How can we help you today?');
   },600);
@@ -1065,25 +1103,35 @@ function showWelcome(){
     startChat(user.name,user.phone||user.email||'');
     return;
   }
+  // Wave + form injected at top of messages area
   msgsEl.innerHTML=`
-    <div class="zm-chat-welcome">
-      <div class="zm-chat-welcome-icon"><i class="fa-solid fa-comment-dots"></i></div>
-      <h3>Hello there! \u{1F44B}</h3>
-      <p>Have a question about our products? We're here to help.</p>
+    <div class="zm-chat-welcome" id="zmWelcomeBlock">
+      <div class="zm-chat-wave">&#x1F44B;</div>
+      <h3>Hi there! How can we help?</h3>
+      <p>We usually reply within minutes. Fill in your details below.</p>
       <div class="zm-chat-form" id="zmChatForm">
-        <input type="text" id="zmVisitorName" placeholder="Your name" required>
-        <input type="tel" id="zmVisitorPhone" placeholder="Phone number" required>
-        <button id="zmStartChat">Start Chat</button>
+        <input type="text" id="zmVisitorName" placeholder="Your name" required autocomplete="name">
+        <input type="tel" id="zmVisitorPhone" placeholder="Phone number (optional)">
+        <button id="zmStartChat">Start Chatting &#x2192;</button>
       </div>
     </div>`;
   document.getElementById('zmStartChat').addEventListener('click',()=>{
     const name=document.getElementById('zmVisitorName').value.trim();
-    const phone=document.getElementById('zmVisitorPhone').value.trim();
     if(!name){document.getElementById('zmVisitorName').focus();return;}
-    if(!phone){document.getElementById('zmVisitorPhone').focus();return;}
+    const phone=document.getElementById('zmVisitorPhone').value.trim();
     visitorAvatar=null;
     startChat(name,phone);
   });
+}
+
+function zmSendChip(btn){
+  if(!sessionId)return;
+  const text=btn.textContent.trim();
+  ChatSystem.sendMessage(sessionId,'visitor',visitorName,text,null);
+  const chips=document.getElementById('zmChatChips');
+  if(chips)chips.style.display='none';
+  renderMsgs();
+  input.focus();
 }
 
 // ── Context menu (delete for all) ─────────────────────
@@ -1097,7 +1145,8 @@ function showCtxMenu(e,msgId){
   closeCtxMenu();
   const menu=document.createElement('div');
   menu.className='zm-ctx-menu';
-  menu.innerHTML=`<div class="zm-ctx-item danger" id="zmDelMsg"><i class="fa-solid fa-ban" style="font-size:.75rem;"></i> Delete for everyone</div>`;
+  menu.innerHTML=`<div class="zm-ctx-item danger" id="zmDelMsg"><i class="fa-solid fa-trash" style="font-size:.75rem;"></i> Delete for everyone</div>`;
+  // position
   const x=Math.min(e.clientX,window.innerWidth-170);
   const y=Math.min(e.clientY,window.innerHeight-80);
   menu.style.left=x+'px';
@@ -1113,7 +1162,9 @@ function showCtxMenu(e,msgId){
 
 function bindMsgEvents(){
   msgsEl.querySelectorAll('[data-msgid]').forEach(el=>{
+    // right-click desktop
     el.addEventListener('contextmenu',e=>showCtxMenu(e,el.dataset.msgid));
+    // long-press mobile
     let lpt;
     el.addEventListener('touchstart',e=>{lpt=setTimeout(()=>showCtxMenu(e.touches[0],el.dataset.msgid),600);},{passive:true});
     el.addEventListener('touchend',()=>clearTimeout(lpt));
@@ -1121,12 +1172,39 @@ function bindMsgEvents(){
   });
 }
 
+function _zmDayLabel(ts){
+  const d=new Date(ts),today=new Date();
+  const diff=Math.floor((new Date(today.toDateString())-new Date(d.toDateString()))/86400000);
+  if(diff===0)return'Today';
+  if(diff===1)return'Yesterday';
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
 function renderMsgs(){
   if(!sessionId)return;
   const msgs=ChatSystem.getSessionMessages(sessionId);
   if(msgs.length===0){msgsEl.innerHTML='';return;}
-  const scrolledToBottom = msgsEl.scrollHeight - msgsEl.scrollTop - msgsEl.clientHeight < 60;
-  msgsEl.innerHTML=msgs.map(m=>{
+  const scrolledToBottom=msgsEl.scrollHeight-msgsEl.scrollTop-msgsEl.clientHeight<60;
+
+  const rows=msgs.map((m,i)=>({
+    m,
+    isFirst:!msgs[i-1]||msgs[i-1].senderType!==m.senderType,
+    isLast:!msgs[i+1]||msgs[i+1].senderType!==m.senderType
+  }));
+
+  msgsEl.innerHTML='';
+  let lastDay=null;
+
+  rows.forEach(({m,isFirst,isLast})=>{
+    const day=_zmDayLabel(m.timestamp);
+    if(day!==lastDay){
+      lastDay=day;
+      const div=document.createElement('div');
+      div.className='zm-chat-divider';
+      div.innerHTML=`<div class="zm-chat-divider-line"></div><div class="zm-chat-divider-label">${day}</div><div class="zm-chat-divider-line"></div>`;
+      msgsEl.appendChild(div);
+    }
+
     const t=new Date(m.timestamp).toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
     const isAdmin=m.senderType==='admin';
     const isDeleted=!!m.deleted;
@@ -1134,22 +1212,34 @@ function renderMsgs(){
       ?`<img src="${m.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${m.text?'6px':'0'};" data-src="${m.imageData}">`
       :'';
     const txtH=isDeleted
-      ?`<div><i class="fa-solid fa-ban" style="font-size:.7rem;margin-right:4px;opacity:.6;"></i>This message was deleted</div>`
+      ?`<span><i class="fa-solid fa-circle-xmark" style="font-size:.72rem;margin-right:5px;opacity:.7;"></i>Message unsent</span>`
       :(m.text?`<div>${escH(m.text)}</div>`:'');
     const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}`;
+    const cls=['zm-chat-msg',isAdmin?'admin':'visitor',!isFirst?'same-sender':'',(isLast&&!isFirst)?'last-in-group':''].filter(Boolean).join(' ');
+
+    const el=document.createElement('div');
+    el.className=cls;
+    el.dataset.msgid=m.id;
+
     if(isAdmin){
-      return`<div class="zm-chat-msg admin" data-msgid="${m.id}" style="align-items:flex-end;gap:8px;">
-        <div style="width:28px;height:28px;min-height:28px;border-radius:50%;background:#FD4D02;color:#fff;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.18);line-height:1;" title="Zami Mart Support"><i class="fa-solid fa-headset"></i></div>
-        <div><div class="${bubbleCls}">${txtH}${imgH}</div><div class="zm-chat-time">${t}</div></div>
-      </div>`;
+      el.innerHTML=`
+        <div class="zm-chat-avatar-admin${isLast?'':' hidden'}"><i class="fa-solid fa-headset"></i></div>
+        <div class="zm-chat-msg-content">
+          ${isFirst?'<div class="zm-chat-sender-label">Zami Mart</div>':''}
+          <div class="${bubbleCls}">${txtH}${imgH}</div>
+          ${isLast?`<div class="zm-chat-time">${t}</div>`:''}
+        </div>`;
     }else{
-      return`<div class="zm-chat-msg visitor" data-msgid="${m.id}" style="align-items:flex-end;gap:8px;">
-        <div><div class="${bubbleCls}">${txtH}${imgH}</div><div class="zm-chat-time">${t}</div></div>
-        ${avatarHtml()}
-      </div>`;
+      el.innerHTML=`
+        <div class="zm-chat-msg-content">
+          <div class="${bubbleCls}">${txtH}${imgH}</div>
+          ${isLast?`<div class="zm-chat-time">${t}</div>`:''}
+        </div>`;
     }
-  }).join('');
-  if(scrolledToBottom) msgsEl.scrollTop=msgsEl.scrollHeight;
+    msgsEl.appendChild(el);
+  });
+
+  if(scrolledToBottom)msgsEl.scrollTop=msgsEl.scrollHeight;
   bindMsgEvents();
 }
 
@@ -1168,6 +1258,8 @@ function doSend(){
   const txt=input.value.trim();
   if((!txt&&!zmPendingImg)||!sessionId)return;
   ChatSystem.sendMessage(sessionId,'visitor',visitorName,txt,zmPendingImg);
+  const chips=document.getElementById('zmChatChips');
+  if(chips)chips.style.display='none';
   input.value='';input.style.height='auto';
   zmClearImg();
   renderMsgs();
@@ -1182,21 +1274,47 @@ function updateBadge(){
 }
 
 function restoreSession(){
+  // 1) Try saved session from localStorage
   try{
     const s=JSON.parse(localStorage.getItem('zm_cv_session')||'null');
     if(s&&s.id&&ChatSystem.getSession(s.id)){
       sessionId=s.id;
       visitorName=s.name;
-      visitorAvatar=s.avatar||null; // restored from session
-      visitorInitials=s.initials||'?';
+      visitorAvatar=s.avatar||null;
       const user=getLoggedUser();
       if(user){visitorAvatar=user.avatarPhoto||null;}
       msgsEl.innerHTML='';
       inputArea.style.display='flex';
+      const chips=document.getElementById('zmChatChips');
+      if(chips){
+        const _msgs=ChatSystem.getSessionMessages(sessionId);
+        const _hasVisitorMsg=_msgs.some(m=>m.senderType==='visitor');
+        chips.style.display=_hasVisitorMsg?'none':'flex';
+      }
       renderMsgs();
       return true;
     }
   }catch(e){}
+
+  // 2) Fallback: check inquiry linkedSessionId for logged-in customers
+  try{
+    const user=getLoggedUser();
+    if(user&&user.email&&window.InquirySystem){
+      const inqs=InquirySystem.getInquiriesByEmail(user.email);
+      for(const inq of inqs){
+        if(inq.linkedSessionId&&ChatSystem.getSession(inq.linkedSessionId)){
+          sessionId=inq.linkedSessionId;
+          visitorName=user.name||'Guest';
+          visitorAvatar=user.avatarPhoto||null;          localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name:visitorName,avatar:visitorAvatar}));
+          msgsEl.innerHTML='';
+          inputArea.style.display='flex';
+          renderMsgs();
+          return true;
+        }
+      }
+    }
+  }catch(e){}
+
   return false;
 }
 
@@ -1210,6 +1328,22 @@ btn.addEventListener('click',()=>{
 });
 closeBtn.addEventListener('click',()=>{win.classList.remove('open');btn.classList.remove('open');});
 sendBtn.addEventListener('click',doSend);
+
+// Quick-reply chips & image-preview close button live INSIDE this IIFE,
+// so they can't be reached via inline onclick="..." attributes (those run
+// in global scope). Bind them here instead — this is the actual fix that
+// makes the chips clickable.
+const _chipsBox=document.getElementById('zmChatChips');
+if(_chipsBox){
+  _chipsBox.addEventListener('click', e=>{
+    const chip=e.target.closest('.zm-chip');
+    if(chip) zmSendChip(chip);
+  });
+}
+const _imgPreviewClose=document.querySelector('#zmImgPreview .zm-chat-img-preview-close');
+if(_imgPreviewClose){
+  _imgPreviewClose.addEventListener('click', zmClearImg);
+}
 input.addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
 input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,80)+'px';});
 

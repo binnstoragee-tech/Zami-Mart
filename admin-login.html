@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login — Zami Mart</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script type="module" src="firebase-init.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --teal:    #063b3f;
+  --teal2:   #0a5560;
+  --teal3:   #0d6b78;
+  --orange:  #FD4D02;
+  --orange2: #ff6a2b;
+  --red:     #ef4444;
+  --border:  #e4ecec;
+  --muted:   #7a9090;
+  --bg:      #f5f8f8;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  min-height: 100dvh;
+  background: #0d1f21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+/* ── Animated shifting gradient background ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background: linear-gradient(
+    135deg,
+    #041f22,
+    #063b3f,
+    #0a5560,
+    #1a1a1a,
+    #3a1800,
+    #FD4D02,
+    #063b3f,
+    #041f22
+  );
+  background-size: 400% 400%;
+  animation: gradientShift 12s ease infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes gradientShift {
+  0%   { background-position: 0% 0%; }
+  25%  { background-position: 100% 0%; }
+  50%  { background-position: 100% 100%; }
+  75%  { background-position: 0% 100%; }
+  100% { background-position: 0% 0%; }
+}
+
+body::after { content: none; }
+
+/* ── Orb blobs ── */
+.blob {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(60px);
+  animation: blobDrift 8s ease-in-out infinite alternate;
+}
+.blob-1 {
+  width: 360px; height: 360px;
+  background: radial-gradient(circle, rgba(253,77,2,.18), transparent 70%);
+  top: -80px; right: -60px;
+  animation-delay: 0s;
+}
+.blob-2 {
+  width: 280px; height: 280px;
+  background: radial-gradient(circle, rgba(6,59,63,.6), transparent 70%);
+  bottom: -60px; left: -40px;
+  animation-delay: -3s;
+}
+@keyframes blobDrift {
+  from { transform: translate(0,0) scale(1); }
+  to   { transform: translate(20px, 15px) scale(1.06); }
+}
+
+/* ── Main card ── */
+.page {
+  position: relative; z-index: 1;
+  width: 100%;
+  max-width: 860px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.06),
+    0 32px 80px rgba(0,0,0,.5),
+    0 8px 20px rgba(0,0,0,.3);
+  animation: cardIn .65s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(32px) scale(.97); }
+  to   { opacity:1; transform: none; }
+}
+
+/* ══════════════════════════════════
+   LEFT PANEL
+══════════════════════════════════ */
+.panel-left {
+  background: linear-gradient(160deg, #0a4a50 0%, #063b3f 55%, #041f22 100%);
+  padding: 2.8rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 480px;
+}
+
+/* inner glow */
+.panel-left::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(253,77,2,.18) 0%, transparent 70%);
+  bottom: -80px; right: -80px;
+  pointer-events: none;
+  animation: glowPulse 4s ease-in-out infinite alternate;
+}
+@keyframes glowPulse {
+  from { opacity: .7; transform: scale(1); }
+  to   { opacity: 1;  transform: scale(1.1); }
+}
+
+/* corner ring accent */
+.panel-left::after {
+  content: '';
+  position: absolute;
+  width: 220px; height: 220px;
+  border-radius: 50%;
+  border: 1px solid rgba(253,77,2,.12);
+  top: -60px; left: -60px;
+  pointer-events: none;
+}
+
+.pl-top { position: relative; z-index: 1; }
+
+/* Logo pill */
+.pl-logo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid rgba(255,255,255,.1);
+  backdrop-filter: blur(8px);
+  padding: 8px 14px 8px 10px;
+  border-radius: 50px;
+  margin-bottom: 2rem;
+}
+.pl-logo-pill img {
+  height: 30px;
+  width: auto;
+  object-fit: contain;
+  mix-blend-mode: screen;
+  filter: brightness(1.4) saturate(1.1);
+}
+.pl-logo-pill span {
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.5);
+}
+
+.pl-heading {
+  font-size: 2rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -.04em;
+  color: #fff;
+  margin-bottom: .75rem;
+}
+.pl-heading em {
+  font-style: normal;
+  background: linear-gradient(90deg, var(--orange), var(--orange2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pl-sub {
+  font-size: .82rem;
+  font-weight: 400;
+  color: rgba(255,255,255,.38);
+  line-height: 1.7;
+  max-width: 240px;
+}
+
+/* Feature pills */
+.pl-features { position: relative; z-index: 1; }
+.pl-feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+}
+.pl-feature:last-child { border-bottom: none; }
+.pl-icon {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: rgba(253,77,2,.15);
+  border: 1px solid rgba(253,77,2,.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: .78rem;
+  color: var(--orange);
+}
+.pl-feature-text {
+  font-size: .75rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.45);
+}
+
+/* Bottom status bar */
+.pl-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative; z-index: 1;
+}
+.pl-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+@keyframes statusPulse {
+  0%,100% { opacity: 1; box-shadow: 0 0 6px #22c55e; }
+  50%      { opacity: .6; box-shadow: 0 0 12px #22c55e; }
+}
+.pl-status-text {
+  font-size: .7rem;
+  font-weight: 500;
+  color: rgba(255,255,255,.3);
+  letter-spacing: .03em;
+}
+
+/* ══════════════════════════════════
+   RIGHT PANEL
+══════════════════════════════════ */
+.panel-right {
+  background: #fff;
+  padding: 2.8rem 2.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* top-right teal corner glow */
+.panel-right::before {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(6,59,63,.06) 0%, transparent 70%);
+  top: -60px; right: -60px;
+  pointer-events: none;
+}
+
+/* ── Push notification banner ── */
+.notif-banner {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #fff7f4, #fff);
+  border: 1.5px solid rgba(253,77,2,.2);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 1.4rem;
+  animation: bannerSlide .4s cubic-bezier(.22,1,.36,1) both;
+}
+.notif-banner.show { display: flex; }
+@keyframes bannerSlide {
+  from { opacity:0; transform: translateY(-8px); }
+  to   { opacity:1; transform: none; }
+}
+.notif-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--orange), var(--orange2));
+  display: flex; align-items: center; justify-content: center;
+  font-size: .8rem; color: #fff; flex-shrink: 0;
+}
+.notif-text {
+  flex: 1;
+  font-size: .72rem;
+  color: #4a6060;
+  line-height: 1.4;
+}
+.notif-text strong {
+  display: block;
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--teal);
+  margin-bottom: 1px;
+}
+.notif-btn {
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: .68rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .15s;
+  flex-shrink: 0;
+}
+.notif-btn:hover { background: var(--orange2); }
+.notif-dismiss {
+  background: none; border: none;
+  color: #b0c4c4; cursor: pointer;
+  font-size: .75rem; padding: 2px;
+  transition: color .15s; flex-shrink: 0;
+}
+.notif-dismiss:hover { color: var(--teal); }
+
+/* ── Form head ── */
+.form-head { margin-bottom: 1.8rem; }
+.form-eyebrow {
+  font-size: .65rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: .5rem;
+}
+.form-head h1 {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--teal);
+  letter-spacing: -.04em;
+  line-height: 1.1;
+  margin-bottom: .4rem;
+}
+.form-head p {
+  font-size: .8rem;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ── Alert ── */
+.alert {
+  display: none;
+  align-items: center; gap: 9px;
+  padding: .7rem 1rem;
+  border-radius: 10px;
+  font-size: .78rem; font-weight: 500;
+  margin-bottom: 1rem;
+  background: #fef2f2;
+  color: var(--red);
+  border: 1px solid rgba(239,68,68,.15);
+  animation: alertIn .25s ease;
+}
+.alert.show { display: flex; }
+@keyframes alertIn { from { opacity:0; transform:translateY(-5px); } to { opacity:1; transform:none; } }
+
+/* ── Google button ── */
+.btn-google {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  width: 100%;
+  background: var(--bg);
+  color: #1a2e2e;
+  font-family: 'Inter', sans-serif;
+  font-size: .84rem; font-weight: 600;
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  margin-bottom: 1.2rem;
+  transition: border-color .2s, box-shadow .2s, background .15s, transform .1s;
+}
+.btn-google:hover:not(:disabled) {
+  border-color: #c5d5d5;
+  background: #fff;
+  box-shadow: 0 4px 14px rgba(0,0,0,.07);
+  transform: translateY(-1px);
+}
+.btn-google:active:not(:disabled) { transform: none; }
+.btn-google:disabled { opacity: .55; cursor: default; }
+.btn-google img { width: 18px; height: 18px; }
+.btn-google .g-spin {
+  width: 16px; height: 16px;
+  border: 2px solid #ddd; border-top-color: var(--teal);
+  border-radius: 50%; animation: spin .7s linear infinite; display: none;
+}
+.btn-google.loading .g-spin { display: block; }
+.btn-google.loading .g-label { display: none; }
+
+/* ── Divider ── */
+.divider {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 1.2rem;
+  color: #c8d8d8; font-size: .68rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── Fields ── */
+.field { margin-bottom: 1rem; }
+.field label {
+  display: block;
+  font-size: .68rem; font-weight: 800;
+  color: var(--teal);
+  letter-spacing: .07em; text-transform: uppercase;
+  margin-bottom: .45rem;
+}
+.input-wrap { position: relative; }
+.input-wrap input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  font-family: 'Inter', sans-serif;
+  font-size: .88rem; color: var(--teal);
+  background: var(--bg);
+  outline: none;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+.input-wrap input::placeholder { color: #b0c8c8; }
+.input-wrap input:focus {
+  border-color: var(--teal);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(6,59,63,.07);
+}
+.input-icon {
+  position: absolute;
+  left: 14px; top: 50%; transform: translateY(-50%);
+  color: #b8cece; font-size: .78rem; pointer-events: none;
+  transition: color .2s;
+}
+.input-wrap:focus-within .input-icon { color: var(--teal); }
+.field.err input {
+  border-color: var(--red);
+  background: #fff8f8;
+  box-shadow: 0 0 0 4px rgba(239,68,68,.07);
+}
+.pw-toggle {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+  background: none; border: none; color: #b8cece;
+  font-size: .78rem; cursor: pointer; padding: 4px;
+  transition: color .2s;
+}
+.pw-toggle:hover { color: var(--teal); }
+.field-err {
+  display: none;
+  font-size: .68rem; color: var(--red);
+  margin-top: .35rem; align-items: center; gap: 5px;
+  font-weight: 500;
+}
+.field-err.show { display: flex; }
+
+/* ── Login button ── */
+.btn-login {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%;
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-size: .9rem; font-weight: 800;
+  padding: 14px 0; border-radius: 12px; border: none;
+  cursor: pointer; margin-top: .2rem;
+  transition: transform .15s, box-shadow .2s, filter .2s;
+  box-shadow: 0 6px 24px -4px rgba(6,59,63,.45);
+  letter-spacing: .01em;
+}
+.btn-login:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -6px rgba(6,59,63,.5);
+  filter: brightness(1.08);
+}
+.btn-login:active:not(:disabled) { transform: none; box-shadow: 0 4px 14px -4px rgba(6,59,63,.4); }
+.btn-login:disabled { opacity: .6; cursor: default; }
+.btn-spin {
+  width: 16px; height: 16px;
+  border: 2.5px solid rgba(255,255,255,.3);
+  border-top-color: #fff; border-radius: 50%;
+  animation: spin .7s linear infinite; display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-login.loading .btn-spin { display: block; }
+.btn-login.loading .btn-text { display: none; }
+
+/* ── Success overlay ── */
+.success-overlay {
+  display: none;
+  position: absolute; inset: 0;
+  background: #fff;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px; text-align: center; padding: 2rem;
+  z-index: 20;
+  animation: overlayIn .4s cubic-bezier(.22,1,.36,1) both;
+}
+.success-overlay.show { display: flex; }
+@keyframes overlayIn { from { opacity:0; } to { opacity:1; } }
+
+.so-ring {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--teal), var(--teal2));
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 8px 32px -8px rgba(6,59,63,.55), 0 0 0 10px rgba(6,59,63,.06);
+  animation: ringIn .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes ringIn { from { transform: scale(0); } to { transform: scale(1); } }
+.so-ring svg path {
+  stroke-dasharray: 26; stroke-dashoffset: 26;
+  animation: drawCheck .35s ease .25s forwards;
+}
+@keyframes drawCheck { to { stroke-dashoffset: 0; } }
+.so-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  object-fit: cover; border: 2.5px solid var(--teal);
+  display: none;
+}
+.so-name { font-size: 1.05rem; font-weight: 900; color: var(--teal); letter-spacing: -.03em; }
+.so-sub  { font-size: .78rem; color: var(--muted); }
+.so-loader {
+  display: flex; gap: 5px; align-items: center;
+}
+.so-loader-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--orange);
+  animation: loaderBounce .7s ease-in-out infinite alternate;
+}
+.so-loader-dot:nth-child(2) { animation-delay: .15s; background: var(--teal); }
+.so-loader-dot:nth-child(3) { animation-delay: .3s;  background: #f0b429; }
+@keyframes loaderBounce {
+  from { transform: translateY(0); opacity: .5; }
+  to   { transform: translateY(-5px); opacity: 1; }
+}
+
+/* ── Shake ── */
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  18%      { transform: translateX(-8px); }
+  36%      { transform: translateX(8px); }
+  54%      { transform: translateX(-5px); }
+  72%      { transform: translateX(5px); }
+}
+.shake { animation: shake .4s ease; }
+
+/* ══════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════ */
+@media (max-width: 680px) {
+  body { padding: .75rem; }
+
+  .page {
+    grid-template-columns: 1fr;
+    max-width: 420px;
+    border-radius: 20px;
+  }
+
+  .panel-left {
+    padding: 2rem 1.8rem 1.6rem;
+    min-height: auto;
+    gap: 1.4rem;
+  }
+  .pl-logo-pill { margin-bottom: 1.2rem; }
+  .pl-heading { font-size: 1.55rem; }
+  .pl-features { display: none; } /* hide on mobile to save space */
+  .pl-status { margin-top: 0; }
+
+  .panel-right { padding: 2rem 1.8rem; }
+  .form-head h1 { font-size: 1.35rem; }
+}
+
+@media (max-width: 380px) {
+  .panel-right { padding: 1.6rem 1.4rem; }
+  .panel-left  { padding: 1.6rem 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- atmospheric blobs -->
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="page">
+
+  <!-- ══ LEFT PANEL ══ -->
+  <div class="panel-left">
+
+    <div class="pl-top">
+      <h2 class="pl-heading">Admin<br><em>Control</em><br>Panel</h2>
+      <p class="pl-sub">Manage your store, orders, and customers from one secure place.</p>
+    </div>
+
+    <div class="pl-features">
+      <div class="pl-feature">
+        <div class="pl-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <span class="pl-feature-text">Inventory & Products</span>
+      </div>
+      <div class="pl-feature">
+        <div class="pl-icon"><i class="fa-solid fa-comment-dots"></i></div>
+        <span class="pl-feature-text">Live Chat & Inquiries</span>
+      </div>
+      <div class="pl-feature">
+        <div class="pl-icon"><i class="fa-solid fa-chart-simple"></i></div>
+        <span class="pl-feature-text">Sales Dashboard</span>
+      </div>
+    </div>
+
+    <div class="pl-status">
+      <span class="pl-dot"></span>
+      <span class="pl-status-text">All systems online</span>
+    </div>
+
+  </div>
+
+  <!-- ══ RIGHT PANEL ══ -->
+  <div class="panel-right" id="panelRight">
+
+    <!-- Success overlay -->
+    <div class="success-overlay" id="successOverlay">
+      <div class="so-ring">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+          <path d="M7 15.5L13 21.5L23 10" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <img class="so-avatar" id="soAvatar" src="" alt="">
+      <p class="so-name" id="soName">Welcome back!</p>
+      <p class="so-sub">Redirecting to dashboard…</p>
+      <div class="so-loader">
+        <span class="so-loader-dot"></span>
+        <span class="so-loader-dot"></span>
+        <span class="so-loader-dot"></span>
+      </div>
+    </div>
+
+    <!-- Push notification banner -->
+    <div class="notif-banner" id="notifBanner">
+      <div class="notif-icon"><i class="fa-solid fa-bell"></i></div>
+      <div class="notif-text">
+        <strong>Enable Notifications</strong>
+        Get alerts for new orders & inquiries
+      </div>
+      <button class="notif-btn" id="notifAllow">Enable</button>
+      <button class="notif-dismiss" id="notifDismiss" title="Dismiss"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="form-head">
+      <p class="form-eyebrow">Secure Access</p>
+      <h1>Welcome back</h1>
+      <p>Sign in to access your admin panel</p>
+    </div>
+
+    <!-- Alert -->
+    <div class="alert" id="alertBox">
+      <i class="fa-solid fa-circle-xmark"></i>
+      <span id="alertMsg">Incorrect credentials.</span>
+    </div>
+
+    <!-- Google SSO -->
+    <button class="btn-google" id="btnGoogle">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="">
+      <span class="g-label">Continue with Google</span>
+      <div class="g-spin"></div>
+    </button>
+
+    <div class="divider">or</div>
+
+    <!-- Username -->
+    <div class="field" id="fieldUser">
+      <label for="adminUser">Username</label>
+      <div class="input-wrap">
+        <input type="text" id="adminUser" placeholder="admin username" autocomplete="username" autocapitalize="off" spellcheck="false">
+        <i class="fa-solid fa-user input-icon"></i>
+      </div>
+      <div class="field-err" id="errUser"><i class="fa-solid fa-circle-exclamation"></i> This field is required</div>
+    </div>
+
+    <!-- Password -->
+    <div class="field" id="fieldPw">
+      <label for="adminPw">Password</label>
+      <div class="input-wrap">
+        <input type="password" id="adminPw" placeholder="••••••••" autocomplete="current-password">
+        <i class="fa-solid fa-lock input-icon"></i>
+        <button type="button" class="pw-toggle" id="pwToggle" tabindex="-1">
+          <i class="fa-solid fa-eye" id="pwToggleIcon"></i>
+        </button>
+      </div>
+      <div class="field-err" id="errPw"><i class="fa-solid fa-circle-exclamation"></i> This field is required</div>
+    </div>
+
+    <button class="btn-login" id="loginBtn">
+      <div class="btn-spin"></div>
+      <span class="btn-text">Sign In &nbsp;<i class="fa-solid fa-arrow-right" style="font-size:.8em"></i></span>
+    </button>
+
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  // ── CREDENTIALS ──────────────────────────────
+  var ADMIN_USER   = 'zamimart_admin';
+  var ADMIN_PASS   = 'Zami@2026!';
+  var ADMIN_EMAILS = [
+    'zamimart.official@gmail.com',
+  ];
+  var SESSION_KEY = 'zm_admin_auth';
+  var TARGET      = 'admin.html';
+
+  // Already logged in → skip
+  try {
+    if (sessionStorage.getItem(SESSION_KEY) === '1') {
+      window.location.replace(TARGET);
+    }
+  } catch(e) {}
+
+  // ── DOM ──────────────────────────────────────
+  var panelRight  = document.getElementById('panelRight');
+  var overlay     = document.getElementById('successOverlay');
+  var alertBox    = document.getElementById('alertBox');
+  var alertMsg    = document.getElementById('alertMsg');
+  var userEl      = document.getElementById('adminUser');
+  var pwEl        = document.getElementById('adminPw');
+  var loginBtn    = document.getElementById('loginBtn');
+  var btnGoogle   = document.getElementById('btnGoogle');
+  var pwToggle    = document.getElementById('pwToggle');
+  var pwIcon      = document.getElementById('pwToggleIcon');
+  var fieldUser   = document.getElementById('fieldUser');
+  var fieldPw     = document.getElementById('fieldPw');
+  var errUser     = document.getElementById('errUser');
+  var errPw       = document.getElementById('errPw');
+  var soName      = document.getElementById('soName');
+  var soAvatar    = document.getElementById('soAvatar');
+  var notifBanner = document.getElementById('notifBanner');
+  var notifAllow  = document.getElementById('notifAllow');
+  var notifDismiss= document.getElementById('notifDismiss');
+
+  // ── Push Notification Setup ───────────────────
+  function initNotifBanner() {
+    if (!('Notification' in window)) return;
+    var dismissed = false;
+    try { dismissed = localStorage.getItem('zm_notif_dismissed') === '1'; } catch(e){}
+
+    if (dismissed) return;
+    if (Notification.permission === 'granted') return;
+    if (Notification.permission === 'denied') return;
+
+    // Show banner after short delay
+    setTimeout(function() {
+      notifBanner.classList.add('show');
+    }, 1200);
+
+    notifAllow.addEventListener('click', function() {
+      Notification.requestPermission().then(function(perm) {
+        notifBanner.classList.remove('show');
+        try { localStorage.setItem('zm_notif_dismissed', '1'); } catch(e){}
+        if (perm === 'granted') {
+          // Test notification
+          setTimeout(function() {
+            try {
+              new Notification('Zami Mart Admin', {
+                body: 'Notifications enabled! You\'ll be alerted for new orders.',
+                icon: 'img/favicon.png',
+                badge: 'img/favicon.png'
+              });
+            } catch(e) {}
+          }, 300);
+        }
+      });
+    });
+
+    notifDismiss.addEventListener('click', function() {
+      notifBanner.classList.remove('show');
+      try { localStorage.setItem('zm_notif_dismissed', '1'); } catch(e){}
+    });
+  }
+
+  initNotifBanner();
+
+  // ── Helpers ──────────────────────────────────
+  function showAlert(msg) { alertMsg.textContent = msg; alertBox.classList.add('show'); }
+  function hideAlert()    { alertBox.classList.remove('show'); }
+
+  function shake() {
+    panelRight.classList.remove('shake');
+    void panelRight.offsetWidth;
+    panelRight.classList.add('shake');
+    panelRight.addEventListener('animationend', function() {
+      panelRight.classList.remove('shake');
+    }, { once: true });
+  }
+
+  function clearErrors() {
+    fieldUser.classList.remove('err'); errUser.classList.remove('show');
+    fieldPw.classList.remove('err');   errPw.classList.remove('show');
+    hideAlert();
+  }
+
+  function grantAccess(name, photoURL) {
+    try { sessionStorage.setItem(SESSION_KEY, '1'); } catch(e){}
+    soName.textContent = 'Welcome, ' + (name || 'Admin') + '!';
+    if (photoURL) { soAvatar.src = photoURL; soAvatar.style.display = 'block'; }
+    overlay.classList.add('show');
+
+    // Send notification if permission granted
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        new Notification('Zami Mart Admin', {
+          body: 'You are now signed in to the admin panel.',
+          icon: 'img/favicon.png'
+        });
+      } catch(e) {}
+    }
+
+    setTimeout(function() { window.location.replace(TARGET); }, 1800);
+  }
+
+  // ── Password toggle ──────────────────────────
+  pwToggle.addEventListener('click', function() {
+    var show = pwEl.type === 'password';
+    pwEl.type = show ? 'text' : 'password';
+    pwIcon.className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+  });
+
+  // ── Clear on type ────────────────────────────
+  userEl.addEventListener('input', clearErrors);
+  pwEl.addEventListener('input', clearErrors);
+
+  // ── Enter key ────────────────────────────────
+  [userEl, pwEl].forEach(function(el) {
+    el.addEventListener('keydown', function(e) { if (e.key === 'Enter') doLogin(); });
+  });
+
+  // ── Username + Password login ─────────────────
+  loginBtn.addEventListener('click', doLogin);
+
+  function doLogin() {
+    clearErrors();
+    var user = userEl.value.trim();
+    var pass = pwEl.value;
+    var ok   = true;
+
+    if (!user) { fieldUser.classList.add('err'); errUser.classList.add('show'); ok = false; }
+    if (!pass) { fieldPw.classList.add('err');   errPw.classList.add('show');   ok = false; }
+    if (!ok) return;
+
+    loginBtn.classList.add('loading');
+    loginBtn.disabled = true;
+
+    setTimeout(function() {
+      if (user === ADMIN_USER && pass === ADMIN_PASS) {
+        grantAccess('Admin');
+      } else {
+        loginBtn.classList.remove('loading');
+        loginBtn.disabled = false;
+        shake();
+        fieldPw.classList.add('err');
+        showAlert('Incorrect username or password.');
+        pwEl.value = '';
+        pwEl.focus();
+      }
+    }, 700);
+  }
+
+  // ── Google Sign-In ────────────────────────────
+  function triggerGoogle() {
+    if (typeof window.zmSignInWithGoogle !== 'function') {
+      window.addEventListener('fb-ready', triggerGoogle, { once: true });
+      return;
+    }
+    btnGoogle.classList.add('loading');
+    btnGoogle.disabled = true;
+
+    window.zmSignInWithGoogle().then(function(gUser) {
+      var email   = (gUser.email || '').toLowerCase().trim();
+      var isAdmin = ADMIN_EMAILS.some(function(e) { return e.toLowerCase() === email; });
+
+      if (isAdmin) {
+        grantAccess(gUser.displayName || gUser.email, gUser.photoURL);
+      } else {
+        if (window.zmSignOutGoogle) window.zmSignOutGoogle();
+        btnGoogle.classList.remove('loading');
+        btnGoogle.disabled = false;
+        shake();
+        showAlert('Access denied. This Google account is not authorized.');
+      }
+    }).catch(function(err) {
+      btnGoogle.classList.remove('loading');
+      btnGoogle.disabled = false;
+      if (err && err.code === 'auth/popup-closed-by-user') return;
+      showAlert('Google sign-in failed. Please try again.');
+    });
+  }
+
+  btnGoogle.addEventListener('click', triggerGoogle);
+
+})();
+</script>
+</body>
+</html>
