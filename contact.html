@@ -1143,9 +1143,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtxMenu();});
 function showCtxMenu(e,msgId){
   e.preventDefault();
   closeCtxMenu();
+  // Only allow actions on visitor's own messages (not admin messages)
+  const msg=ChatSystem.getMessages().find(m=>m.id===msgId);
+  if(!msg||msg.senderType!=='visitor'||msg.deleted)return;
   const menu=document.createElement('div');
   menu.className='zm-ctx-menu';
-  menu.innerHTML=`<div class="zm-ctx-item danger" id="zmDelMsg"><i class="fa-solid fa-trash" style="font-size:.75rem;"></i> Delete for everyone</div>`;
+  menu.innerHTML=`
+    <div class="zm-ctx-item" id="zmEditMsg"><i class="fa-solid fa-pen" style="font-size:.75rem;"></i> Edit message</div>
+    <div class="zm-ctx-item danger" id="zmDelMsg"><i class="fa-solid fa-trash" style="font-size:.75rem;"></i> Delete for everyone</div>`;
   // position
   const x=Math.min(e.clientX,window.innerWidth-170);
   const y=Math.min(e.clientY,window.innerHeight-80);
@@ -1157,6 +1162,14 @@ function showCtxMenu(e,msgId){
     ChatSystem.deleteMessage(msgId);
     closeCtxMenu();
     renderMsgs();
+  });
+  menu.querySelector('#zmEditMsg').addEventListener('click',()=>{
+    closeCtxMenu();
+    const newText=prompt('Edit your message:',msg.text||'');
+    if(newText!==null){
+      ChatSystem.editMessage(msgId,newText);
+      renderMsgs();
+    }
   });
 }
 
@@ -1211,9 +1224,10 @@ function renderMsgs(){
     const imgH=(!isDeleted&&m.imageData)
       ?`<img src="${m.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${m.text?'6px':'0'};" data-src="${m.imageData}">`
       :'';
+    const editedTag=(!isDeleted&&m.edited)?`<span style="font-size:.6rem;opacity:.6;margin-left:4px;font-style:italic;">edited</span>`:'';
     const txtH=isDeleted
       ?`<span><i class="fa-solid fa-circle-xmark" style="font-size:.72rem;margin-right:5px;opacity:.7;"></i>Message unsent</span>`
-      :(m.text?`<div>${escH(m.text)}</div>`:'');
+      :(m.text?`<div>${escH(m.text)}${editedTag}</div>`:'');
     const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}`;
     const cls=['zm-chat-msg',isAdmin?'admin':'visitor',!isFirst?'same-sender':'',(isLast&&!isFirst)?'last-in-group':''].filter(Boolean).join(' ');
 

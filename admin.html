@@ -1078,6 +1078,10 @@ select {
     <button class="nav-item" data-section="loginlogs">
       <i class="fa-solid fa-clock-rotate-left"></i> Login Records
     </button>
+    <button class="nav-item superadmin-only" data-section="pendingadmins" id="navPendingAdmins" style="display:none;">
+      <i class="fa-solid fa-user-shield"></i> Pending Admins
+      <span class="nav-badge" id="navPendingBadge">0</span>
+    </button>
 
     <div class="nav-section-label">Settings</div>
     <button class="nav-item" data-section="settings">
@@ -1636,6 +1640,38 @@ select {
       </div>
     </section>
 
+    <!-- ==================== PENDING ADMINS (super admin only) ==================== -->
+    <section class="section" id="sec-pendingadmins">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title"><i class="fa-solid fa-user-shield" style="color:var(--orange);margin-right:8px;"></i>Pending Admin Requests</span>
+          <button class="btn btn-outline btn-sm" onclick="renderPendingAdmins()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+        </div>
+        <div class="card-body" style="padding:0;">
+          <div class="table-wrap">
+            <table id="pendingAdminsTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Requested</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pendingAdminsBody"></tbody>
+            </table>
+          </div>
+          <div id="pendingAdminsEmpty" class="empty-state" style="display:none;">
+            <div class="empty-icon"><i class="fa-solid fa-user-check"></i></div>
+            <h3>No pending requests</h3>
+            <p>When someone tries to log in with an unapproved Google account, they'll appear here.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ==================== SETTINGS ==================== -->
     <section class="section" id="sec-settings">
       <div class="card">
@@ -1972,7 +2008,8 @@ const pageTitles = {
   inquiries: 'Customer Inquiries',
   chat:      'Live Chat',
   users:     'Registered Users',
-  loginlogs: 'Login Records',
+  loginlogs:     'Login Records',
+  pendingadmins: 'Pending Admin Requests',
   settings:  'Store Settings'
 };
 
@@ -1989,8 +2026,9 @@ function navigate(section) {
   if (section === 'arrivals')  renderArrivals();
   if (section === 'inquiries') renderInquiries();
   if (section === 'chat')      renderChatSessions();
-  if (section === 'users')     renderUsers();
-  if (section === 'loginlogs') renderLoginLogs();
+  if (section === 'users')         renderUsers();
+  if (section === 'loginlogs')     renderLoginLogs();
+  if (section === 'pendingadmins') renderPendingAdmins();
   if (section === 'settings')  loadSettings();
 }
 
@@ -2613,7 +2651,7 @@ function renderChatSessions() {
       grouped.push(keyMap[key]);
     }
     keyMap[key].sessions.push(s);
-    keyMap[key].totalUnread += ChatSystem.getUnreadCount(s.id);
+    keyMap[key].totalUnread += ChatSystem.getAdminUnreadBySession(s.id);
     if (s.email) keyMap[key].contact = s.email;
   });
 
@@ -2719,9 +2757,14 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAdminCtxMenu
 function showAdminCtxMenu(e, msgId){
   e.preventDefault();
   closeAdminCtxMenu();
+  // Only allow actions on admin's own messages
+  const msg = ChatSystem.getMessages().find(m => m.id === msgId);
+  if (!msg || msg.senderType !== 'admin' || msg.deleted) return;
   const menu = document.createElement('div');
   menu.className = 'zm-ctx-menu';
-  menu.innerHTML = `<div class="zm-ctx-item danger" id="zmAdminDelMsg"><i class="fa-solid fa-ban" style="font-size:.75rem;"></i> Delete for everyone</div>`;
+  menu.innerHTML = `
+    <div class="zm-ctx-item" id="zmAdminEditMsg"><i class="fa-solid fa-pen" style="font-size:.75rem;"></i> Edit message</div>
+    <div class="zm-ctx-item danger" id="zmAdminDelMsg"><i class="fa-solid fa-ban" style="font-size:.75rem;"></i> Delete for everyone</div>`;
   const x = Math.min(e.clientX, window.innerWidth - 170);
   const y = Math.min(e.clientY, window.innerHeight - 80);
   menu.style.left = x + 'px';
@@ -2732,6 +2775,14 @@ function showAdminCtxMenu(e, msgId){
     ChatSystem.deleteMessage(msgId);
     closeAdminCtxMenu();
     renderChatMessages();
+  });
+  menu.querySelector('#zmAdminEditMsg').addEventListener('click', () => {
+    closeAdminCtxMenu();
+    const newText = prompt('Edit your message:', msg.text || '');
+    if (newText !== null) {
+      ChatSystem.editMessage(msgId, newText);
+      renderChatMessages();
+    }
   });
 }
 
@@ -2751,7 +2802,8 @@ function renderChatMessages() {
   const container = document.getElementById('chatDetailMessages');
   const scrolledToBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 60;
 
-  const messages = ChatSystem.getSessionMessages(currentChatSessionId);
+  const messages = ChatSystem.getSessionMessages(currentChatSessionId)
+    .filter(m => !m.deleted);
   const rows = messages.map((msg, i) => {
     const prev = messages[i - 1];
     const next = messages[i + 1];
@@ -2786,13 +2838,11 @@ function renderChatMessages() {
 
     const time      = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     const isAdmin   = msg.senderType === 'admin';
-    const isDeleted = !!msg.deleted;
     const role      = isAdmin ? 'admin' : 'visitor';
-    const txtH = isDeleted
-      ? '<span><i class="fa-solid fa-ban" style="font-size:.7rem;margin-right:4px;opacity:.6;"></i>This message was deleted</span>'
-      : (msg.text ? escHtml(msg.text) : '');
-    const imgH = (!isDeleted && msg.imageData) ? `<img src="${msg.imageData}" alt="image">` : '';
-    const bubbleCls = `zm-chat-bubble${isDeleted ? ' deleted' : ''}`;
+    const editedTag = (!msg.deleted && msg.edited) ? `<span style="font-size:.6rem;opacity:.6;margin-left:4px;font-style:italic;">edited</span>` : '';
+    const txtH      = msg.text ? escHtml(msg.text) + editedTag : '';
+    const imgH      = msg.imageData ? `<img src="${msg.imageData}" alt="image">` : '';
+    const bubbleCls = 'zm-chat-bubble';
     const initials  = (msg.senderName || 'C').charAt(0).toUpperCase();
 
     const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
@@ -3340,7 +3390,8 @@ function renderInqChat() {
     const imgHtml = msg.imageData
       ? `<img src="${msg.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${msg.text?'6px':'0'};" data-src="${msg.imageData}">`
       : '';
-    const textHtml = msg.text ? `<div>${escHtml(msg.text)}</div>` : '';
+    const editedTagInq = (!msg.deleted && msg.edited) ? `<span style="font-size:.6rem;opacity:.6;margin-left:4px;font-style:italic;">edited</span>` : '';
+    const textHtml = msg.text ? `<div>${escHtml(msg.text)}${editedTagInq}</div>` : '';
     const role      = isAdmin ? 'admin' : 'visitor';
     const initials  = (msg.senderName||'C').charAt(0).toUpperCase();
     const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
@@ -3607,6 +3658,154 @@ async function renderUsers() {
     </tr>`;
   }).join('');
 }
+
+// =============================================
+// PENDING ADMINS (super admin only)
+// =============================================
+async function renderPendingAdmins() {
+  const tbody = document.getElementById('pendingAdminsBody');
+  const empty = document.getElementById('pendingAdminsEmpty');
+  const table = document.getElementById('pendingAdminsTable');
+  if (!tbody) return;
+
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#8aa19f;padding:16px;">Loading…</td></tr>';
+
+  let admins = [];
+  try {
+    if (window.fb && window.fb.db) {
+      const { db, collection, getDocs } = window.fb;
+      const snap = await getDocs(collection(db, 'admins'));
+      snap.forEach(doc => {
+        const d = doc.data();
+        admins.push({ uid: doc.id, ...d });
+      });
+    }
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#ef4444;padding:16px;">Failed to load. Check Firestore connection.</td></tr>';
+    return;
+  }
+
+  if (admins.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'flex';
+    table.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  table.style.display = '';
+
+  // Sort: pending first
+  admins.sort((a, b) => {
+    const order = { pending: 0, approved: 1, rejected: 2 };
+    return (order[a.status] ?? 9) - (order[b.status] ?? 9);
+  });
+
+  tbody.innerHTML = admins.map((a, i) => {
+    const date = a.requestedAt ? new Date(a.requestedAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
+    const statusBadge = a.status === 'approved'
+      ? '<span style="background:#dcfce7;color:#16a34a;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;">Approved</span>'
+      : a.status === 'rejected'
+      ? '<span style="background:#fef2f2;color:#ef4444;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;">Rejected</span>'
+      : '<span style="background:#fef9c3;color:#b45309;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;">Pending</span>';
+
+    const actions = a.status === 'pending'
+      ? `<button class="btn btn-primary btn-sm" onclick="approveAdmin('${a.uid}', '${(a.displayName||'').replace(/'/g,"\\'")}')">
+           <i class="fa-solid fa-check"></i> Approve
+         </button>
+         <button class="btn btn-outline btn-sm" style="margin-left:6px;border-color:#ef4444;color:#ef4444;" onclick="rejectAdmin('${a.uid}', '${(a.displayName||'').replace(/'/g,"\\'")}')">
+           <i class="fa-solid fa-xmark"></i> Reject
+         </button>`
+      : a.status === 'approved'
+      ? `<button class="btn btn-outline btn-sm" style="border-color:#ef4444;color:#ef4444;" onclick="rejectAdmin('${a.uid}', '${(a.displayName||'').replace(/'/g,"\\'")}')">
+           <i class="fa-solid fa-ban"></i> Revoke
+         </button>`
+      : `<button class="btn btn-outline btn-sm" onclick="approveAdmin('${a.uid}', '${(a.displayName||'').replace(/'/g,"\\'")}')">
+           <i class="fa-solid fa-rotate-right"></i> Re-approve
+         </button>`;
+
+    return `<tr>
+      <td>${i + 1}</td>
+      <td><strong>${a.displayName || '—'}</strong></td>
+      <td>${a.email || '—'}</td>
+      <td>${date}</td>
+      <td>${statusBadge}</td>
+      <td style="white-space:nowrap;">${actions}</td>
+    </tr>`;
+  }).join('');
+
+  // Update badge count
+  const pendingCount = admins.filter(a => a.status === 'pending').length;
+  updatePendingBadge(pendingCount);
+}
+
+async function approveAdmin(uid, name) {
+  if (!confirm('Approve access for ' + (name || uid) + '?')) return;
+  try {
+    const { db, doc, updateDoc } = window.fb;
+    await updateDoc(doc(db, 'admins', uid), {
+      status: 'approved',
+      approvedAt: new Date().toISOString(),
+      approvedBy: 'super_admin'
+    });
+    showToast((name || 'Admin') + ' has been approved.', 'success');
+    renderPendingAdmins();
+  } catch(e) {
+    showToast('Failed to approve. Try again.', 'error');
+  }
+}
+
+async function rejectAdmin(uid, name) {
+  if (!confirm('Reject/revoke access for ' + (name || uid) + '?')) return;
+  try {
+    const { db, doc, updateDoc } = window.fb;
+    await updateDoc(doc(db, 'admins', uid), {
+      status: 'rejected',
+      approvedAt: null,
+      approvedBy: null
+    });
+    showToast((name || 'Admin') + ' access has been revoked.', 'info');
+    renderPendingAdmins();
+  } catch(e) {
+    showToast('Failed to reject. Try again.', 'error');
+  }
+}
+
+function updatePendingBadge(count) {
+  const badge = document.getElementById('navPendingBadge');
+  if (!badge) return;
+  badge.textContent = count;
+  badge.classList.toggle('badge-visible', count > 0);
+}
+
+async function checkPendingAdminsBadge() {
+  try {
+    if (!window.fb || !window.fb.db) return;
+    const { db, collection, getDocs } = window.fb;
+    const snap = await getDocs(collection(db, 'admins'));
+    let count = 0;
+    snap.forEach(doc => { if (doc.data().status === 'pending') count++; });
+    updatePendingBadge(count);
+  } catch(e) {}
+}
+
+function initSuperAdmin() {
+  const role = (() => { try { return sessionStorage.getItem('zm_admin_role'); } catch(e) { return null; } })();
+  if (role === 'superadmin') {
+    // Show super admin nav items
+    document.querySelectorAll('.superadmin-only').forEach(el => el.style.display = '');
+    // Check pending count
+    const waitForFb = () => {
+      if (window.fb && window.fb.db) {
+        checkPendingAdminsBadge();
+      } else {
+        window.addEventListener('fb-ready', checkPendingAdminsBadge, { once: true });
+      }
+    };
+    waitForFb();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', initSuperAdmin);
 
 // =============================================
 // LOGIN LOGS

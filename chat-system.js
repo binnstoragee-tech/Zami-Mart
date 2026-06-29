@@ -208,12 +208,15 @@ const ChatSystem = (function() {
       setDoc(doc(db, 'chatMessages', id), data)
         .catch(e => _reportErr('ChatSystem: sendMessage error', e));
 
-      const field = senderType === 'visitor' ? 'admin' : sessionId;
-      updateDoc(doc(db, 'chatMeta', 'unreadCounts'), { [field]: increment(1) })
-        .catch(() => {
-          // Doc may not exist yet on first ever message.
-          setDoc(doc(db, 'chatMeta', 'unreadCounts'), { [field]: 1 }, { merge: true }).catch(() => {});
-        });
+      // Only increment unread count for visitor messages (so admin gets notified).
+      // When admin sends, do NOT increment the session unread — that's the customer's count
+      // and incrementing it causes the admin sidebar to show a false notification on their own messages.
+      if (senderType === 'visitor') {
+        updateDoc(doc(db, 'chatMeta', 'unreadCounts'), { admin: increment(1) })
+          .catch(() => {
+            setDoc(doc(db, 'chatMeta', 'unreadCounts'), { admin: 1 }, { merge: true }).catch(() => {});
+          });
+      }
     });
 
     updateSessionLastMessage(sessionId);
@@ -282,6 +285,21 @@ const ChatSystem = (function() {
     });
   }
 
+  function editMessage(messageId, newText) {
+    const m = _messages.find(m => m.id === messageId);
+    if (!m || m.deleted) return false;
+    const trimmed = newText && newText.trim();
+    if (!trimmed) return false;
+    m.text = trimmed;
+    m.edited = true;
+    notifyListeners('messages-updated', _messages);
+
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'chatMessages', messageId), { text: trimmed, edited: true }).catch(() => {});
+    });
+    return true;
+  }
+
   function clearAllChats() {
     _messages = [];
     _sessions = [];
@@ -315,7 +333,7 @@ const ChatSystem = (function() {
   return {
     init: initStorage, on, onReady,
     createSession, getSession, getSessions, updateSessionLastMessage, linkInquiryToSession, deleteSession,
-    sendMessage, getSessionMessages, getMessages, deleteMessage,
+    sendMessage, getSessionMessages, getMessages, deleteMessage, editMessage,
     markSessionAsRead, markAdminRead,
     getUnreadCount, getAdminUnreadCount, getAdminUnreadBySession,
     clearAllChats

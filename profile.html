@@ -854,30 +854,9 @@
             <!-- Avatar row inside edit -->
             <div class="pf-edit-avatar-row">
               <div class="avatar-big" id="avatarBigEdit"></div>
-              <div class="avatar-actions">
-                <p>Upload a photo or pick an avatar color.</p>
-                <div class="avatar-btn-row">
-                  <label class="avatar-btn avatar-btn-upload" for="avatarFileInput">
-                    <i class="fa-solid fa-camera"></i> Upload photo
-                  </label>
-                  <button type="button" class="avatar-btn avatar-btn-remove" id="removeAvatarBtn">
-                    <i class="fa-solid fa-trash"></i> Remove
-                  </button>
-                  <input type="file" accept="image/*" id="avatarFileInput" hidden>
-                </div>
-                <div style="margin-top:.5rem;">
-                  <span class="color-label">Avatar color</span>
-                  <div class="color-swatch-row" id="colorSwatchRow">
-                    <button type="button" class="color-swatch" data-color="#063b3f" style="background:#063b3f" aria-label="Teal"></button>
-                    <button type="button" class="color-swatch" data-color="#fd4d02" style="background:#fd4d02" aria-label="Orange"></button>
-                    <button type="button" class="color-swatch" data-color="#2563eb" style="background:#2563eb" aria-label="Blue"></button>
-                    <button type="button" class="color-swatch" data-color="#16a34a" style="background:#16a34a" aria-label="Green"></button>
-                    <button type="button" class="color-swatch" data-color="#7c3aed" style="background:#7c3aed" aria-label="Purple"></button>
-                    <button type="button" class="color-swatch" data-color="#db2777" style="background:#db2777" aria-label="Pink"></button>
-                    <button type="button" class="color-swatch" data-color="#b45309" style="background:#b45309" aria-label="Amber"></button>
-                  </div>
-                </div>
-              </div>
+              <input type="file" accept="image/*" id="avatarFileInput" hidden>
+              <button type="button" id="removeAvatarBtn" hidden></button>
+              <div id="colorSwatchRow" hidden></div>
             </div>
             <div class="pf-divider"></div>
             <div class="field-row">
@@ -887,8 +866,8 @@
                 <span class="field-error" id="editNameErr">Please enter your name.</span>
               </div>
               <div class="field-group">
-                <label class="field-label" for="editEmail">Email / Phone</label>
-                <input type="text" class="pf-input" id="editEmail" placeholder="Email or phone number">
+                <label class="field-label" for="editEmail">Email <span style="font-size:.7rem;color:#94a3b8;font-weight:400;text-transform:none;">(cannot be changed)</span></label>
+                <input type="text" class="pf-input" id="editEmail" placeholder="Email" readonly style="opacity:.6;cursor:not-allowed;background:#f5f7f7;">
                 <span class="field-error" id="editEmailErr">Please enter a valid email or phone.</span>
               </div>
             </div>
@@ -941,7 +920,13 @@
 
         <!-- EDIT MODE -->
         <div class="profile-card-body pf-hidden" id="pwEdit">
-          <div class="field-row full">
+          <!-- Google re-auth notice (shown only for Google users) -->
+          <div id="googleReauthNotice" style="display:none;align-items:center;gap:10px;background:#f0f7ff;border:1px solid #bfdbfe;border-radius:10px;padding:.75rem 1rem;margin-bottom:1rem;font-size:.82rem;color:#1d4ed8;">
+            <i class="fa-brands fa-google" style="font-size:1rem;flex-shrink:0;"></i>
+            <span>You signed in with Google. Click <strong>Verify with Google</strong> to confirm it's you before setting a new password.</span>
+          </div>
+          <!-- Current password (email users only) -->
+          <div class="field-row full" id="currentPwRow">
             <div class="field-group">
               <label class="field-label" for="currentPw">Current Password</label>
               <div class="pw-wrap">
@@ -951,9 +936,10 @@
                 </button>
               </div>
               <span class="field-error" id="currentPwErr">Incorrect current password.</span>
+              <a href="#" id="forgotPwLink" style="font-size:.78rem;color:var(--teal);text-decoration:none;margin-top:4px;display:inline-block;">Forgot password?</a>
             </div>
           </div>
-          <div class="field-row">
+          <div class="field-row full">
             <div class="field-group">
               <label class="field-label" for="newPw">New Password</label>
               <div class="pw-wrap">
@@ -970,6 +956,8 @@
               </div>
               <span class="field-error" id="newPwErr">Password must be at least 8 characters.</span>
             </div>
+          </div>
+          <div class="field-row full">
             <div class="field-group">
               <label class="field-label" for="confirmPw">Confirm New Password</label>
               <div class="pw-wrap">
@@ -983,6 +971,10 @@
           </div>
           <div class="card-actions">
             <button type="button" class="btn-cancel" id="pwCancelBtn">Cancel</button>
+            <!-- Google users see this first -->
+            <button type="button" class="btn-save" id="googleReauthBtn" style="display:none;background:#4285f4;">
+              <i class="fa-brands fa-google"></i> Verify with Google
+            </button>
             <button type="button" class="btn-save" id="pwSaveBtn">
               <i class="fa-solid fa-key"></i> Update Password
             </button>
@@ -1173,7 +1165,7 @@ document.addEventListener('DOMContentLoaded', () => {
       email:      u.email || '',
       phone:      extraProfile.phone   || '',
       address:    extraProfile.address || '',
-      avatarPhoto:u.photoURL || extraProfile.avatarPhoto || null,
+      avatarPhoto:extraProfile.avatarPhoto || u.photoURL || null,
       avatarColor:extraProfile.avatarColor || '#063b3f',
       pwChangedAt:extraProfile.pwChangedAt || null,
     };
@@ -1245,7 +1237,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderEditAvatar() {
     const el = document.getElementById('avatarBigEdit');
-    const merged = stagedAvatar ? { ...currentUser, ...stagedAvatar } : currentUser;
+    const base = buildProfile(); // .name, .avatarPhoto, .avatarColor correctly mapped
+    const merged = stagedAvatar ? { ...base, ...stagedAvatar } : base;
     renderAvatar(el, merged);
     setActiveSwatch(merged.avatarPhoto ? null : (merged.avatarColor || '#063b3f'));
   }
@@ -1325,14 +1318,11 @@ document.addEventListener('DOMContentLoaded', () => {
       showFieldError('editName', 'editNameErr', 'Please enter your name.');
       valid = false;
     }
-    if (!email) {
-      showFieldError('editEmail', 'editEmailErr', 'Please enter your email or phone.');
-      valid = false;
-    }
+    // email is readonly — no validation needed
     if (!valid) return;
 
     detailsSaveBtn.disabled = true;
-    detailsSaveBtn.textContent = 'Saving…';
+    detailsSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px"></i>Saving…';
 
     try {
       // Update Firebase Auth displayName
@@ -1340,7 +1330,7 @@ document.addEventListener('DOMContentLoaded', () => {
       await updateProfile(currentUser, { displayName: name });
 
       // Commit staged avatar changes to Firestore extra profile
-      const extraUpdates = { phone, address };
+      const extraUpdates = { phone, address, email };
       if (stagedAvatar !== null) {
         extraUpdates.avatarPhoto = stagedAvatar.avatarPhoto;
         extraUpdates.avatarColor = stagedAvatar.avatarColor;
@@ -1355,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast('Save failed: ' + (e && e.message ? e.message : e), 'error');
     } finally {
       detailsSaveBtn.disabled = false;
-      detailsSaveBtn.textContent = 'Save Changes';
+      detailsSaveBtn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';
     }
   });
 
@@ -1368,6 +1358,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const pwView      = document.getElementById('pwView');
   const pwEdit      = document.getElementById('pwEdit');
 
+  function isEmailUser() {
+    if (!currentUser) return false;
+    const providers = currentUser.providerData || [];
+    return providers.some(p => p.providerId === 'password');
+  }
+
   function openPwEdit() {
     document.getElementById('currentPw').value = '';
     document.getElementById('newPw').value     = '';
@@ -1376,6 +1372,12 @@ document.addEventListener('DOMContentLoaded', () => {
     clearFieldError('newPw');
     clearFieldError('confirmPw');
     document.getElementById('pwStrengthWrap').classList.remove('show');
+    // Show correct UI based on auth provider
+    const isGoogle = !isEmailUser();
+    document.getElementById('googleReauthNotice').style.display = isGoogle ? 'flex' : 'none';
+    document.getElementById('currentPwRow').style.display       = isGoogle ? 'none' : '';
+    document.getElementById('googleReauthBtn').style.display    = isGoogle ? '' : 'none';
+    document.getElementById('pwSaveBtn').style.display          = isGoogle ? 'none' : '';
     pwView.classList.add('pf-hidden');
     pwEdit.classList.remove('pf-hidden');
     pwEditBtn.innerHTML = '<i class="fa-solid fa-xmark"></i> Cancel';
@@ -1429,6 +1431,7 @@ document.addEventListener('DOMContentLoaded', () => {
     text.style.color = lvl.color;
   });
 
+  // Email/password users — validate current pw then update
   pwSaveBtn.addEventListener('click', () => {
     const current = document.getElementById('currentPw').value;
     const newPw   = document.getElementById('newPw').value;
@@ -1454,7 +1457,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!valid) return;
 
     pwSaveBtn.disabled = true;
-    pwSaveBtn.textContent = 'Saving…';
+    pwSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px"></i>Saving…';
 
     (async () => {
       try {
@@ -1467,8 +1470,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const credential = EmailAuthProvider.credential(currentUser.email, current);
         await reauthenticateWithCredential(currentUser, credential);
         await updatePassword(currentUser, newPw);
-
-        // Save timestamp in Firestore
         await saveExtraProfile({ pwChangedAt: new Date().toISOString() });
         populatePage();
         closePwEdit();
@@ -1484,9 +1485,74 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       } finally {
         pwSaveBtn.disabled = false;
-        pwSaveBtn.textContent = 'Save';
+        pwSaveBtn.innerHTML = '<i class="fa-solid fa-key"></i> Update Password';
       }
     })();
+  });
+
+  // Google users — re-auth via popup then update password
+  document.getElementById('googleReauthBtn').addEventListener('click', () => {
+    const newPw   = document.getElementById('newPw').value;
+    const confirm = document.getElementById('confirmPw').value;
+
+    let valid = true;
+    clearFieldError('newPw');
+    clearFieldError('confirmPw');
+    if (!newPw || newPw.length < 8) {
+      showFieldError('newPw', 'newPwErr', 'Password must be at least 8 characters.');
+      valid = false;
+    }
+    if (newPw && confirm !== newPw) {
+      showFieldError('confirmPw', 'confirmPwErr', 'Passwords do not match.');
+      valid = false;
+    }
+    if (!valid) return;
+
+    const btn = document.getElementById('googleReauthBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px"></i>Verifying…';
+
+    (async () => {
+      try {
+        const {
+          GoogleAuthProvider,
+          reauthenticateWithPopup,
+          updatePassword
+        } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
+
+        const provider = new GoogleAuthProvider();
+        await reauthenticateWithPopup(currentUser, provider);
+        await updatePassword(currentUser, newPw);
+        await saveExtraProfile({ pwChangedAt: new Date().toISOString() });
+        populatePage();
+        closePwEdit();
+        showToast('Password set successfully! You can now log in with email and password too.');
+      } catch(e) {
+        const code = e && e.code ? e.code : '';
+        if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+          showToast('Verification cancelled. Try again.', 'error');
+        } else {
+          showToast('Error: ' + (e && e.message ? e.message : 'Could not set password.'), 'error');
+        }
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-brands fa-google"></i> Verify with Google';
+      }
+    })();
+  });
+
+  // Forgot password link (email users only)
+  document.getElementById('forgotPwLink').addEventListener('click', async (e) => {
+    e.preventDefault();
+    if (!currentUser || !currentUser.email) return;
+    try {
+      const { sendPasswordResetEmail } = await import('https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js');
+      await sendPasswordResetEmail(window.fb.auth, currentUser.email);
+      showToast('Password reset link sent to ' + currentUser.email + '!');
+      closePwEdit();
+    } catch(e) {
+      showToast('Could not send reset email: ' + (e && e.message ? e.message : e), 'error');
+    }
   });
 
   // =============================================

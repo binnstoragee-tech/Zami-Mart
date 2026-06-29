@@ -448,6 +448,12 @@ body { background: transparent; color: var(--text); font-size: 14px; }
   30%         { transform: translateY(-5px); opacity:1; }
 }
 
+
+
+
+
+
+
 /* Mobile */
 @media (max-width: 480px) {
   .chat-widget-window {
@@ -526,8 +532,6 @@ body { background: transparent; color: var(--text); font-size: 14px; }
   </div>
 </div>
 
-<script>
-'use strict';
 
 const chatBtn        = document.getElementById('chatWidgetBtn');
 const chatWindow     = document.getElementById('chatWindow');
@@ -669,7 +673,8 @@ function sendMessage() {
 // ── RENDER ──
 function renderMessages() {
   if (!currentSessionId) return;
-  const messages = ChatSystem.getSessionMessages(currentSessionId).filter(m => !m.deleted);
+  const messages = ChatSystem.getSessionMessages(currentSessionId)
+    .filter(m => !m.deleted);
 
   // Group messages by sender to apply consecutive bubble styling
   const rows = messages.map((msg, i) => {
@@ -720,12 +725,14 @@ function renderMessages() {
           <div class="chat-message-bubble">${bubbleContent}</div>
           ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
         </div>`;
+      // ── NO context menu for admin bubbles ──
     } else {
       el.innerHTML = `
         <div class="chat-message-content">
           <div class="chat-message-bubble">${bubbleContent}</div>
           ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
         </div>`;
+
     }
 
     chatMessages.appendChild(el);
