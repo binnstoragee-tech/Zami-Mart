@@ -182,7 +182,7 @@ const ChatSystem = (function() {
   // =============================================
   // MESSAGE MANAGEMENT (supports imageData)
   // =============================================
-  function sendMessage(sessionId, senderType, senderName, text, imageData) {
+  function sendMessage(sessionId, senderType, senderName, text, imageData, replyTo) {
     const hasText  = text && text.trim();
     const hasImage = imageData && typeof imageData === 'string';
     if (!hasText && !hasImage) return null;
@@ -196,7 +196,9 @@ const ChatSystem = (function() {
       text:       hasText ? text.trim() : '',
       imageData:  hasImage ? imageData : null,   // base64 data-URL
       timestamp:  new Date().toISOString(),
-      read:       false
+      read:       false,
+      // replyTo: { id, senderName, text } — short snapshot of the quoted message, or null
+      replyTo:    replyTo || null
     };
 
     // Optimistic local push (the next Firestore snapshot will reconcile/replace this).
@@ -300,6 +302,18 @@ const ChatSystem = (function() {
     return true;
   }
 
+  // Toggle an emoji reaction on a message. Pass the same emoji again to remove it.
+  function reactToMessage(messageId, emoji) {
+    const m = _messages.find(m => m.id === messageId);
+    if (!m || m.deleted) return;
+    m.reaction = (m.reaction === emoji) ? null : emoji;
+    notifyListeners('messages-updated', _messages);
+
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'chatMessages', messageId), { reaction: m.reaction || null }).catch(() => {});
+    });
+  }
+
   function clearAllChats() {
     _messages = [];
     _sessions = [];
@@ -333,7 +347,7 @@ const ChatSystem = (function() {
   return {
     init: initStorage, on, onReady,
     createSession, getSession, getSessions, updateSessionLastMessage, linkInquiryToSession, deleteSession,
-    sendMessage, getSessionMessages, getMessages, deleteMessage, editMessage,
+    sendMessage, getSessionMessages, getMessages, deleteMessage, editMessage, reactToMessage,
     markSessionAsRead, markAdminRead,
     getUnreadCount, getAdminUnreadCount, getAdminUnreadBySession,
     clearAllChats

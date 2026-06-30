@@ -1007,6 +1007,7 @@ body.is-leaving .pt-panel { transform: scaleX(1); transform-origin: left; }
       });
       document.getElementById('logoutConfirmBtn').addEventListener('click', async () => {
         try { await signOut(auth); } catch (e) { alert('Hindi na-log out: ' + (e && e.message ? e.message : e)); }
+        localStorage.removeItem('zm_cv_session');
         logoutOverlay.classList.remove('open');
       });
     }

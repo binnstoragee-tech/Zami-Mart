@@ -286,6 +286,32 @@ body { background: transparent; color: var(--text); font-size: 14px; }
 .chat-message.visitor .chat-message-time { text-align: right; }
 .chat-message.admin .chat-message-time   { text-align: left; }
 
+/* ── Reaction badge ── */
+.chat-reaction {
+  font-size: .85rem; line-height: 1;
+  background: #fff; border: 1px solid rgba(6,59,63,.12);
+  border-radius: 20px; padding: 1px 5px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+  width: fit-content; cursor: pointer; user-select: none;
+  margin-top: 2px;
+}
+.chat-message.visitor .chat-reaction { align-self: flex-end; }
+.chat-message.admin   .chat-reaction { align-self: flex-start; }
+
+/* ── Emoji picker popup (widget) ── */
+.chat-emoji-picker {
+  position: fixed; z-index: 999999;
+  background: #fff; border-radius: 24px; padding: 6px 8px;
+  display: flex; gap: 3px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.22);
+}
+.chat-emoji-picker button {
+  border: none; background: none; font-size: 1.1rem; cursor: pointer;
+  padding: 3px; border-radius: 50%; transition: transform .12s, background .12s;
+  line-height: 1;
+}
+.chat-emoji-picker button:hover { background: #f0f4f4; transform: scale(1.25); }
+
 /* ── Sender label (first in group) ── */
 .chat-sender-label {
   font-size: .6rem; font-weight: 600;
@@ -717,28 +743,83 @@ function renderMessages() {
       isLast && !isFirst ? 'last-in-group' : ''
     ].filter(Boolean).join(' ');
 
+    const reactionH = msg.reaction
+      ? `<div class="chat-reaction" data-msgid="${msg.id}" data-em="${msg.reaction}" title="React">${msg.reaction}</div>`
+      : '';
+
+    el.dataset.msgid = msg.id;
+
     if (isAdmin) {
       el.innerHTML = `
         <div class="chat-avatar admin-av ${isLast ? '' : 'hidden'}" title="Zami Mart">ZM</div>
         <div class="chat-message-content">
           ${isFirst ? '<div class="chat-sender-label">Zami Mart</div>' : ''}
           <div class="chat-message-bubble">${bubbleContent}</div>
+          ${reactionH}
           ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
         </div>`;
-      // ── NO context menu for admin bubbles ──
     } else {
       el.innerHTML = `
         <div class="chat-message-content">
           <div class="chat-message-bubble">${bubbleContent}</div>
+          ${reactionH}
           ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
         </div>`;
-
     }
+
+    // Long-press / right-click to react (both admin and visitor bubbles)
+    const bubble = el.querySelector('.chat-message-bubble');
+    let _lpTimer = null;
+    bubble.addEventListener('contextmenu', ev => { ev.preventDefault(); openWidgetEmojiPicker(ev, msg.id, isAdmin); });
+    bubble.addEventListener('touchstart',  () => { _lpTimer = setTimeout(() => openWidgetEmojiPicker(null, msg.id, isAdmin, bubble), 500); }, { passive: true });
+    bubble.addEventListener('touchend',    () => clearTimeout(_lpTimer));
+    bubble.addEventListener('touchmove',   () => clearTimeout(_lpTimer), { passive: true });
+
+    // Tap existing reaction badge to toggle it off
+    const badge = el.querySelector('.chat-reaction');
+    if (badge) badge.addEventListener('click', () => { ChatSystem.reactToMessage(badge.dataset.msgid, badge.dataset.em); renderMessages(); });
 
     chatMessages.appendChild(el);
   });
 
   chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// ── Widget emoji picker ──────────────────────────
+const WIDGET_QUICK_EMOJIS = ['👍','❤️','😂','😮','😢','🙏'];
+let _widgetEmojiPicker = null;
+function closeWidgetEmojiPicker() { if (_widgetEmojiPicker) { _widgetEmojiPicker.remove(); _widgetEmojiPicker = null; } }
+document.addEventListener('click', closeWidgetEmojiPicker);
+
+function openWidgetEmojiPicker(e, msgId, isAdmin, anchorEl) {
+  if (e) e.preventDefault();
+  closeWidgetEmojiPicker();
+  const anchor = anchorEl || (e && e.currentTarget) || document.querySelector(`[data-msgid="${msgId}"] .chat-message-bubble`);
+  if (!anchor) return;
+  const rect = anchor.getBoundingClientRect();
+
+  const picker = document.createElement('div');
+  picker.className = 'chat-emoji-picker';
+  picker.innerHTML = WIDGET_QUICK_EMOJIS.map(em => `<button data-em="${em}">${em}</button>`).join('');
+  document.body.appendChild(picker);
+  const pw = picker.offsetWidth;
+  const ph = picker.offsetHeight;
+  // Align to the same side as the bubble
+  let left = isAdmin ? rect.right - pw : rect.left;
+  left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+  const top = Math.max(8, rect.top - ph - 6);
+  picker.style.left = left + 'px';
+  picker.style.top  = top + 'px';
+  _widgetEmojiPicker = picker;
+
+  picker.addEventListener('click', ev => {
+    const btn = ev.target.closest('button[data-em]');
+    if (!btn) return;
+    ev.stopPropagation();
+    ChatSystem.reactToMessage(msgId, btn.dataset.em);
+    closeWidgetEmojiPicker();
+    renderMessages();
+  });
 }
 
 function _dayLabel(date) {
@@ -808,8 +889,52 @@ function escapeHtml(str) {
   return d.innerHTML;
 }
 
+// ── ACCOUNT-LINKED SESSION ──
+// If the customer is logged in, tie their chat to their account (email) so
+// the SAME conversation/history shows up again whenever they log back in —
+// on this device or any other — instead of starting a blank guest chat.
+let _lastAuthUid = undefined; // undefined = not checked yet, null = logged out, string = uid
+function _resetToGuestWidget() {
+  currentSessionId = null;
+  visitorName      = null;
+  chatWelcomeBlock.style.display = 'block';
+  chatInput.style.display   = 'none';
+  chatSendBtn.style.display = 'none';
+  chatImgBtn.style.display  = 'none';
+  chatSuggestions.style.display = 'none';
+  chatMessages.innerHTML = '';
+  unreadBadge.style.display = 'none';
+  document.getElementById('visitorName').value  = '';
+  document.getElementById('visitorPhone').value = '';
+}
+function _initSessionForAuthUser(user) {
+  const uid = user ? user.uid : null;
+  if (uid === _lastAuthUid) return; // no real change
+  _lastAuthUid = uid;
+
+  if (user) {
+    const name = user.displayName || (user.email ? user.email.split('@')[0] : 'Customer');
+    visitorName      = name;
+    currentSessionId = ChatSystem.createSession(name, user.email || '');
+    _activateChat();
+    const msgs = ChatSystem.getSessionMessages(currentSessionId);
+    const hasVisitorMsg = msgs.some(m => m.senderType === 'visitor');
+    if (hasVisitorMsg) chatSuggestions.style.display = 'none';
+    _lastSeenAdminMsgCount = msgs.filter(m => m.senderType === 'admin').length;
+    saveSession();
+  } else {
+    // Logged out / guest: don't show any account's chat — fall back to whatever
+    // is saved for this browser as a guest, or the blank name/number form.
+    if (!restoreSession()) _resetToGuestWidget();
+  }
+}
+
 ChatSystem.onReady(() => {
-  restoreSession();
+  function _watchAuth() {
+    window.fb.onAuthStateChanged(window.fb.auth, _initSessionForAuthUser);
+  }
+  if (window.fb && window.fb.auth) _watchAuth();
+  else window.addEventListener('fb-ready', _watchAuth, { once: true });
 
   ChatSystem.on('messages-updated', () => {
     if (!currentSessionId) return;

@@ -3416,11 +3416,28 @@ function goBackToAdmin() {
 .zm-chat-bubble.deleted{font-style:italic;font-size:.74rem;background:rgba(0,0,0,0)!important;color:#aaa!important;border:1.5px dashed #ccc!important;padding:7px 11px;display:flex;align-items:center;gap:5px;border-radius:10px!important;}
 /* time + sender label */
 .zm-chat-time{font-size:.6rem;color:#8a9faa;padding:0 3px;margin-top:1px;}
+.zm-chat-edited-tag{font-size:.6rem;color:#8a9faa;opacity:.85;font-style:italic;padding:0 3px;margin-top:1px;}
+.zm-chat-msg.visitor .zm-chat-edited-tag{text-align:right;}
+.zm-chat-msg.admin  .zm-chat-edited-tag{text-align:left;}
 .zm-chat-sender-label{font-size:.6rem;font-weight:600;color:#8a9faa;padding:0 4px;margin-bottom:1px;}
 .zm-chat-msg.visitor .zm-chat-time{text-align:right;}
 .zm-chat-msg.admin  .zm-chat-time{text-align:left;}
 /* ctx menu */
 .zm-ctx-menu{position:fixed;background:#1a2e2e;color:#fff;border-radius:10px;padding:4px 0;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:999999;font-family:'Poppins',sans-serif;font-size:.78rem;}
+/* Edit-message modal (replaces native prompt() for a consistent look) */
+.zm-edit-overlay{position:fixed;inset:0;background:rgba(6,20,20,.55);z-index:9999999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.zm-edit-overlay.show{opacity:1;pointer-events:all;}
+.zm-edit-modal{background:#fff;border-radius:16px;padding:22px;width:100%;max-width:340px;box-shadow:0 20px 50px rgba(0,0,0,.3);transform:translateY(10px) scale(.97);transition:transform .2s;font-family:'Poppins',sans-serif;}
+.zm-edit-overlay.show .zm-edit-modal{transform:translateY(0) scale(1);}
+.zm-edit-modal h4{font-size:.92rem;font-weight:700;color:#063b3f;margin:0 0 12px;}
+.zm-edit-modal textarea{width:100%;min-height:80px;border:1.5px solid #e0e6e6;border-radius:10px;padding:10px 12px;font-size:.82rem;font-family:'Poppins',sans-serif;resize:vertical;color:#1a2e2e;outline:none;transition:border-color .15s;box-sizing:border-box;}
+.zm-edit-modal textarea:focus{border-color:#FD4D02;}
+.zm-edit-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+.zm-edit-modal-actions button{border:none;border-radius:10px;padding:9px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:opacity .15s;}
+.zm-edit-cancel{background:#f0f4f4;color:#063b3f;}
+.zm-edit-cancel:hover{opacity:.8;}
+.zm-edit-save{background:#FD4D02;color:#fff;}
+.zm-edit-save:hover{opacity:.88;}
 .zm-ctx-item{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;transition:background .15s;}
 .zm-ctx-item:hover{background:rgba(255,255,255,.1);}
 .zm-ctx-item.danger{color:#ff6b6b;}
@@ -3612,12 +3629,58 @@ function closeCtxMenu(){if(zmCtxMenu){zmCtxMenu.remove();zmCtxMenu=null;}}
 document.addEventListener('click',closeCtxMenu);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCtxMenu();});
 
+// ── Edit-message modal (replaces native prompt() for a consistent look) ──
+function zmEditPrompt(initialText,onSave){
+  let overlay=document.getElementById('zmEditOverlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='zmEditOverlay';
+    overlay.className='zm-edit-overlay';
+    overlay.innerHTML=`
+      <div class="zm-edit-modal">
+        <h4>Edit message</h4>
+        <textarea id="zmEditTextarea"></textarea>
+        <div class="zm-edit-modal-actions">
+          <button type="button" class="zm-edit-cancel" id="zmEditCancelBtn">Cancel</button>
+          <button type="button" class="zm-edit-save" id="zmEditSaveBtn">Save</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&overlay.classList.contains('show')) overlay.classList.remove('show'); });
+  }
+  const ta=document.getElementById('zmEditTextarea');
+  ta.value=initialText||'';
+  overlay.classList.add('show');
+  setTimeout(()=>{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);},50);
+
+  const oldSave=document.getElementById('zmEditSaveBtn');
+  const newSave=oldSave.cloneNode(true);
+  oldSave.replaceWith(newSave);
+  newSave.addEventListener('click',()=>{
+    const val=ta.value.trim();
+    overlay.classList.remove('show');
+    if(val) onSave(val);
+  });
+
+  const oldCancel=document.getElementById('zmEditCancelBtn');
+  const newCancel=oldCancel.cloneNode(true);
+  oldCancel.replaceWith(newCancel);
+  newCancel.addEventListener('click',()=>{ overlay.classList.remove('show'); });
+
+  ta.onkeydown=function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); newSave.click(); } };
+}
 function showCtxMenu(e,msgId){
   e.preventDefault();
   closeCtxMenu();
+  // Customers can only delete their OWN messages — never the admin's
+  const msg=ChatSystem.getMessages().find(m=>m.id===msgId);
+  if(!msg || msg.senderType!=='visitor' || msg.deleted) return;
   const menu=document.createElement('div');
   menu.className='zm-ctx-menu';
-  menu.innerHTML=`<div class="zm-ctx-item danger" id="zmDelMsg"><i class="fa-solid fa-trash" style="font-size:.75rem;"></i> Delete for everyone</div>`;
+  menu.innerHTML=`
+    <div class="zm-ctx-item" id="zmEditMsg"><i class="fa-solid fa-pen" style="font-size:.75rem;"></i> Edit message</div>
+    <div class="zm-ctx-item danger" id="zmDelMsg"><i class="fa-solid fa-trash" style="font-size:.75rem;"></i> Delete for everyone</div>`;
   // position
   const x=Math.min(e.clientX,window.innerWidth-170);
   const y=Math.min(e.clientY,window.innerHeight-80);
@@ -3629,6 +3692,13 @@ function showCtxMenu(e,msgId){
     ChatSystem.deleteMessage(msgId);
     closeCtxMenu();
     renderMsgs();
+  });
+  menu.querySelector('#zmEditMsg').addEventListener('click',()=>{
+    closeCtxMenu();
+    zmEditPrompt(msg.text||'',(newText)=>{
+      ChatSystem.editMessage(msgId,newText);
+      renderMsgs();
+    });
   });
 }
 
@@ -3683,6 +3753,7 @@ function renderMsgs(){
     const imgH=(!isDeleted&&m.imageData)
       ?`<img src="${m.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${m.text?'6px':'0'};" data-src="${m.imageData}">`
       :'';
+    const editedTag=(!isDeleted&&m.edited)?`<div class="zm-chat-edited-tag">edited</div>`:'';
     const txtH=isDeleted
       ?`<span><i class="fa-solid fa-circle-xmark" style="font-size:.72rem;margin-right:5px;opacity:.7;"></i>Message unsent</span>`
       :(m.text?`<div>${escH(m.text)}</div>`:'');
@@ -3699,12 +3770,14 @@ function renderMsgs(){
         <div class="zm-chat-msg-content">
           ${isFirst?'<div class="zm-chat-sender-label">Zami Mart</div>':''}
           <div class="${bubbleCls}">${txtH}${imgH}</div>
+          ${editedTag}
           ${isLast?`<div class="zm-chat-time">${t}</div>`:''}
         </div>`;
     }else{
       el.innerHTML=`
         <div class="zm-chat-msg-content">
           <div class="${bubbleCls}">${txtH}${imgH}</div>
+          ${editedTag}
           ${isLast?`<div class="zm-chat-time">${t}</div>`:''}
         </div>`;
     }
@@ -3831,7 +3904,51 @@ ChatSystem.on('messages-updated',()=>{
   updateBadge();
 });
 
-ChatSystem.onReady(() => { if(!restoreSession()) showWelcome(); });
+// ── Keep the widget in sync with login/logout, even without a full page reload ──
+let _zmLastUid; // undefined = not checked yet
+function _zmResetGuestWidget(){
+  sessionId=null; visitorName=null; visitorAvatar=null;
+  inputArea.style.display='none';
+  const chips=document.getElementById('zmChatChips');
+  if(chips) chips.style.display='none';
+  unreadBadge.style.display='none';
+  showWelcome();
+}
+function _zmAttachAccountSession(user){
+  visitorAvatar=user.avatarPhoto||null;
+  visitorName=user.name;
+  sessionId=ChatSystem.createSession(user.name,user.email||'');
+  localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name:user.name,avatar:visitorAvatar}));
+  msgsEl.innerHTML='';
+  inputArea.style.display='flex';
+  const chips=document.getElementById('zmChatChips');
+  if(chips){
+    const _msgs=ChatSystem.getSessionMessages(sessionId);
+    chips.style.display=_msgs.some(m=>m.senderType==='visitor')?'none':'flex';
+  }
+  renderMsgs();
+  updateBadge();
+}
+function _zmSyncAuth(user){
+  const uid=user?user.uid:null;
+  if(uid===_zmLastUid) return; // no real change in login state
+  _zmLastUid=uid;
+  if(user){
+    _zmAttachAccountSession({name:user.displayName||user.email||'Customer',email:user.email||''});
+  } else {
+    // Logged out: this device/browser should no longer show that account's chat
+    localStorage.removeItem('zm_cv_session');
+    if(!restoreSession()) _zmResetGuestWidget();
+  }
+}
+function _zmWatchAuth(){
+  if(window.fb && window.fb.auth){
+    window.fb.onAuthStateChanged(window.fb.auth,_zmSyncAuth);
+  } else {
+    window.addEventListener('fb-ready', _zmWatchAuth, { once:true });
+  }
+}
+ChatSystem.onReady(() => { _zmWatchAuth(); });
 updateBadge();
 })();
 </script>

@@ -932,6 +932,20 @@ select {
 .zm-ctx-item:hover { background: rgba(255,255,255,.08); }
 .zm-ctx-item.danger { color: #ff7b7b; }
 .zm-ctx-item.danger:hover { background: rgba(255,107,107,.12); }
+/* Edit-message modal (replaces native prompt() for a consistent look) */
+.zm-edit-overlay{position:fixed;inset:0;background:rgba(6,20,20,.55);z-index:9999999;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+.zm-edit-overlay.show{opacity:1;pointer-events:all;}
+.zm-edit-modal{background:#fff;border-radius:16px;padding:22px;width:100%;max-width:340px;box-shadow:0 20px 50px rgba(0,0,0,.3);transform:translateY(10px) scale(.97);transition:transform .2s;font-family:'Poppins',sans-serif;}
+.zm-edit-overlay.show .zm-edit-modal{transform:translateY(0) scale(1);}
+.zm-edit-modal h4{font-size:.92rem;font-weight:700;color:#063b3f;margin:0 0 12px;}
+.zm-edit-modal textarea{width:100%;min-height:80px;border:1.5px solid #e0e6e6;border-radius:10px;padding:10px 12px;font-size:.82rem;font-family:'Poppins',sans-serif;resize:vertical;color:#1a2e2e;outline:none;transition:border-color .15s;box-sizing:border-box;}
+.zm-edit-modal textarea:focus{border-color:#FD4D02;}
+.zm-edit-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;}
+.zm-edit-modal-actions button{border:none;border-radius:10px;padding:9px 16px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'Poppins',sans-serif;transition:opacity .15s;}
+.zm-edit-cancel{background:#f0f4f4;color:#063b3f;}
+.zm-edit-cancel:hover{opacity:.8;}
+.zm-edit-save{background:#FD4D02;color:#fff;}
+.zm-edit-save:hover{opacity:.88;}
 
 .zm-chat-time {
   font-size: .6rem; color: var(--text-muted);
@@ -939,6 +953,11 @@ select {
 }
 .zm-chat-msg.admin .zm-chat-time   { text-align: right; }
 .zm-chat-msg.visitor .zm-chat-time { text-align: left; }
+
+.zm-chat-edited-tag {
+  font-size: .6rem; opacity: .55; font-style: italic;
+  margin-top: 2px; padding: 0 2px;
+}
 
 .zm-chat-avatar {
   width: 28px; height: 28px; border-radius: 50%;
@@ -952,6 +971,88 @@ select {
   font-size:.6rem; font-weight:600; color:var(--text-muted);
   padding:0 2px; margin-bottom:2px;
 }
+
+/* ─── HOVER / LONG-PRESS MESSAGE ACTIONS (reply, react, more) ─── */
+.zm-chat-msg-actions {
+  display: flex; align-items: center; gap: 2px;
+  opacity: 0; transform: scale(.92);
+  transition: opacity .12s ease, transform .12s ease;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+.zm-chat-msg:hover .zm-chat-msg-actions,
+.zm-chat-msg.zm-actions-pinned .zm-chat-msg-actions {
+  opacity: 1; transform: scale(1); pointer-events: all;
+}
+.zm-chat-msg-actions button {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; background: #fff; color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .68rem; cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,.12);
+  transition: background .12s, color .12s, transform .12s;
+}
+.zm-chat-msg-actions button:hover {
+  background: var(--teal); color: #fff; transform: translateY(-1px);
+}
+/* Hide the "more" (edit/delete) button on messages the admin can't manage */
+.zm-chat-msg.visitor .zm-chat-msg-actions .zm-act-more { display: none; }
+
+/* Touch devices: show on long-press via the pinned class, no hover available */
+@media (hover: none) {
+  .zm-chat-msg-actions { opacity: 0; }
+  .zm-chat-msg.zm-actions-pinned .zm-chat-msg-actions { opacity: 1; pointer-events: all; }
+}
+
+/* Reaction badge sitting on the lower corner of a bubble */
+.zm-chat-reaction {
+  font-size: .82rem; line-height: 1; background: #fff;
+  border-radius: 50%; padding: 2px 4px; margin-top: -10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.18);
+  display: inline-flex; width: fit-content; cursor: pointer;
+}
+.zm-chat-msg.admin .zm-chat-reaction { align-self: flex-end; margin-right: 4px; }
+.zm-chat-msg.visitor .zm-chat-reaction { align-self: flex-start; margin-left: 4px; }
+
+/* Quoted "replying to" snippet shown inside a bubble */
+.zm-chat-reply-quote {
+  font-size: .71rem; line-height: 1.3; padding: 5px 8px; margin-bottom: 5px;
+  border-left: 3px solid rgba(255,255,255,.7);
+  background: rgba(255,255,255,.14); border-radius: 6px;
+  opacity: .92; max-height: 2.6em; overflow: hidden;
+  cursor: pointer;
+}
+.zm-chat-msg.visitor .zm-chat-reply-quote { border-left-color: rgba(255,255,255,.8); background: rgba(255,255,255,.16); }
+.zm-chat-reply-quote b { font-weight: 700; }
+
+/* Emoji reaction picker popup */
+.zm-emoji-picker {
+  position: fixed; z-index: 999999;
+  background: #fff; border-radius: 24px; padding: 6px 8px;
+  display: flex; gap: 3px; box-shadow: 0 8px 28px rgba(0,0,0,.22);
+}
+.zm-emoji-picker button {
+  border: none; background: none; font-size: 1.15rem; cursor: pointer;
+  padding: 3px; border-radius: 50%; transition: transform .12s, background .12s;
+  line-height: 1;
+}
+.zm-emoji-picker button:hover { background: #f0f4f4; transform: scale(1.25); }
+
+/* "Replying to ..." bar shown above the textarea while composing a reply */
+.zm-reply-bar {
+  display: none; align-items: center; gap: 8px;
+  padding: 8px 12px; background: #f4f7f7;
+  border-top: 1px solid var(--border); border-left: 3px solid var(--orange);
+  font-size: .73rem; color: var(--text-muted);
+}
+.zm-reply-bar.show { display: flex; }
+.zm-reply-bar-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.zm-reply-bar-text b { color: var(--teal); }
+.zm-reply-bar-close {
+  border: none; background: none; cursor: pointer; color: var(--text-muted);
+  font-size: .85rem; padding: 2px 6px;
+}
+.zm-reply-bar-close:hover { color: #d63030; }
 
 /* ─── QUICK REPLIES BAR ─────────────────────── */
 #sec-chat .chat-quick-replies {
@@ -1469,6 +1570,12 @@ select {
               <button class="zm-reply-chip" onclick="useReplyChip(this)">Wholesale pricing available — DM us!</button>
               <button class="zm-reply-chip" onclick="useReplyChip(this)">Your order is being processed. ✅</button>
               <button class="zm-reply-chip" onclick="useReplyChip(this)">We'll get back to you shortly!</button>
+            </div>
+
+            <!-- Replying-to bar -->
+            <div class="zm-reply-bar" id="zmReplyBar">
+              <div class="zm-reply-bar-text">Replying to <b id="zmReplyBarName"></b>: <span id="zmReplyBarText"></span></div>
+              <button class="zm-reply-bar-close" onclick="cancelChatReplyTo()" title="Cancel"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <!-- Input -->
@@ -2754,6 +2861,47 @@ function closeAdminCtxMenu(){ if(zmAdminCtxMenu){zmAdminCtxMenu.remove();zmAdmin
 document.addEventListener('click', closeAdminCtxMenu);
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAdminCtxMenu(); });
 
+// ── Edit-message modal (replaces native prompt() for a consistent look) ──
+function zmEditPrompt(initialText,onSave){
+  let overlay=document.getElementById('zmEditOverlay');
+  if(!overlay){
+    overlay=document.createElement('div');
+    overlay.id='zmEditOverlay';
+    overlay.className='zm-edit-overlay';
+    overlay.innerHTML=`
+      <div class="zm-edit-modal">
+        <h4>Edit message</h4>
+        <textarea id="zmEditTextarea"></textarea>
+        <div class="zm-edit-modal-actions">
+          <button type="button" class="zm-edit-cancel" id="zmEditCancelBtn">Cancel</button>
+          <button type="button" class="zm-edit-save" id="zmEditSaveBtn">Save</button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click',e=>{ if(e.target===overlay) overlay.classList.remove('show'); });
+    document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&overlay.classList.contains('show')) overlay.classList.remove('show'); });
+  }
+  const ta=document.getElementById('zmEditTextarea');
+  ta.value=initialText||'';
+  overlay.classList.add('show');
+  setTimeout(()=>{ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);},50);
+
+  const oldSave=document.getElementById('zmEditSaveBtn');
+  const newSave=oldSave.cloneNode(true);
+  oldSave.replaceWith(newSave);
+  newSave.addEventListener('click',()=>{
+    const val=ta.value.trim();
+    overlay.classList.remove('show');
+    if(val) onSave(val);
+  });
+
+  const oldCancel=document.getElementById('zmEditCancelBtn');
+  const newCancel=oldCancel.cloneNode(true);
+  oldCancel.replaceWith(newCancel);
+  newCancel.addEventListener('click',()=>{ overlay.classList.remove('show'); });
+
+  ta.onkeydown=function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); newSave.click(); } };
+}
 function showAdminCtxMenu(e, msgId){
   e.preventDefault();
   closeAdminCtxMenu();
@@ -2778,22 +2926,45 @@ function showAdminCtxMenu(e, msgId){
   });
   menu.querySelector('#zmAdminEditMsg').addEventListener('click', () => {
     closeAdminCtxMenu();
-    const newText = prompt('Edit your message:', msg.text || '');
-    if (newText !== null) {
+    zmEditPrompt(msg.text || '', (newText) => {
       ChatSystem.editMessage(msgId, newText);
       renderChatMessages();
-    }
+    });
   });
 }
 
 function bindAdminMsgEvents(){
   const container = document.getElementById('chatDetailMessages');
   container.querySelectorAll('[data-msgid]').forEach(el => {
-    el.addEventListener('contextmenu', e => showAdminCtxMenu(e, el.dataset.msgid));
-    let lpt;
-    el.addEventListener('touchstart', e => { lpt = setTimeout(() => showAdminCtxMenu(e.touches[0], el.dataset.msgid), 600); }, {passive:true});
+    const msgId = el.dataset.msgid;
+    el.addEventListener('contextmenu', e => showAdminCtxMenu(e, msgId));
+
+    // Long-press on touch devices pins the reply/react/more icons so they can be tapped
+    let lpt, moved = false;
+    el.addEventListener('touchstart', e => {
+      moved = false;
+      lpt = setTimeout(() => {
+        if (moved) return;
+        unpinAllChatActions();
+        el.classList.add('zm-actions-pinned');
+        if (navigator.vibrate) navigator.vibrate(15);
+      }, 450);
+    }, { passive: true });
     el.addEventListener('touchend', () => clearTimeout(lpt));
-    el.addEventListener('touchmove', () => clearTimeout(lpt));
+    el.addEventListener('touchmove', () => { moved = true; clearTimeout(lpt); });
+
+    const replyBtn = el.querySelector('.zm-act-reply');
+    const reactBtn = el.querySelector('.zm-act-react');
+    const moreBtn  = el.querySelector('.zm-act-more');
+    if (replyBtn) replyBtn.addEventListener('click', e => { e.stopPropagation(); startChatReplyTo(msgId); });
+    if (reactBtn) reactBtn.addEventListener('click', e => openZmEmojiPicker(e, msgId));
+    if (moreBtn)  moreBtn.addEventListener('click', e => { e.stopPropagation(); showAdminCtxMenu(e, msgId); });
+
+    const reactionBadge = el.querySelector('.zm-chat-reaction');
+    if (reactionBadge) reactionBadge.addEventListener('click', e => { e.stopPropagation(); ChatSystem.reactToMessage(msgId, reactionBadge.dataset.em); renderChatMessages(); });
+
+    const quote = el.querySelector('.zm-chat-reply-quote');
+    if (quote) quote.addEventListener('click', e => { e.stopPropagation(); scrollToChatMsg(quote.dataset.refid); });
   });
 }
 
@@ -2839,11 +3010,19 @@ function renderChatMessages() {
     const time      = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     const isAdmin   = msg.senderType === 'admin';
     const role      = isAdmin ? 'admin' : 'visitor';
-    const editedTag = (!msg.deleted && msg.edited) ? `<span style="font-size:.6rem;opacity:.6;margin-left:4px;font-style:italic;">edited</span>` : '';
-    const txtH      = msg.text ? escHtml(msg.text) + editedTag : '';
+    const editedTag = (!msg.deleted && msg.edited) ? `<div class="zm-chat-edited-tag">edited</div>` : '';
+    const txtH      = msg.text ? escHtml(msg.text) : '';
     const imgH      = msg.imageData ? `<img src="${msg.imageData}" alt="image">` : '';
     const bubbleCls = 'zm-chat-bubble';
     const initials  = (msg.senderName || 'C').charAt(0).toUpperCase();
+    const quoteH    = msg.replyTo ? `<div class="zm-chat-reply-quote" data-refid="${msg.replyTo.id}"><b>${escHtml(msg.replyTo.senderName||'')}</b>: ${escHtml(msg.replyTo.text||'')}</div>` : '';
+    const reactionH = msg.reaction ? `<div class="zm-chat-reaction" data-em="${msg.reaction}" title="Remove reaction">${msg.reaction}</div>` : '';
+    const actionsH  = `
+      <div class="zm-chat-msg-actions">
+        <button class="zm-act-reply" title="Reply"><i class="fa-solid fa-reply"></i></button>
+        <button class="zm-act-react" title="React"><i class="fa-regular fa-face-smile"></i></button>
+        <button class="zm-act-more" title="More"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>`;
 
     const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
 
@@ -2855,18 +3034,24 @@ function renderChatMessages() {
       el.innerHTML = `
         <div class="zm-chat-content">
           ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
-          <div class="${bubbleCls}">${txtH}${imgH}</div>
+          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}</div>
+          ${reactionH}
+          ${editedTag ? `<div style="text-align:right;">${editedTag}</div>` : ''}
           ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
-        </div>`;
+        </div>
+        ${actionsH}`;
     } else {
       const avatarHtml = `<div class="zm-chat-avatar${isLast ? '' : ' hidden'}" title="${escHtml(msg.senderName||'Visitor')}">${initials}</div>`;
       el.innerHTML = `
         ${avatarHtml}
         <div class="zm-chat-content">
           ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Visitor')}</div>` : ''}
-          <div class="${bubbleCls}">${txtH}${imgH}</div>
+          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}</div>
+          ${reactionH}
+          ${editedTag}
           ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}
-        </div>`;
+        </div>
+        ${actionsH}`;
     }
     container.appendChild(el);
   });
@@ -2883,6 +3068,85 @@ function useReplyChip(btn) {
   }
 }
 
+// ── Reply-to state ──────────────────────────────
+let zmReplyTarget = null; // { id, senderName, text }
+function startChatReplyTo(msgId) {
+  const msg = ChatSystem.getMessages().find(m => m.id === msgId);
+  if (!msg || msg.deleted) return;
+  closeAdminCtxMenu(); closeZmEmojiPicker(); unpinAllChatActions();
+  zmReplyTarget = {
+    id: msg.id,
+    senderName: msg.senderType === 'admin' ? 'You' : (msg.senderName || 'Customer'),
+    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : '')
+  };
+  document.getElementById('zmReplyBarName').textContent = zmReplyTarget.senderName;
+  document.getElementById('zmReplyBarText').textContent = zmReplyTarget.text;
+  document.getElementById('zmReplyBar').classList.add('show');
+  const input = document.getElementById('chatDetailInput');
+  if (input) input.focus();
+}
+function cancelChatReplyTo() {
+  zmReplyTarget = null;
+  const bar = document.getElementById('zmReplyBar');
+  if (bar) bar.classList.remove('show');
+}
+function scrollToChatMsg(msgId) {
+  const el = document.querySelector(`#chatDetailMessages [data-msgid="${msgId}"]`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.style.transition = 'background-color .3s';
+  el.style.backgroundColor = 'rgba(253,77,2,.12)';
+  setTimeout(() => { el.style.backgroundColor = ''; }, 700);
+}
+
+// ── Emoji reaction picker ───────────────────────
+const ZM_QUICK_EMOJIS = ['👍','❤️','😂','😮','😢','🙏'];
+let zmEmojiPicker = null;
+function closeZmEmojiPicker() { if (zmEmojiPicker) { zmEmojiPicker.remove(); zmEmojiPicker = null; } }
+document.addEventListener('click', closeZmEmojiPicker);
+
+function openZmEmojiPicker(e, msgId) {
+  e.stopPropagation();
+  closeAdminCtxMenu(); closeZmEmojiPicker();
+  const msgEl = e.currentTarget.closest('.zm-chat-msg');
+  const bubbleEl = msgEl ? msgEl.querySelector('.zm-chat-bubble') : e.currentTarget;
+  const anchorRect = bubbleEl.getBoundingClientRect();
+  const isAdmin = msgEl && msgEl.classList.contains('admin');
+
+  const picker = document.createElement('div');
+  picker.className = 'zm-emoji-picker';
+  picker.style.position = 'fixed';
+  picker.innerHTML = ZM_QUICK_EMOJIS.map(em => `<button data-em="${em}">${em}</button>`).join('');
+  document.body.appendChild(picker);
+
+  const pw = picker.offsetWidth;
+  const ph = picker.offsetHeight;
+  // Position above the bubble, aligned to the same side
+  let left = isAdmin ? anchorRect.right - pw : anchorRect.left;
+  left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+  const top = Math.max(8, anchorRect.top - ph - 6);
+  picker.style.left = left + 'px';
+  picker.style.top  = top + 'px';
+  zmEmojiPicker = picker;
+  picker.addEventListener('click', ev => {
+    const btn = ev.target.closest('button[data-em]');
+    if (!btn) return;
+    ev.stopPropagation();
+    ChatSystem.reactToMessage(msgId, btn.dataset.em);
+    closeZmEmojiPicker();
+    unpinAllChatActions();
+    renderChatMessages();
+  });
+}
+
+// ── Mobile long-press: pin the action icons so they're tappable ──
+function unpinAllChatActions() {
+  document.querySelectorAll('.zm-chat-msg.zm-actions-pinned').forEach(el => el.classList.remove('zm-actions-pinned'));
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.zm-chat-msg-actions') && !e.target.closest('.zm-emoji-picker')) unpinAllChatActions();
+});
+
 function sendChatReply() {
   if (!currentChatSessionId) return;
 
@@ -2890,7 +3154,8 @@ function sendChatReply() {
   const text = input.value.trim();
   if (!text) return;
 
-  ChatSystem.sendMessage(currentChatSessionId, 'admin', 'Admin', text);
+  ChatSystem.sendMessage(currentChatSessionId, 'admin', 'Admin', text, null, zmReplyTarget);
+  cancelChatReplyTo();
   input.value = '';
   input.style.height = 'auto';
   renderChatMessages();
@@ -3390,8 +3655,8 @@ function renderInqChat() {
     const imgHtml = msg.imageData
       ? `<img src="${msg.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${msg.text?'6px':'0'};" data-src="${msg.imageData}">`
       : '';
-    const editedTagInq = (!msg.deleted && msg.edited) ? `<span style="font-size:.6rem;opacity:.6;margin-left:4px;font-style:italic;">edited</span>` : '';
-    const textHtml = msg.text ? `<div>${escHtml(msg.text)}${editedTagInq}</div>` : '';
+    const editedTagInq = (!msg.deleted && msg.edited) ? `<div class="zm-chat-edited-tag">edited</div>` : '';
+    const textHtml = msg.text ? `<div>${escHtml(msg.text)}</div>` : '';
     const role      = isAdmin ? 'admin' : 'visitor';
     const initials  = (msg.senderName||'C').charAt(0).toUpperCase();
     const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
@@ -3403,6 +3668,7 @@ function renderInqChat() {
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:68%;">
           ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
           <div class="zm-chat-bubble">${textHtml}${imgHtml}</div>
+          ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
         </div>`;
     } else {
@@ -3412,6 +3678,7 @@ function renderInqChat() {
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:68%;">
           ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Customer')}</div>` : ''}
           <div class="zm-chat-bubble">${textHtml}${imgHtml}</div>
+          ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}
         </div>`;
     }
