@@ -29,8 +29,25 @@
   --shadow:     0 2px 16px -4px rgba(6,59,63,.1);
   --shadow-lg:  0 8px 32px -8px rgba(6,59,63,.15);
   --ease:       cubic-bezier(.4,0,.2,1);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --ease-smooth:cubic-bezier(.16,1,.3,1);
   font-family: 'Poppins', sans-serif;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(6,59,63,.18); border-radius: 100px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(6,59,63,.32); background-clip: padding-box; }
+.sidebar-nav::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); background-clip: padding-box; }
+.sidebar-nav::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.28); background-clip: padding-box; }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -70,11 +87,15 @@ ul { list-style: none; }
 }
 .sidebar-logo-icon {
   width: 36px; height: 36px;
-  background: var(--orange);
+  background: #f5f0e6;
   border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  font-size: 1rem; color: #fff;
+  overflow: hidden;
   flex-shrink: 0;
+}
+.sidebar-logo-icon img {
+  width: 100%; height: 100%;
+  object-fit: cover;
 }
 .sidebar-logo-text strong {
   display: block;
@@ -110,25 +131,32 @@ ul { list-style: none; }
   font-size: .82rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background .15s, color .15s;
+  transition: background .25s var(--ease-smooth), color .25s var(--ease-smooth), transform .25s var(--ease-smooth), box-shadow .25s var(--ease-smooth);
   margin-bottom: 1px;
   background: none;
   width: 100%;
   text-align: left;
+  position: relative;
+  overflow: hidden;
 }
 .nav-item i {
   width: 16px; text-align: center;
   font-size: .85rem; flex-shrink: 0;
+  transition: transform .25s var(--ease-spring);
 }
 .nav-item:hover {
-  background: rgba(255,255,255,.06);
-  color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.07);
+  color: rgba(255,255,255,.9);
+  transform: translateX(2px);
 }
+.nav-item:hover i { transform: scale(1.1); }
 .nav-item.active {
-  background: var(--orange);
+  background: linear-gradient(135deg, var(--orange), #ff6a2b);
   color: #fff;
   font-weight: 600;
+  box-shadow: 0 4px 14px -2px rgba(253,77,2,.45);
 }
+.nav-item.active:hover { transform: none; }
 .nav-item .nav-badge {
   margin-left: auto;
   background: rgba(255,255,255,.18);
@@ -155,9 +183,9 @@ ul { list-style: none; }
   padding: 8px 10px;
   border-radius: 8px;
   cursor: pointer;
-  transition: background .15s;
+  transition: background .2s var(--ease-smooth), transform .2s var(--ease-smooth);
 }
-.sidebar-user:hover { background: rgba(255,255,255,.05); }
+.sidebar-user:hover { background: rgba(255,255,255,.06); transform: translateX(2px); }
 .sidebar-avatar {
   width: 32px; height: 32px;
   border-radius: 50%;
@@ -194,6 +222,7 @@ ul { list-style: none; }
   justify-content: space-between;
   position: sticky; top: 0;
   z-index: 50;
+  transition: box-shadow .3s var(--ease-smooth);
 }
 .topbar.scrolled { box-shadow: 0 1px 8px rgba(6,59,63,.07); }
 .topbar-left { display: flex; align-items: center; gap: 14px; }
@@ -220,15 +249,22 @@ ul { list-style: none; }
   display: flex; align-items: center; justify-content: center;
   font-size: .88rem; color: var(--text-muted);
   cursor: pointer;
-  transition: background .15s, color .15s;
+  transition: background .2s var(--ease-smooth), color .2s var(--ease-smooth), transform .2s var(--ease-smooth), border-color .2s var(--ease-smooth);
   position: relative;
+  overflow: hidden;
 }
-.topbar-btn:hover { background: var(--cream); color: var(--teal); }
+.topbar-btn:hover { background: var(--cream); color: var(--teal); border-color: rgba(6,59,63,.18); transform: translateY(-1px); }
+.topbar-btn:active { transform: translateY(0) scale(.94); }
 .topbar-btn .notif-dot {
   position: absolute; top: 6px; right: 6px;
   width: 6px; height: 6px;
   border-radius: 50%; background: var(--orange);
   border: 2px solid #fff;
+  animation: notifPulse 2s var(--ease-smooth) infinite;
+}
+@keyframes notifPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(253,77,2,.5); }
+  50%      { box-shadow: 0 0 0 4px rgba(253,77,2,0); }
 }
 
 /* Notification panel */
@@ -240,6 +276,8 @@ ul { list-style: none; }
   box-shadow: 0 12px 40px -8px rgba(6,59,63,.16), 0 0 0 1px rgba(6,59,63,.07);
   z-index: 9999;
   overflow: hidden;
+  animation: fadeIn .22s var(--ease-smooth);
+  transform-origin: top right;
 }
 .notif-panel-header {
   display: flex; align-items: center; justify-content: space-between;
@@ -287,11 +325,13 @@ ul { list-style: none; }
   background: var(--cream);
   border: 1px solid var(--border);
   cursor: pointer;
-  transition: background .15s, border-color .15s;
+  transition: background .2s var(--ease-smooth), border-color .2s var(--ease-smooth), transform .2s var(--ease-smooth);
   font-size: .8rem; font-weight: 500; color: var(--teal);
 }
-.profile-trigger:hover { background: var(--white); border-color: rgba(6,59,63,.18); }
-.profile-trigger i { font-size: .78rem; }
+.profile-trigger:hover { background: var(--white); border-color: rgba(6,59,63,.18); box-shadow: var(--shadow); }
+.profile-trigger:active { transform: scale(.97); }
+.profile-trigger i { font-size: .78rem; transition: transform .25s var(--ease-smooth); }
+.profile-trigger.open i { transform: rotate(180deg); }
 .profile-dropdown {
   position: absolute; top: 100%; right: 0;
   margin-top: 6px;
@@ -301,11 +341,12 @@ ul { list-style: none; }
   box-shadow: var(--shadow-lg);
   min-width: 220px;
   opacity: 0; visibility: hidden;
-  transform: translateY(-6px);
-  transition: all .2s var(--ease);
+  transform: translateY(-8px) scale(.97);
+  transform-origin: top right;
+  transition: opacity .22s var(--ease-smooth), transform .22s var(--ease-spring), visibility .22s;
   z-index: 1000;
 }
-.profile-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0); }
+.profile-dropdown.open { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
 .profile-dropdown-header {
   padding: 14px 18px;
   border-bottom: 1px solid var(--border);
@@ -338,12 +379,12 @@ ul { list-style: none; }
   flex: 1;
 }
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: translateY(10px) scale(.995); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .section { display: none; }
-.section.active { display: block; animation: fadeIn .25s var(--ease); }
+.section.active { display: block; animation: fadeIn .35s var(--ease-smooth); }
 
 /* ─── CARDS ────────────────────────────────── */
 .card {
@@ -351,13 +392,16 @@ ul { list-style: none; }
   border-radius: var(--radius);
   border: 1px solid var(--border);
   overflow: hidden;
+  transition: box-shadow .25s var(--ease-smooth), transform .25s var(--ease-smooth), border-color .25s var(--ease-smooth);
 }
+.card:hover { box-shadow: var(--shadow); }
 .card-header {
   padding: 18px 22px;
   border-bottom: 1px solid var(--border);
   display: flex; align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px 12px;
+  flex-wrap: wrap;
 }
 .card-title { font-size: .88rem; font-weight: 700; color: var(--teal); }
 .card-body { padding: 22px; }
@@ -369,10 +413,21 @@ ul { list-style: none; }
   border-radius: 8px;
   font-size: .8rem; font-weight: 600;
   border: none; cursor: pointer;
-  transition: background .15s, box-shadow .15s;
+  transition: background .2s var(--ease-smooth), box-shadow .2s var(--ease-smooth), transform .15s var(--ease-smooth), color .2s var(--ease-smooth), border-color .2s var(--ease-smooth);
+  position: relative;
+  overflow: hidden;
 }
-.btn:hover { box-shadow: 0 3px 10px rgba(0,0,0,.1); }
-.btn:active { transform: none; box-shadow: none; }
+.btn:hover { box-shadow: 0 4px 14px -3px rgba(0,0,0,.16); transform: translateY(-1px); }
+.btn:active { transform: translateY(0) scale(.97); box-shadow: none; }
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,.4);
+  transform: scale(0);
+  animation: rippleEffect .55s var(--ease-smooth);
+  pointer-events: none;
+}
+@keyframes rippleEffect { to { transform: scale(2.6); opacity: 0; } }
 
 .btn-primary { background: var(--teal); color: #fff; }
 .btn-primary:hover { background: var(--teal-mid); }
@@ -398,7 +453,7 @@ thead th {
 }
 thead th:first-child { border-radius: 8px 0 0 8px; }
 thead th:last-child  { border-radius: 0 8px 8px 0; }
-tbody tr { border-bottom: 1px solid rgba(6,59,63,.06); transition: background .1s; }
+tbody tr { border-bottom: 1px solid rgba(6,59,63,.06); transition: background .18s var(--ease-smooth); }
 tbody tr:last-child { border-bottom: none; }
 tbody tr:hover { background: #f9fbfb; }
 tbody td { padding: 13px 14px; font-size: .82rem; color: var(--text); vertical-align: middle; }
@@ -437,12 +492,12 @@ select, textarea {
   font-size: .82rem; color: var(--text);
   background: var(--white);
   outline: none;
-  transition: border-color .15s, box-shadow .15s;
+  transition: border-color .2s var(--ease-smooth), box-shadow .2s var(--ease-smooth);
   width: 100%;
 }
 input:focus, select:focus, textarea:focus {
   border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(6,59,63,.07);
+  box-shadow: 0 0 0 3px rgba(6,59,63,.09);
 }
 textarea { resize: vertical; min-height: 86px; }
 select {
@@ -456,13 +511,13 @@ select {
 /* ─── MODAL ────────────────────────────────── */
 .modal-overlay {
   position: fixed; inset: 0;
-  background: rgba(6,20,20,.5);
-  backdrop-filter: blur(3px);
+  background: rgba(6,20,20,.55);
+  backdrop-filter: blur(4px);
   z-index: 200;
   display: flex; align-items: center; justify-content: center;
   padding: 20px;
   opacity: 0; pointer-events: none;
-  transition: opacity .2s var(--ease);
+  transition: opacity .25s var(--ease-smooth);
 }
 .modal-overlay.open { opacity: 1; pointer-events: all; }
 .modal {
@@ -471,10 +526,23 @@ select {
   width: 100%; max-width: 520px;
   max-height: 90vh; overflow-y: auto;
   box-shadow: 0 24px 60px -12px rgba(0,0,0,.3);
-  transform: translateY(16px) scale(.98);
-  transition: transform .25s var(--ease);
+  transform: translateY(18px) scale(.96);
+  transition: transform .35s var(--ease-spring), opacity .25s var(--ease-smooth);
+  opacity: 0;
 }
-.modal-overlay.open .modal { transform: translateY(0) scale(1); }
+.modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+.rb-tab.active {
+  background: var(--teal); color: #fff; border-color: var(--teal);
+}
+.rb-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 14px; background: var(--cream); border-radius: 10px; margin-bottom: 8px;
+}
+.rb-item-info { min-width: 0; flex: 1; }
+.rb-item-name { font-weight: 700; color: var(--teal); font-size: .84rem; }
+.rb-item-sub { font-size: .72rem; color: var(--text-muted); margin-top: 2px; }
+.rb-item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.rb-empty { text-align: center; padding: 30px; color: var(--text-muted); font-size: .82rem; }
 .modal-header {
   padding: 20px 22px 16px;
   border-bottom: 1px solid var(--border);
@@ -485,9 +553,10 @@ select {
   width: 30px; height: 30px; border-radius: 7px;
   background: var(--cream); color: var(--text-muted);
   display: flex; align-items: center; justify-content: center;
-  font-size: .82rem; cursor: pointer; transition: background .15s;
+  font-size: .82rem; cursor: pointer; transition: background .2s var(--ease-smooth), transform .2s var(--ease-smooth);
+  position: relative; overflow: hidden;
 }
-.modal-close:hover { background: #ffd5d5; color: #c0392b; }
+.modal-close:hover { background: #ffd5d5; color: #c0392b; transform: rotate(90deg); }
 .modal-body { padding: 22px; }
 .modal-footer {
   padding: 14px 22px;
@@ -503,15 +572,15 @@ select {
   font-size: .8rem; font-weight: 500;
   display: flex; align-items: center; gap: 8px;
   box-shadow: var(--shadow-lg);
-  animation: toastIn .25s var(--ease) forwards;
+  animation: toastIn .4s var(--ease-spring) forwards;
   max-width: 300px;
 }
 .toast.success { background: #1a7a4a; }
 .toast.error   { background: #c0392b; }
 .toast i { font-size: .85rem; flex-shrink: 0; }
 @keyframes toastIn {
-  from { opacity: 0; transform: translateX(24px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from { opacity: 0; transform: translateX(30px) scale(.9); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
 }
 
 /* ─── CONFIRM ──────────────────────────────── */
@@ -531,10 +600,10 @@ select {
   padding: 28px; width: 100%; max-width: 360px;
   text-align: center;
   box-shadow: 0 24px 60px -12px rgba(0,0,0,.25);
-  transform: scale(.96);
-  transition: transform .2s var(--ease);
+  transform: scale(.92) translateY(10px);
+  transition: transform .35s var(--ease-spring);
 }
-.confirm-overlay.open .confirm-box { transform: scale(1); }
+.confirm-overlay.open .confirm-box { transform: scale(1) translateY(0); }
 .confirm-icon {
   width: 52px; height: 52px; border-radius: 50%;
   background: #fff0f0;
@@ -565,6 +634,11 @@ select {
   display: flex; align-items: center; justify-content: center;
   font-size: 1.6rem; color: var(--text-muted);
   margin: 0 auto 14px;
+  animation: emptyFloat 3s var(--ease-smooth) infinite;
+}
+@keyframes emptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
 }
 .empty-state h3 { font-size: .9rem; font-weight: 700; color: var(--teal); margin-bottom: 5px; }
 .empty-state p  { font-size: .8rem; color: var(--text-muted); max-width: 260px; margin: 0 auto 18px; }
@@ -586,14 +660,28 @@ select {
   padding: 18px 18px 14px;
   border: 1px solid var(--border);
   display: flex; align-items: flex-start; gap: 14px;
-  transition: box-shadow .2s;
+  transition: box-shadow .3s var(--ease-smooth), transform .3s var(--ease-smooth), border-color .3s var(--ease-smooth);
+  position: relative;
+  overflow: hidden;
 }
-.stat-card:hover { box-shadow: var(--shadow); }
+.stat-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--teal), var(--orange));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform .35s var(--ease-smooth);
+}
+.stat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: rgba(6,59,63,.18); }
+.stat-card:hover::before { transform: scaleX(1); }
 .stat-icon-wrap {
   width: 44px; height: 44px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
+  transition: transform .35s var(--ease-spring);
 }
+.stat-card:hover .stat-icon-wrap { transform: scale(1.12) rotate(-6deg); }
 .stat-icon-wrap.teal   { background: #e0f4f5; color: #0a8a96; }
 .stat-icon-wrap.yellow { background: #fef9c3; color: #ca8a04; }
 .stat-icon-wrap.red    { background: #fee2e2; color: #dc2626; }
@@ -609,7 +697,7 @@ select {
   color: var(--teal); line-height: 1;
   letter-spacing: -.04em; margin-bottom: 6px;
 }
-.stat-link { font-size: .7rem; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: color .12s; }
+.stat-link { font-size: .7rem; color: var(--text-muted); font-weight: 500; cursor: pointer; transition: color .2s var(--ease-smooth); }
 .stat-card:hover .stat-link { color: var(--orange); }
 
 /* Dashboard layout */
@@ -675,17 +763,67 @@ select {
   .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.18); }
   .main { margin-left: 0; }
   .menu-toggle { display: flex; }
-  .page-content { padding: 18px 14px; }
+  .page-content { padding: 16px 12px; }
   .topbar { padding: 0 14px; }
   .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .form-grid { grid-template-columns: 1fr; }
   .form-grid.cols-3 { grid-template-columns: 1fr; }
   .topbar-date { display: none; }
   .profile-dropdown { right: auto; left: 0; }
+  .profile-trigger span { display: none; }
+  .profile-trigger { padding: 7px 9px; }
+
+  /* Card headers & toolbars */
+  .card-header { padding: 14px 16px; }
+  .card-header > div[style*="display:flex"] { flex-wrap: wrap; width: 100%; gap: 6px !important; }
+  .card-header > div[style*="display:flex"] .btn { flex: 1 1 auto; justify-content: center; white-space: nowrap; }
+  .card-body { padding: 16px; }
+
+  /* Buttons row wrapping generally */
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .search-input-wrap { width: 100%; min-width: 0; }
+  .td-actions { flex-wrap: wrap; }
+
+  /* Modals */
+  .modal-header, .modal-body { padding: 16px; }
+  .modal-footer { padding: 12px 16px; flex-wrap: wrap; }
+  .modal-footer .btn { flex: 1 1 auto; justify-content: center; }
+  .confirm-box { padding: 20px; }
+
+  /* Recycle bin items */
+  .rb-item { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .rb-item-actions { width: 100%; justify-content: flex-end; }
+
+  /* Dashboard */
+  .dash-tip { flex-wrap: wrap; }
+  .dash-tip button { margin-left: 0; }
+
+  /* Stat cards */
+  .stat-card { padding: 14px; gap: 10px; }
+  .stat-num { font-size: 1.5rem; }
+  .stat-icon-wrap { width: 38px; height: 38px; }
+
+  /* Tables stay horizontally scrollable */
+  .table-wrap { -webkit-overflow-scrolling: touch; }
+
+  /* Notification & dropdown panels don't overflow viewport */
+  .notif-panel { width: min(300px, calc(100vw - 28px)); right: -8px; }
+
+  /* Inline grids used across sections */
+  div[style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns: 1fr 1fr !important; }
+  div[style*="grid-template-columns:260px 1fr"] { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
   .topbar-right { gap: 6px; }
+  .stat-num { font-size: 1.3rem; }
+  .stat-label { font-size: .62rem; }
+  .card-header > div[style*="display:flex"] .btn { font-size: .72rem; padding: 6px 10px; }
+  .modal-footer { flex-direction: column-reverse; }
+  .modal-footer .btn { width: 100%; }
+  .empty-state { padding: 36px 14px; }
+  .empty-icon { width: 52px; height: 52px; font-size: 1.3rem; }
+  div[style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns: 1fr !important; }
 }
 
 /* ─── LIVE CHAT REDESIGN ───────────────────── */
@@ -1004,15 +1142,27 @@ select {
   .zm-chat-msg.zm-actions-pinned .zm-chat-msg-actions { opacity: 1; pointer-events: all; }
 }
 
-/* Reaction badge sitting on the lower corner of a bubble */
+/* Reaction badge(s) sitting on the lower corner of a bubble */
+.zm-chat-reaction-row {
+  display: flex; gap: 3px; margin-top: -10px;
+}
+.zm-chat-msg.admin .zm-chat-reaction-row { align-self: flex-end; margin-right: 4px; }
+.zm-chat-msg.visitor .zm-chat-reaction-row { align-self: flex-start; margin-left: 4px; }
 .zm-chat-reaction {
   font-size: .82rem; line-height: 1; background: #fff;
-  border-radius: 50%; padding: 2px 4px; margin-top: -10px;
+  border-radius: 50%; padding: 2px 4px;
   box-shadow: 0 1px 4px rgba(0,0,0,.18);
-  display: inline-flex; width: fit-content; cursor: pointer;
+  display: inline-flex; width: fit-content;
+  animation: zmReactionPop .32s cubic-bezier(.34,1.56,.64,1);
+  cursor: default; /* not yours: just a badge, not removable by you */
 }
-.zm-chat-msg.admin .zm-chat-reaction { align-self: flex-end; margin-right: 4px; }
-.zm-chat-msg.visitor .zm-chat-reaction { align-self: flex-start; margin-left: 4px; }
+.zm-chat-reaction.mine { cursor: pointer; } /* yours: tap to remove */
+.zm-chat-reaction.mine:hover { filter: brightness(.96); }
+@keyframes zmReactionPop {
+  0%   { transform: scale(0); opacity: 0; }
+  55%  { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(1); }
+}
 
 /* Quoted "replying to" snippet shown inside a bubble */
 .zm-chat-reply-quote {
@@ -1025,18 +1175,41 @@ select {
 .zm-chat-msg.visitor .zm-chat-reply-quote { border-left-color: rgba(255,255,255,.8); background: rgba(255,255,255,.16); }
 .zm-chat-reply-quote b { font-weight: 700; }
 
-/* Emoji reaction picker popup */
+/* Emoji reaction picker popup — Messenger-style bounce-in */
 .zm-emoji-picker {
   position: fixed; z-index: 999999;
   background: #fff; border-radius: 24px; padding: 6px 8px;
   display: flex; gap: 3px; box-shadow: 0 8px 28px rgba(0,0,0,.22);
+  animation: zmPickerIn .16s cubic-bezier(.34,1.56,.64,1);
+  transform-origin: bottom center;
+}
+@keyframes zmPickerIn {
+  0%   { transform: scale(.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 .zm-emoji-picker button {
   border: none; background: none; font-size: 1.15rem; cursor: pointer;
-  padding: 3px; border-radius: 50%; transition: transform .12s, background .12s;
+  padding: 3px; border-radius: 50%; transition: transform .14s cubic-bezier(.34,1.56,.64,1), background .12s;
   line-height: 1;
+  animation: zmPickerBtnIn .22s cubic-bezier(.34,1.56,.64,1) backwards;
 }
-.zm-emoji-picker button:hover { background: #f0f4f4; transform: scale(1.25); }
+.zm-emoji-picker button:nth-child(1) { animation-delay: .01s; }
+.zm-emoji-picker button:nth-child(2) { animation-delay: .03s; }
+.zm-emoji-picker button:nth-child(3) { animation-delay: .05s; }
+.zm-emoji-picker button:nth-child(4) { animation-delay: .07s; }
+.zm-emoji-picker button:nth-child(5) { animation-delay: .09s; }
+.zm-emoji-picker button:nth-child(6) { animation-delay: .11s; }
+@keyframes zmPickerBtnIn {
+  0%   { transform: scale(0) translateY(6px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.zm-emoji-picker button:hover { background: #f0f4f4; transform: scale(1.5) translateY(-6px); }
+.zm-emoji-picker button.picked { animation: zmEmojiPicked .3s ease; }
+@keyframes zmEmojiPicked {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.7); }
+  100% { transform: scale(0); opacity: 0; }
+}
 
 /* "Replying to ..." bar shown above the textarea while composing a reply */
 .zm-reply-bar {
@@ -1140,7 +1313,7 @@ select {
      ============================================= -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
-    <div class="sidebar-logo-icon"><i class="fa-solid fa-store"></i></div>
+    <div class="sidebar-logo-icon"><img src="img/favicon.png" alt="Zami Mart"></div>
     <div class="sidebar-logo-text">
       <strong>Zami Mart</strong>
       <span>Admin Panel</span>
@@ -1175,9 +1348,6 @@ select {
     <div class="nav-section-label">Users</div>
     <button class="nav-item" data-section="users">
       <i class="fa-solid fa-users"></i> Registered Users
-    </button>
-    <button class="nav-item" data-section="loginlogs">
-      <i class="fa-solid fa-clock-rotate-left"></i> Login Records
     </button>
     <button class="nav-item superadmin-only" data-section="pendingadmins" id="navPendingAdmins" style="display:none;">
       <i class="fa-solid fa-user-shield"></i> Pending Admins
@@ -1600,7 +1770,7 @@ select {
       <div class="card" id="inqListCard">
         <div class="card-header">
           <span class="card-title"><i class="fa-solid fa-cart-shopping" style="color:var(--orange);margin-right:8px;"></i>Customer Inquiries</span>
-          <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-outline btn-sm" id="inqViewToggleBtn" onclick="toggleInqView()" style="min-width:120px;"><i class="fa-solid fa-clock-rotate-left" style="margin-right:5px;"></i>History View</button><button class="btn btn-outline btn-sm" onclick="clearNewInquiryBadge()">Mark all read</button><button class="btn btn-sm" onclick="deleteAllInquiries()" style="background:#fff0f0;color:#d63030;border:1.5px solid #d63030;font-weight:600;"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Delete All</button></div>
+          <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-outline btn-sm" onclick="clearNewInquiryBadge()">Mark all read</button><button class="btn btn-outline btn-sm" onclick="openRecycleBin()" id="recycleBinBtn"><i class="fa-solid fa-trash-can" style="margin-right:5px;"></i>Recycle Bin</button><button class="btn btn-sm" onclick="deleteAllInquiries()" style="background:#fff0f0;color:#d63030;border:1.5px solid #d63030;font-weight:600;"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Delete All</button></div>
         </div>
         <div class="card-body" style="padding:0;">
           <div class="table-wrap">
@@ -1975,6 +2145,36 @@ select {
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('arrivalModal')">Cancel</button>
       <button class="btn btn-orange" onclick="saveArrival()"><i class="fa-solid fa-floppy-disk"></i> Save Arrival</button>
+    </div>
+  </div>
+</div>
+
+<!-- =============================================
+     RECYCLE BIN MODAL
+     ============================================= -->
+<div class="modal-overlay" id="recycleBinModal">
+  <div class="modal" style="max-width:640px;width:92%;">
+    <div class="modal-header">
+      <span class="modal-title"><i class="fa-solid fa-trash-can" style="margin-right:8px;color:#d63030;"></i>Recycle Bin</span>
+      <button class="modal-close" onclick="closeModal('recycleBinModal')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="modal-body" style="max-height:60vh;overflow-y:auto;">
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button class="btn btn-outline btn-sm rb-tab active" id="rbTabInq" onclick="switchRecycleBinTab('inquiries')">
+          <i class="fa-solid fa-cart-shopping" style="margin-right:5px;"></i>Inquiries
+        </button>
+        <button class="btn btn-outline btn-sm rb-tab" id="rbTabChats" onclick="switchRecycleBinTab('chats')">
+          <i class="fa-solid fa-comments" style="margin-right:5px;"></i>Conversations
+        </button>
+      </div>
+      <div id="rbListInquiries"></div>
+      <div id="rbListChats" style="display:none;"></div>
+    </div>
+    <div class="modal-footer" style="justify-content:space-between;">
+      <span style="font-size:.72rem;color:var(--text-muted);">Items here can be restored anytime.</span>
+      <button class="btn btn-sm" onclick="emptyRecycleBin()" style="background:#fff0f0;color:#d63030;border:1.5px solid #d63030;font-weight:600;">
+        <i class="fa-solid fa-fire" style="margin-right:5px;"></i>Empty Bin
+      </button>
     </div>
   </div>
 </div>
@@ -2953,19 +3153,42 @@ function bindAdminMsgEvents(){
     el.addEventListener('touchend', () => clearTimeout(lpt));
     el.addEventListener('touchmove', () => { moved = true; clearTimeout(lpt); });
 
-    const replyBtn = el.querySelector('.zm-act-reply');
-    const reactBtn = el.querySelector('.zm-act-react');
-    const moreBtn  = el.querySelector('.zm-act-more');
+    const replyBtn   = el.querySelector('.zm-act-reply');
+    const reactBtn   = el.querySelector('.zm-act-react');
+    const moreBtn    = el.querySelector('.zm-act-more');
     if (replyBtn) replyBtn.addEventListener('click', e => { e.stopPropagation(); startChatReplyTo(msgId); });
     if (reactBtn) reactBtn.addEventListener('click', e => openZmEmojiPicker(e, msgId));
     if (moreBtn)  moreBtn.addEventListener('click', e => { e.stopPropagation(); showAdminCtxMenu(e, msgId); });
 
-    const reactionBadge = el.querySelector('.zm-chat-reaction');
-    if (reactionBadge) reactionBadge.addEventListener('click', e => { e.stopPropagation(); ChatSystem.reactToMessage(msgId, reactionBadge.dataset.em); renderChatMessages(); });
+    // You can only tap-remove YOUR OWN reaction (admin's). The visitor's
+    // reaction badge is view-only from here.
+    el.querySelectorAll('.zm-chat-reaction').forEach(badge => {
+      if (badge.dataset.owner === 'admin' || badge.dataset.owner === 'legacy') {
+        badge.classList.add('mine');
+        badge.title = 'Remove reaction';
+        badge.addEventListener('click', e => {
+          e.stopPropagation();
+          ChatSystem.reactToMessage(msgId, badge.dataset.em, badge.dataset.owner === 'legacy' ? 'legacy' : 'admin');
+          renderChatMessages();
+        });
+      } else {
+        badge.title = '';
+      }
+    });
 
     const quote = el.querySelector('.zm-chat-reply-quote');
     if (quote) quote.addEventListener('click', e => { e.stopPropagation(); scrollToChatMsg(quote.dataset.refid); });
   });
+}
+
+function _zmReactionBadgesHtml(msg) {
+  if (msg.deleted) return '';
+  const reactions = msg.reactions || (msg.reaction ? { legacy: msg.reaction } : {});
+  const entries = Object.entries(reactions).filter(([, em]) => em);
+  if (!entries.length) return '';
+  return `<div class="zm-chat-reaction-row">` + entries.map(([owner, em]) =>
+    `<div class="zm-chat-reaction" data-em="${em}" data-owner="${owner}">${em}</div>`
+  ).join('') + `</div>`;
 }
 
 function renderChatMessages() {
@@ -2973,8 +3196,7 @@ function renderChatMessages() {
   const container = document.getElementById('chatDetailMessages');
   const scrolledToBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 60;
 
-  const messages = ChatSystem.getSessionMessages(currentChatSessionId)
-    .filter(m => !m.deleted);
+  const messages = ChatSystem.getSessionMessages(currentChatSessionId);
   const rows = messages.map((msg, i) => {
     const prev = messages[i - 1];
     const next = messages[i + 1];
@@ -3013,11 +3235,18 @@ function renderChatMessages() {
     const editedTag = (!msg.deleted && msg.edited) ? `<div class="zm-chat-edited-tag">edited</div>` : '';
     const txtH      = msg.text ? escHtml(msg.text) : '';
     const imgH      = msg.imageData ? `<img src="${msg.imageData}" alt="image">` : '';
-    const bubbleCls = 'zm-chat-bubble';
+    const bubbleCls = 'zm-chat-bubble' + (msg.deleted ? ' deleted' : '');
     const initials  = (msg.senderName || 'C').charAt(0).toUpperCase();
     const quoteH    = msg.replyTo ? `<div class="zm-chat-reply-quote" data-refid="${msg.replyTo.id}"><b>${escHtml(msg.replyTo.senderName||'')}</b>: ${escHtml(msg.replyTo.text||'')}</div>` : '';
-    const reactionH = msg.reaction ? `<div class="zm-chat-reaction" data-em="${msg.reaction}" title="Remove reaction">${msg.reaction}</div>` : '';
-    const actionsH  = `
+    const reactionH = _zmReactionBadgesHtml(msg);
+    // Deleted (unsent) messages show a compact "deleted" placeholder with no
+    // actions — unsending is final from the chat view (no restore here).
+    const bubbleBodyH = msg.deleted
+      ? `<i class="fa-solid fa-ban" style="margin-right:6px;"></i>Message deleted`
+      : `${quoteH}${txtH}${imgH}`;
+    const actionsH  = msg.deleted
+      ? ''
+      : `
       <div class="zm-chat-msg-actions">
         <button class="zm-act-reply" title="Reply"><i class="fa-solid fa-reply"></i></button>
         <button class="zm-act-react" title="React"><i class="fa-regular fa-face-smile"></i></button>
@@ -3034,7 +3263,7 @@ function renderChatMessages() {
       el.innerHTML = `
         <div class="zm-chat-content">
           ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
-          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}</div>
+          <div class="${bubbleCls}">${bubbleBodyH}</div>
           ${reactionH}
           ${editedTag ? `<div style="text-align:right;">${editedTag}</div>` : ''}
           ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
@@ -3046,7 +3275,7 @@ function renderChatMessages() {
         ${avatarHtml}
         <div class="zm-chat-content">
           ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Visitor')}</div>` : ''}
-          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}</div>
+          <div class="${bubbleCls}">${bubbleBodyH}</div>
           ${reactionH}
           ${editedTag}
           ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}
@@ -3132,10 +3361,13 @@ function openZmEmojiPicker(e, msgId) {
     const btn = ev.target.closest('button[data-em]');
     if (!btn) return;
     ev.stopPropagation();
-    ChatSystem.reactToMessage(msgId, btn.dataset.em);
-    closeZmEmojiPicker();
-    unpinAllChatActions();
-    renderChatMessages();
+    btn.classList.add('picked');
+    ChatSystem.reactToMessage(msgId, btn.dataset.em, 'admin');
+    setTimeout(() => {
+      closeZmEmojiPicker();
+      unpinAllChatActions();
+      renderChatMessages();
+    }, 130);
   });
 }
 
@@ -3166,14 +3398,14 @@ function sendChatReply() {
 
 function deleteChatSession(sessionId) {
   const session = ChatSystem.getSession(sessionId);
-  showConfirm('Delete Chat Session?', `Delete chat with "${session ? session.name : 'this visitor'}"? This cannot be undone.`, () => {
+  showConfirm('Delete Chat Session?', `Move chat with "${session ? session.name : 'this visitor'}" to the Recycle Bin? You can restore it later.`, () => {
     ChatSystem.deleteSession(sessionId);
     if (currentChatSessionId === sessionId) {
       closeChatDetail();
     }
     renderChatSessions();
     updateChatBadge();
-    showToast('Chat session deleted.', 'success');
+    showToast('Chat moved to Recycle Bin.', 'success');
   });
 }
 
@@ -3656,7 +3888,10 @@ function renderInqChat() {
       ? `<img src="${msg.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${msg.text?'6px':'0'};" data-src="${msg.imageData}">`
       : '';
     const editedTagInq = (!msg.deleted && msg.edited) ? `<div class="zm-chat-edited-tag">edited</div>` : '';
-    const textHtml = msg.text ? `<div>${escHtml(msg.text)}</div>` : '';
+    const textHtml = msg.deleted
+      ? `<div style="font-style:italic;opacity:.55;"><i class="fa-solid fa-ban" style="margin-right:5px;"></i>Message deleted</div>`
+      : (msg.text ? `<div>${escHtml(msg.text)}</div>` : '');
+    const imgHtmlFinal = msg.deleted ? '' : imgHtml;
     const role      = isAdmin ? 'admin' : 'visitor';
     const initials  = (msg.senderName||'C').charAt(0).toUpperCase();
     const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
@@ -3667,7 +3902,7 @@ function renderInqChat() {
       el.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:68%;">
           ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
-          <div class="zm-chat-bubble">${textHtml}${imgHtml}</div>
+          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}">${textHtml}${imgHtmlFinal}</div>
           ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
         </div>`;
@@ -3677,7 +3912,7 @@ function renderInqChat() {
         ${avatarHtml}
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:68%;">
           ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Customer')}</div>` : ''}
-          <div class="zm-chat-bubble">${textHtml}${imgHtml}</div>
+          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}">${textHtml}${imgHtmlFinal}</div>
           ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}
         </div>`;
@@ -3751,11 +3986,11 @@ function deleteAllInquiries() {
   if (!inqs.length) { showToast('No inquiries to delete.', 'info'); return; }
   showConfirm(
     'Delete All Inquiries?',
-    'This will permanently delete all ' + inqs.length + ' inquiries and their linked chat histories. This cannot be undone.',
+    'Move all ' + inqs.length + ' inquiries and their linked chat histories to the Recycle Bin? You can restore them later.',
     () => {
       const ids = inqs.map(i => i.id);
       ids.forEach(id => {
-        // Also delete linked chat session
+        // Also soft-delete the linked chat session
         const inq = InquirySystem.getInquiries().find(i => i.id === id);
         if (inq) {
           const linked = ChatSystem.getSessions().find(s => s.inquiryId === id || s.id === inq.linkedSessionId);
@@ -3763,7 +3998,7 @@ function deleteAllInquiries() {
         }
         InquirySystem.deleteInquiry(id);
       });
-      showToast('All inquiries deleted.', 'success');
+      showToast('All inquiries moved to Recycle Bin.', 'success');
       renderInquiries();
       updateDashboard();
     }
@@ -3775,11 +4010,11 @@ function deleteAllChats() {
   if (!sessions.length) { showToast('No chat sessions to delete.', 'info'); return; }
   showConfirm(
     'Delete All Chats?',
-    'This will permanently delete all ' + sessions.length + ' chat session(s) and their messages. This cannot be undone.',
+    'Move all ' + sessions.length + ' chat session(s) to the Recycle Bin? You can restore them later.',
     () => {
-      ChatSystem.clearAllChats();
+      sessions.forEach(s => ChatSystem.deleteSession(s.id));
       if (currentChatSessionId) closeChatDetail();
-      showToast('All chat sessions deleted.', 'success');
+      showToast('All chats moved to Recycle Bin.', 'success');
       renderChatSessions();
       updateChatBadge();
     }
@@ -3787,10 +4022,10 @@ function deleteAllChats() {
 }
 
 function deleteInquiry(idx) {
-  showConfirm('Delete Inquiry?', 'This will permanently delete the inquiry and its chat history.', () => {
+  showConfirm('Delete Inquiry?', 'Move this inquiry and its chat history to the Recycle Bin? You can restore it later.', () => {
     const inqs = _getInqs();
     const inq = inqs[idx];
-    // also delete linked chat session if any
+    // also soft-delete linked chat session if any
     if (_inqSessionId) {
       ChatSystem.deleteSession(_inqSessionId);
     } else if (inq) {
@@ -3801,7 +4036,7 @@ function deleteInquiry(idx) {
     updateDashboard();
     closeInqDetail();
     renderInquiries();
-    showToast('Inquiry deleted.', 'success');
+    showToast('Inquiry moved to Recycle Bin.', 'success');
   });
 }
 
@@ -3882,6 +4117,126 @@ function renderInqHistory() {
     </div>`;
   }).join('');
 }
+
+// =============================================
+// RECYCLE BIN (deleted inquiries + deleted chats)
+// =============================================
+let _rbTab = 'inquiries';
+
+function openRecycleBin() {
+  _rbTab = 'inquiries';
+  renderRecycleBin();
+  openModal('recycleBinModal');
+}
+
+function switchRecycleBinTab(tab) {
+  _rbTab = tab;
+  document.getElementById('rbTabInq').classList.toggle('active', tab === 'inquiries');
+  document.getElementById('rbTabChats').classList.toggle('active', tab === 'chats');
+  document.getElementById('rbListInquiries').style.display = tab === 'inquiries' ? '' : 'none';
+  document.getElementById('rbListChats').style.display = tab === 'chats' ? '' : 'none';
+  renderRecycleBin();
+}
+
+function _rbDateStr(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function renderRecycleBin() {
+  // Deleted inquiries
+  const deletedInqs = InquirySystem.getDeletedInquiries();
+  const inqListEl = document.getElementById('rbListInquiries');
+  if (!deletedInqs.length) {
+    inqListEl.innerHTML = '<div class="rb-empty"><i class="fa-solid fa-box-open" style="font-size:1.6rem;opacity:.3;display:block;margin-bottom:8px;"></i>Recycle Bin is empty.</div>';
+  } else {
+    inqListEl.innerHTML = deletedInqs.map(inq => {
+      const itemCount = inq.items ? inq.items.length : 0;
+      return `<div class="rb-item">
+        <div class="rb-item-info">
+          <div class="rb-item-name">${escHtml(inq.name || 'Guest')}</div>
+          <div class="rb-item-sub">${itemCount} item${itemCount!==1?'s':''} &bull; Deleted ${_rbDateStr(inq.deletedAt)}</div>
+        </div>
+        <div class="rb-item-actions">
+          <button class="btn btn-outline btn-sm" onclick="restoreInquiryFromBin('${inq.id}')" style="font-size:.72rem;padding:4px 10px;"><i class="fa-solid fa-clock-rotate-left"></i> Restore</button>
+          <button class="btn btn-outline btn-sm" onclick="permanentlyDeleteInquiryFromBin('${inq.id}')" style="font-size:.72rem;padding:4px 10px;border-color:#d63030;color:#d63030;"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Deleted chat sessions
+  const deletedSessions = ChatSystem.getDeletedSessions();
+  const chatListEl = document.getElementById('rbListChats');
+  if (!deletedSessions.length) {
+    chatListEl.innerHTML = '<div class="rb-empty"><i class="fa-solid fa-box-open" style="font-size:1.6rem;opacity:.3;display:block;margin-bottom:8px;"></i>Recycle Bin is empty.</div>';
+  } else {
+    chatListEl.innerHTML = deletedSessions.map(s => `
+      <div class="rb-item">
+        <div class="rb-item-info">
+          <div class="rb-item-name">${escHtml(s.name || 'Visitor')}</div>
+          <div class="rb-item-sub">${escHtml(s.email || 'No email')} &bull; Deleted ${_rbDateStr(s.deletedAt)}</div>
+        </div>
+        <div class="rb-item-actions">
+          <button class="btn btn-outline btn-sm" onclick="restoreSessionFromBin('${s.id}')" style="font-size:.72rem;padding:4px 10px;"><i class="fa-solid fa-clock-rotate-left"></i> Restore</button>
+          <button class="btn btn-outline btn-sm" onclick="permanentlyDeleteSessionFromBin('${s.id}')" style="font-size:.72rem;padding:4px 10px;border-color:#d63030;color:#d63030;"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function restoreInquiryFromBin(id) {
+  InquirySystem.restoreInquiry(id);
+  renderRecycleBin();
+  renderInquiries();
+  updateDashboard();
+  showToast('Inquiry restored.', 'success');
+}
+
+function permanentlyDeleteInquiryFromBin(id) {
+  showConfirm('Delete Forever?', 'This inquiry will be permanently deleted. This cannot be undone.', () => {
+    InquirySystem.permanentlyDeleteInquiry(id);
+    renderRecycleBin();
+    showToast('Inquiry permanently deleted.', 'success');
+  });
+}
+
+function restoreSessionFromBin(id) {
+  ChatSystem.restoreSession(id);
+  renderRecycleBin();
+  renderChatSessions();
+  updateChatBadge();
+  showToast('Conversation restored.', 'success');
+}
+
+function permanentlyDeleteSessionFromBin(id) {
+  showConfirm('Delete Forever?', 'This conversation and its messages will be permanently deleted. This cannot be undone.', () => {
+    ChatSystem.permanentlyDeleteSession(id);
+    renderRecycleBin();
+    showToast('Conversation permanently deleted.', 'success');
+  });
+}
+
+function emptyRecycleBin() {
+  const deletedInqs = InquirySystem.getDeletedInquiries();
+  const deletedSessions = ChatSystem.getDeletedSessions();
+  const total = deletedInqs.length + deletedSessions.length;
+  if (!total) { showToast('Recycle Bin is already empty.', 'info'); return; }
+  showConfirm('Empty Recycle Bin?', `This will permanently delete ${total} item(s) in the Recycle Bin. This cannot be undone.`, () => {
+    deletedInqs.forEach(inq => InquirySystem.permanentlyDeleteInquiry(inq.id));
+    deletedSessions.forEach(s => ChatSystem.permanentlyDeleteSession(s.id));
+    renderRecycleBin();
+    showToast('Recycle Bin emptied.', 'success');
+  });
+}
+
+// Keep the bin's counts fresh if it's open when data changes elsewhere.
+InquirySystem.on('inquiries-updated', () => {
+  if (document.getElementById('recycleBinModal').classList.contains('open')) renderRecycleBin();
+});
+ChatSystem.on('sessions-updated', () => {
+  if (document.getElementById('recycleBinModal').classList.contains('open')) renderRecycleBin();
+});
 
 // Realtime: re-render chat if open
 ChatSystem.on('messages-updated', () => {
@@ -4125,6 +4480,23 @@ document.addEventListener('click', function(e) {
     document.body.appendChild(o);
   }
   o.innerHTML = '<img src="' + src + '" style="max-width:90vw;max-height:90vh;border-radius:10px;">';
+});
+</script>
+
+<script>
+/* Fresh & modern: universal ripple micro-interaction on buttons/nav */
+document.addEventListener('click', function(e) {
+  var el = e.target.closest('.btn, .nav-item, .topbar-btn, .modal-close');
+  if (!el) return;
+  var rect = el.getBoundingClientRect();
+  var size = Math.max(rect.width, rect.height);
+  var ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+  el.appendChild(ripple);
+  setTimeout(function () { ripple.remove(); }, 550);
 });
 </script>
 </body>

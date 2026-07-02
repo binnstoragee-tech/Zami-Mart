@@ -1737,6 +1737,34 @@ document.addEventListener('DOMContentLoaded', () => {
 .zm-chat-img-preview{display:none;padding:6px 12px 0;position:relative;width:fit-content;}
 .zm-chat-img-preview img{max-height:60px;border-radius:8px;border:1px solid rgba(6,59,63,.12);}
 .zm-chat-img-preview-close{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#d63030;color:#fff;border:none;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+/* reaction badge sitting under a bubble */
+.zm-chat-reaction-row{display:flex;gap:3px;}
+.zm-chat-msg.visitor .zm-chat-reaction-row{align-self:flex-end;}
+.zm-chat-msg.admin .zm-chat-reaction-row{align-self:flex-start;}
+.zm-chat-reaction{font-size:.85rem;line-height:1;background:#fff;border:1px solid rgba(6,59,63,.12);border-radius:20px;padding:1px 5px;box-shadow:0 1px 4px rgba(0,0,0,.1);width:fit-content;cursor:default;user-select:none;margin-top:2px;}
+.zm-chat-reaction.mine{cursor:pointer;}
+.zm-chat-reaction.mine:hover{filter:brightness(.96);}
+/* emoji reaction picker popup */
+.zm-emoji-picker{position:fixed;z-index:999999;background:#fff;border-radius:24px;padding:6px 8px;display:flex;gap:3px;box-shadow:0 8px 28px rgba(0,0,0,.22);}
+.zm-emoji-picker button{border:none;background:none;font-size:1.1rem;cursor:pointer;padding:3px;border-radius:50%;transition:transform .12s,background .12s;line-height:1;}
+.zm-emoji-picker button:hover{background:#f0f4f4;transform:scale(1.25);}
+/* hover/tap message actions (reply, react) */
+.zm-chat-msg-actions{display:flex;align-items:center;gap:2px;opacity:0;transform:scale(.92);transition:opacity .12s ease,transform .12s ease;pointer-events:none;flex-shrink:0;align-self:flex-end;margin-bottom:2px;}
+.zm-chat-msg:hover .zm-chat-msg-actions,.zm-chat-msg.zm-actions-pinned .zm-chat-msg-actions{opacity:1;transform:scale(1);pointer-events:all;}
+.zm-chat-msg-actions button{width:24px;height:24px;border-radius:50%;border:none;background:#fff;color:#8a9faa;display:flex;align-items:center;justify-content:center;font-size:.62rem;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.14);transition:background .12s,color .12s,transform .12s;}
+.zm-chat-msg-actions button:hover{background:#063b3f;color:#fff;transform:translateY(-1px);}
+@media(hover:none){.zm-chat-msg-actions{opacity:0;}.zm-chat-msg.zm-actions-pinned .zm-chat-msg-actions{opacity:1;pointer-events:all;}}
+/* quoted "replying to" snippet shown inside a bubble */
+.zm-chat-reply-quote{font-size:.68rem;line-height:1.3;padding:4px 7px;margin-bottom:4px;border-left:3px solid rgba(255,255,255,.7);background:rgba(255,255,255,.16);border-radius:5px;opacity:.92;max-height:2.4em;overflow:hidden;cursor:pointer;}
+.zm-chat-msg.admin .zm-chat-reply-quote{border-left-color:rgba(6,59,63,.35);background:rgba(6,59,63,.05);}
+.zm-chat-reply-quote b{font-weight:700;}
+/* "Replying to ..." bar shown above the input while composing a reply */
+.zm-chat-reply-bar{display:none;align-items:center;gap:8px;padding:7px 12px;background:#f4f7f7;border-top:1px solid rgba(6,59,63,.1);border-left:3px solid #FD4D02;font-size:.7rem;color:#8a9faa;flex-shrink:0;}
+.zm-chat-reply-bar.show{display:flex;}
+.zm-chat-reply-bar-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.zm-chat-reply-bar-text b{color:#063b3f;}
+.zm-chat-reply-bar-close{border:none;background:none;cursor:pointer;color:#8a9faa;font-size:.78rem;padding:2px 6px;}
+.zm-chat-reply-bar-close:hover{color:#d63030;}
 @media(max-width:480px){
   .zm-chat-btn{bottom:16px;right:16px;width:52px;height:52px;font-size:1.2rem;}
   .zm-chat-win{position:fixed;inset:0;width:100%;max-width:100%;height:100%;border-radius:0;bottom:0;right:0;}
@@ -1789,6 +1817,11 @@ document.addEventListener('DOMContentLoaded', () => {
     <button class="zm-chip">🛒 How to order?</button>
     <button class="zm-chip">📞 Contact details</button>
   </div>
+  <!-- Replying-to bar -->
+  <div class="zm-chat-reply-bar" id="zmReplyBar">
+    <div class="zm-chat-reply-bar-text">Replying to <b id="zmReplyBarName"></b>: <span id="zmReplyBarText"></span></div>
+    <button class="zm-chat-reply-bar-close" id="zmReplyBarClose" title="Cancel reply"><i class="fa-solid fa-xmark"></i></button>
+  </div>
   <!-- Image preview strip -->
   <div class="zm-chat-img-preview" id="zmImgPreview">
     <img id="zmImgPreviewImg" src="">
@@ -1815,7 +1848,78 @@ const input=document.getElementById('zmChatInput');
 const sendBtn=document.getElementById('zmChatSend');
 const unreadBadge=document.getElementById('zmChatUnread');
 let sessionId=null,visitorName=null,visitorAvatar=null;
+let zmReplyTarget=null;
 function escH(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+
+// ── Reply-to state / bar ──
+const zmReplyBar=document.getElementById('zmReplyBar');
+const zmReplyBarName=document.getElementById('zmReplyBarName');
+const zmReplyBarText=document.getElementById('zmReplyBarText');
+const zmReplyBarClose=document.getElementById('zmReplyBarClose');
+function startZmReplyTo(msgId){
+  const msg=ChatSystem.getSessionMessages(sessionId).find(m=>m.id===msgId);
+  if(!msg||msg.deleted)return;
+  closeZmEmojiPicker();
+  unpinAllZmActions();
+  zmReplyTarget={id:msg.id,senderName:msg.senderType==='visitor'?'You':'Zami Mart',text:msg.text?msg.text.slice(0,80):(msg.imageData?'\u{1F4F7} Photo':'')};
+  zmReplyBarName.textContent=zmReplyTarget.senderName;
+  zmReplyBarText.textContent=zmReplyTarget.text;
+  zmReplyBar.classList.add('show');
+  input.focus();
+}
+function cancelZmReplyTo(){zmReplyTarget=null;zmReplyBar.classList.remove('show');}
+if(zmReplyBarClose)zmReplyBarClose.addEventListener('click',cancelZmReplyTo);
+
+function zmScrollToMsg(msgId){
+  const el=msgsEl.querySelector(`[data-msgid="${msgId}"]`);
+  if(!el)return;
+  el.scrollIntoView({behavior:'smooth',block:'center'});
+  const bubble=el.querySelector('.zm-chat-bubble');
+  if(!bubble)return;
+  bubble.style.transition='box-shadow .3s';
+  const prevShadow=bubble.style.boxShadow;
+  bubble.style.boxShadow='0 0 0 2px #FD4D02';
+  setTimeout(()=>{bubble.style.boxShadow=prevShadow;},700);
+}
+
+function unpinAllZmActions(){
+  msgsEl.querySelectorAll('.zm-chat-msg.zm-actions-pinned').forEach(el=>el.classList.remove('zm-actions-pinned'));
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.zm-chat-msg-actions')&&!e.target.closest('.zm-emoji-picker'))unpinAllZmActions();
+});
+
+// ── Emoji reaction picker ──
+const ZM_QUICK_EMOJIS=['\u{1F44D}','\u2764\uFE0F','\u{1F602}','\u{1F62E}','\u{1F622}','\u{1F64F}'];
+let _zmEmojiPicker=null;
+function closeZmEmojiPicker(){if(_zmEmojiPicker){_zmEmojiPicker.remove();_zmEmojiPicker=null;}}
+document.addEventListener('click',closeZmEmojiPicker);
+function openZmEmojiPicker(e,msgId,isAdmin,anchorEl){
+  if(e)e.preventDefault();
+  closeZmEmojiPicker();
+  const anchor=anchorEl||(e&&e.currentTarget)||msgsEl.querySelector(`[data-msgid="${msgId}"] .zm-chat-bubble`);
+  if(!anchor)return;
+  const rect=anchor.getBoundingClientRect();
+  const picker=document.createElement('div');
+  picker.className='zm-emoji-picker';
+  picker.innerHTML=ZM_QUICK_EMOJIS.map(em=>`<button data-em="${em}">${em}</button>`).join('');
+  document.body.appendChild(picker);
+  const pw=picker.offsetWidth,ph=picker.offsetHeight;
+  let left=isAdmin?rect.left:rect.right-pw;
+  left=Math.max(8,Math.min(left,window.innerWidth-pw-8));
+  const top=Math.max(8,rect.top-ph-6);
+  picker.style.left=left+'px';
+  picker.style.top=top+'px';
+  _zmEmojiPicker=picker;
+  picker.addEventListener('click',ev=>{
+    const b=ev.target.closest('button[data-em]');
+    if(!b)return;
+    ev.stopPropagation();
+    ChatSystem.reactToMessage(msgId,b.dataset.em,'visitor');
+    closeZmEmojiPicker();
+    renderMsgs();
+  });
+}
 
 function getLoggedUser(){
   try{
@@ -1881,7 +1985,8 @@ function showWelcome(){
 function zmSendChip(btn){
   if(!sessionId)return;
   const text=btn.textContent.trim();
-  ChatSystem.sendMessage(sessionId,'visitor',visitorName,text,null);
+  ChatSystem.sendMessage(sessionId,'visitor',visitorName,text,null,zmReplyTarget);
+  cancelZmReplyTo();
   const chips=document.getElementById('zmChatChips');
   if(chips)chips.style.display='none';
   renderMsgs();
@@ -2024,6 +2129,15 @@ function renderMsgs(){
       :(m.text?`<div>${escH(m.text)}</div>`:'');
     const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}`;
     const cls=['zm-chat-msg',isAdmin?'admin':'visitor',!isFirst?'same-sender':'',(isLast&&!isFirst)?'last-in-group':''].filter(Boolean).join(' ');
+    const reactions=(!isDeleted)?(m.reactions||(m.reaction?{legacy:m.reaction}:{})):{};
+    const reactionEntries=Object.entries(reactions).filter(([,em])=>em);
+    const reactionH=reactionEntries.length?`<div class="zm-chat-reaction-row">`+reactionEntries.map(([owner,em])=>`<div class="zm-chat-reaction" data-msgid="${m.id}" data-em="${em}" data-owner="${owner}">${em}</div>`).join('')+`</div>`:'';
+    const quoteH=(!isDeleted&&m.replyTo)?`<div class="zm-chat-reply-quote" data-refid="${m.replyTo.id}"><b>${escH(m.replyTo.senderName||'')}</b>: ${escH(m.replyTo.text||'')}</div>`:'';
+    const actionsH=isDeleted?'':`
+      <div class="zm-chat-msg-actions">
+        <button class="zm-act-reply" title="Reply"><i class="fa-solid fa-reply"></i></button>
+        <button class="zm-act-react" title="React"><i class="fa-regular fa-face-smile"></i></button>
+      </div>`;
 
     const el=document.createElement('div');
     el.className=cls;
@@ -2034,18 +2148,50 @@ function renderMsgs(){
         <div class="zm-chat-avatar-admin${isLast?'':' hidden'}"><i class="fa-solid fa-headset"></i></div>
         <div class="zm-chat-msg-content">
           ${isFirst?'<div class="zm-chat-sender-label">Zami Mart</div>':''}
-          <div class="${bubbleCls}">${txtH}${imgH}</div>
+          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}</div>
+          ${reactionH}
           ${editedTag}
           ${isLast?`<div class="zm-chat-time">${t}</div>`:''}
-        </div>`;
+        </div>
+        ${actionsH}`;
     }else{
       el.innerHTML=`
         <div class="zm-chat-msg-content">
-          <div class="${bubbleCls}">${txtH}${imgH}</div>
+          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}</div>
+          ${reactionH}
           ${editedTag}
           ${isLast?`<div class="zm-chat-time">${t}</div>`:''}
-        </div>`;
+        </div>
+        ${actionsH}`;
     }
+
+    // Reply / react hover-action buttons
+    const zmReplyBtn=el.querySelector('.zm-act-reply');
+    const zmReactBtn=el.querySelector('.zm-act-react');
+    if(zmReplyBtn)zmReplyBtn.addEventListener('click',e=>{e.stopPropagation();startZmReplyTo(m.id);});
+    if(zmReactBtn)zmReactBtn.addEventListener('click',e=>{e.stopPropagation();openZmEmojiPicker(e,m.id,isAdmin,el.querySelector('.zm-chat-bubble'));});
+
+    // Tap YOUR OWN reaction badge to toggle it off. The other side's
+    // reaction badge is view-only from here.
+    el.querySelectorAll('.zm-chat-reaction').forEach(badge=>{
+      if(badge.dataset.owner==='visitor'||badge.dataset.owner==='legacy'){
+        badge.classList.add('mine');
+        badge.title='Remove reaction';
+        badge.addEventListener('click',e=>{e.stopPropagation();ChatSystem.reactToMessage(badge.dataset.msgid,badge.dataset.em,badge.dataset.owner==='legacy'?'legacy':'visitor');renderMsgs();});
+      }
+    });
+
+    // Click a quoted reply snippet to jump to the original message
+    const zmQuote=el.querySelector('.zm-chat-reply-quote');
+    if(zmQuote)zmQuote.addEventListener('click',e=>{e.stopPropagation();zmScrollToMsg(zmQuote.dataset.refid);});
+
+    // Tap the message row (mobile) to reveal the reply/react buttons
+    el.addEventListener('click',e=>{
+      if(e.target.closest('.zm-chat-reply-quote')||e.target.closest('.zm-chat-reaction')||e.target.closest('.zm-chat-msg-actions')||e.target.closest('.zm-chat-img'))return;
+      unpinAllZmActions();
+      el.classList.toggle('zm-actions-pinned');
+    });
+
     msgsEl.appendChild(el);
   });
 
@@ -2067,7 +2213,8 @@ document.addEventListener('change',function(e){
 function doSend(){
   const txt=input.value.trim();
   if((!txt&&!zmPendingImg)||!sessionId)return;
-  ChatSystem.sendMessage(sessionId,'visitor',visitorName,txt,zmPendingImg);
+  ChatSystem.sendMessage(sessionId,'visitor',visitorName,txt,zmPendingImg,zmReplyTarget);
+  cancelZmReplyTo();
   const chips=document.getElementById('zmChatChips');
   if(chips)chips.style.display='none';
   input.value='';input.style.height='auto';

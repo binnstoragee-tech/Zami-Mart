@@ -7,9 +7,14 @@
  * page that already calls ChatSystem.* keeps working without edits.
  *
  * Firestore layout:
- *   chatSessions/{sessionId}   -> { name, email, createdAt, lastMessageAt, status, inquiryId? }
- *   chatMessages/{messageId}   -> { sessionId, senderType, senderName, text, imageData, timestamp, read, deleted? }
+ *   chatSessions/{sessionId}   -> { name, email, createdAt, lastMessageAt, status, inquiryId?, deleted?, deletedAt? }
+ *   chatMessages/{messageId}   -> { sessionId, senderType, senderName, text, imageData, timestamp, read, deleted?, deletedAt? }
  *   chatMeta/unreadCounts      -> { admin: number, [sessionId]: number }
+ *
+ * Recycle Bin: deleting a session or a message is a SOFT delete (deleted:true,
+ * deletedAt set) — the original data is kept so it can be restored later from
+ * the admin Recycle Bin. Use permanentlyDeleteSession()/permanentlyDeleteMessage()
+ * to erase for good (called from the Recycle Bin's "Delete Forever").
  */
 
 const ChatSystem = (function() {
@@ -112,7 +117,8 @@ const ChatSystem = (function() {
   }
 
   function getMessages() { return _messages; }
-  function getSessions()  { return _sessions; }
+  function getSessions()  { return _sessions.filter(s => !s.deleted); }
+  function getDeletedSessions() { return _sessions.filter(s => s.deleted); }
   function getUnread()    { return _unread; }
 
   // =============================================
@@ -122,19 +128,19 @@ const ChatSystem = (function() {
     // If a previous session ID is explicitly linked, reuse it
     if (linkedSessionId) {
       const prev = _sessions.find(s => s.id === linkedSessionId);
-      if (prev) return prev.id;
+      if (prev) { if (prev.deleted) restoreSession(prev.id); return prev.id; }
     }
 
     // Deduplicate by contact (phone/email) if provided
     if (visitorContact) {
       const existing = _sessions.find(s => s.email && s.email.toLowerCase() === visitorContact.toLowerCase());
-      if (existing) return existing.id;
+      if (existing) { if (existing.deleted) restoreSession(existing.id); return existing.id; }
     }
 
     // Deduplicate by name if no contact (prevents duplicate guest sessions)
     if (!visitorContact && visitorName) {
       const existing = _sessions.find(s => s.name && s.name.toLowerCase() === visitorName.toLowerCase() && !s.email);
-      if (existing) return existing.id;
+      if (existing) { if (existing.deleted) restoreSession(existing.id); return existing.id; }
     }
 
     const sessionId = 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
@@ -201,6 +207,12 @@ const ChatSystem = (function() {
       replyTo:    replyTo || null
     };
 
+    // If this session was moved to the Recycle Bin but the conversation is
+    // still active (visitor replying, or admin replying from history), bring
+    // it back so it shows up in the normal chat list again.
+    const s = _sessions.find(s => s.id === sessionId);
+    if (s && s.deleted) restoreSession(sessionId);
+
     // Optimistic local push (the next Firestore snapshot will reconcile/replace this).
     _messages.push(message);
     notifyListeners('messages-updated', _messages);
@@ -263,7 +275,33 @@ const ChatSystem = (function() {
   // =============================================
   // UTILITY
   // =============================================
+  // Soft delete — moves the conversation to the Recycle Bin. Session + its
+  // messages are kept in Firestore untouched so it can be restored later.
   function deleteSession(sessionId) {
+    const s = _sessions.find(s => s.id === sessionId);
+    const deletedAt = new Date().toISOString();
+    if (s) { s.deleted = true; s.deletedAt = deletedAt; }
+    notifyListeners('sessions-updated', _sessions);
+
+    whenReady(({ db, doc, setDoc }) => {
+      setDoc(doc(db, 'chatSessions', sessionId), { deleted: true, deletedAt }, { merge: true }).catch(() => {});
+      setDoc(doc(db, 'chatMeta', 'unreadCounts'), { [sessionId]: 0 }, { merge: true }).catch(() => {});
+    });
+  }
+
+  // Bring a conversation back out of the Recycle Bin.
+  function restoreSession(sessionId) {
+    const s = _sessions.find(s => s.id === sessionId);
+    if (s) { s.deleted = false; s.deletedAt = null; }
+    notifyListeners('sessions-updated', _sessions);
+
+    whenReady(({ db, doc, setDoc }) => {
+      setDoc(doc(db, 'chatSessions', sessionId), { deleted: false, deletedAt: null }, { merge: true }).catch(() => {});
+    });
+  }
+
+  // Erase a conversation for good (called from the Recycle Bin's "Delete Forever").
+  function permanentlyDeleteSession(sessionId) {
     _sessions = _sessions.filter(s => s.id !== sessionId);
     const toDelete = _messages.filter(m => m.sessionId === sessionId);
     _messages = _messages.filter(m => m.sessionId !== sessionId);
@@ -277,13 +315,37 @@ const ChatSystem = (function() {
     });
   }
 
+  // Soft delete a single message — original text/image are KEPT so it can be
+  // restored; the UI is responsible for hiding/graying it out.
   function deleteMessage(messageId) {
     const m = _messages.find(m => m.id === messageId);
-    if (m) { m.deleted = true; m.text = ''; m.imageData = null; }
+    const deletedAt = new Date().toISOString();
+    if (m) { m.deleted = true; m.deletedAt = deletedAt; }
     notifyListeners('messages-updated', _messages);
 
     whenReady(({ db, doc, updateDoc }) => {
-      updateDoc(doc(db, 'chatMessages', messageId), { deleted: true, text: '', imageData: null }).catch(() => {});
+      updateDoc(doc(db, 'chatMessages', messageId), { deleted: true, deletedAt }).catch(() => {});
+    });
+  }
+
+  // Undo a message delete.
+  function restoreMessage(messageId) {
+    const m = _messages.find(m => m.id === messageId);
+    if (m) { m.deleted = false; m.deletedAt = null; }
+    notifyListeners('messages-updated', _messages);
+
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'chatMessages', messageId), { deleted: false, deletedAt: null }).catch(() => {});
+    });
+  }
+
+  // Erase a single message for good.
+  function permanentlyDeleteMessage(messageId) {
+    _messages = _messages.filter(m => m.id !== messageId);
+    notifyListeners('messages-updated', _messages);
+
+    whenReady(({ db, doc, deleteDoc }) => {
+      deleteDoc(doc(db, 'chatMessages', messageId)).catch(() => {});
     });
   }
 
@@ -302,15 +364,30 @@ const ChatSystem = (function() {
     return true;
   }
 
-  // Toggle an emoji reaction on a message. Pass the same emoji again to remove it.
-  function reactToMessage(messageId, emoji) {
+  // Toggle an emoji reaction on a message, per reactor. Each side (admin /
+  // visitor) owns its own reaction slot on a message — reacting never
+  // touches or removes the other side's reaction. Pass the same emoji again
+  // (as the same reactorType) to remove your own reaction.
+  // reactorType: 'admin' | 'visitor'
+  function reactToMessage(messageId, emoji, reactorType) {
     const m = _messages.find(m => m.id === messageId);
-    if (!m || m.deleted) return;
-    m.reaction = (m.reaction === emoji) ? null : emoji;
+    if (!m || m.deleted || !reactorType) return;
+    const reactions = Object.assign({}, m.reactions);
+    // Migrate any older single-reaction message the first time it's touched,
+    // so pre-existing reactions aren't silently dropped.
+    if (!m.reactions && m.reaction) reactions.legacy = m.reaction;
+    if (reactions[reactorType] === emoji) {
+      delete reactions[reactorType];
+    } else {
+      reactions[reactorType] = emoji;
+    }
+    m.reactions = reactions;
+    m.reaction = null; // fully migrated away from the old single-slot field
     notifyListeners('messages-updated', _messages);
 
     whenReady(({ db, doc, updateDoc }) => {
-      updateDoc(doc(db, 'chatMessages', messageId), { reaction: m.reaction || null }).catch(() => {});
+      updateDoc(doc(db, 'chatMessages', messageId), { reactions, reaction: null })
+        .catch(e => _reportErr('ChatSystem: reactToMessage error', e));
     });
   }
 
@@ -346,8 +423,10 @@ const ChatSystem = (function() {
 
   return {
     init: initStorage, on, onReady,
-    createSession, getSession, getSessions, updateSessionLastMessage, linkInquiryToSession, deleteSession,
-    sendMessage, getSessionMessages, getMessages, deleteMessage, editMessage, reactToMessage,
+    createSession, getSession, getSessions, getDeletedSessions, updateSessionLastMessage, linkInquiryToSession,
+    deleteSession, restoreSession, permanentlyDeleteSession,
+    sendMessage, getSessionMessages, getMessages, deleteMessage, restoreMessage, permanentlyDeleteMessage,
+    editMessage, reactToMessage,
     markSessionAsRead, markAdminRead,
     getUnreadCount, getAdminUnreadCount, getAdminUnreadBySession,
     clearAllChats

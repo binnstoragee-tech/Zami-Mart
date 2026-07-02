@@ -44,7 +44,10 @@ const InquirySystem = (function() {
     });
   }
 
-  function getInquiries() { return _inquiries; }
+  // Active (non-deleted) inquiries — what every normal list should show.
+  function getInquiries() { return _inquiries.filter(i => !i.deleted); }
+  // Soft-deleted inquiries — shown in the admin Recycle Bin.
+  function getDeletedInquiries() { return _inquiries.filter(i => i.deleted); }
 
   function submitInquiry({ name, email, items, chatSessionId }) {
     const id = 'inq_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
@@ -96,13 +99,13 @@ const InquirySystem = (function() {
 
   function getInquiriesByEmail(email) {
     if (!email) return [];
-    return _inquiries.filter(i => i.email && i.email.toLowerCase() === email.toLowerCase())
+    return _inquiries.filter(i => !i.deleted && i.email && i.email.toLowerCase() === email.toLowerCase())
       .sort((a, b) => new Date(b.sentAt) - new Date(a.sentAt));
   }
 
   function getCustomers() {
     const map = {};
-    _inquiries.forEach(inq => {
+    _inquiries.filter(i => !i.deleted).forEach(inq => {
       const key = inq.email ? inq.email.toLowerCase() : ('_guest_' + inq.name);
       if (!map[key]) {
         map[key] = {
@@ -139,11 +142,36 @@ const InquirySystem = (function() {
     });
   }
 
+  // Soft delete — moves the inquiry to the Recycle Bin. Original data is kept
+  // so it can be restored later.
   function deleteInquiry(id) {
+    const inq = _inquiries.find(i => i.id === id);
+    const deletedAt = new Date().toISOString();
+    if (inq) { inq.deleted = true; inq.deletedAt = deletedAt; }
+    notifyListeners('inquiries-updated', _inquiries);
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'inquiries', id), { deleted: true, deletedAt })
+        .catch(e => _reportErr('InquirySystem: deleteInquiry error', e));
+    });
+  }
+
+  // Bring an inquiry back out of the Recycle Bin.
+  function restoreInquiry(id) {
+    const inq = _inquiries.find(i => i.id === id);
+    if (inq) { inq.deleted = false; inq.deletedAt = null; }
+    notifyListeners('inquiries-updated', _inquiries);
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'inquiries', id), { deleted: false, deletedAt: null })
+        .catch(e => _reportErr('InquirySystem: restoreInquiry error', e));
+    });
+  }
+
+  // Erase an inquiry for good (called from the Recycle Bin's "Delete Forever").
+  function permanentlyDeleteInquiry(id) {
     _inquiries = _inquiries.filter(i => i.id !== id);
     notifyListeners('inquiries-updated', _inquiries);
     whenReady(({ db, doc, deleteDoc }) => {
-      deleteDoc(doc(db, 'inquiries', id)).catch(e => _reportErr('InquirySystem: deleteInquiry error', e));
+      deleteDoc(doc(db, 'inquiries', id)).catch(e => _reportErr('InquirySystem: permanentlyDeleteInquiry error', e));
     });
   }
 
@@ -157,7 +185,10 @@ const InquirySystem = (function() {
     });
   }
 
-  return { init, on, getInquiries, submitInquiry, getInquiriesByEmail, getCustomers, markRead, markAllRead, deleteInquiry, updateLinkedSessionId };
+  return {
+    init, on, getInquiries, getDeletedInquiries, submitInquiry, getInquiriesByEmail, getCustomers,
+    markRead, markAllRead, deleteInquiry, restoreInquiry, permanentlyDeleteInquiry, updateLinkedSessionId
+  };
 })();
 
 if (document.readyState === 'loading') {

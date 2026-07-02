@@ -286,31 +286,134 @@ body { background: transparent; color: var(--text); font-size: 14px; }
 .chat-message.visitor .chat-message-time { text-align: right; }
 .chat-message.admin .chat-message-time   { text-align: left; }
 
-/* ── Reaction badge ── */
+/* Edited tag (matches admin panel) */
+.chat-edited-tag {
+  font-size: .6rem; opacity: .55; font-style: italic;
+  padding: 0 3px; margin-top: 1px;
+}
+.chat-message.visitor .chat-edited-tag { text-align: right; }
+.chat-message.admin .chat-edited-tag   { text-align: left; }
+
+/* ── Reaction badge(s) ── */
+.chat-reaction-row {
+  display: flex; gap: 3px; margin-top: 2px;
+}
+.chat-message.visitor .chat-reaction-row { align-self: flex-end; }
+.chat-message.admin   .chat-reaction-row { align-self: flex-start; }
 .chat-reaction {
   font-size: .85rem; line-height: 1;
   background: #fff; border: 1px solid rgba(6,59,63,.12);
   border-radius: 20px; padding: 1px 5px;
   box-shadow: 0 1px 4px rgba(0,0,0,.1);
-  width: fit-content; cursor: pointer; user-select: none;
-  margin-top: 2px;
+  width: fit-content; user-select: none;
+  animation: chatReactionPop .32s cubic-bezier(.34,1.56,.64,1);
+  cursor: default; /* not yours: just a badge, not removable by you */
 }
-.chat-message.visitor .chat-reaction { align-self: flex-end; }
-.chat-message.admin   .chat-reaction { align-self: flex-start; }
+.chat-reaction.mine { cursor: pointer; } /* yours: tap to remove */
+.chat-reaction.mine:hover { filter: brightness(.96); }
+@keyframes chatReactionPop {
+  0%   { transform: scale(0); opacity: 0; }
+  55%  { transform: scale(1.35); opacity: 1; }
+  100% { transform: scale(1); }
+}
 
-/* ── Emoji picker popup (widget) ── */
+/* ── Emoji picker popup (widget) — Messenger-style bounce-in ── */
 .chat-emoji-picker {
   position: fixed; z-index: 999999;
   background: #fff; border-radius: 24px; padding: 6px 8px;
   display: flex; gap: 3px;
   box-shadow: 0 8px 28px rgba(0,0,0,.22);
+  animation: chatPickerIn .16s cubic-bezier(.34,1.56,.64,1);
+  transform-origin: bottom center;
+}
+@keyframes chatPickerIn {
+  0%   { transform: scale(.4); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 .chat-emoji-picker button {
   border: none; background: none; font-size: 1.1rem; cursor: pointer;
-  padding: 3px; border-radius: 50%; transition: transform .12s, background .12s;
+  padding: 3px; border-radius: 50%; transition: transform .14s cubic-bezier(.34,1.56,.64,1), background .12s;
   line-height: 1;
+  animation: chatPickerBtnIn .22s cubic-bezier(.34,1.56,.64,1) backwards;
 }
-.chat-emoji-picker button:hover { background: #f0f4f4; transform: scale(1.25); }
+.chat-emoji-picker button:nth-child(1) { animation-delay: .01s; }
+.chat-emoji-picker button:nth-child(2) { animation-delay: .03s; }
+.chat-emoji-picker button:nth-child(3) { animation-delay: .05s; }
+.chat-emoji-picker button:nth-child(4) { animation-delay: .07s; }
+.chat-emoji-picker button:nth-child(5) { animation-delay: .09s; }
+.chat-emoji-picker button:nth-child(6) { animation-delay: .11s; }
+@keyframes chatPickerBtnIn {
+  0%   { transform: scale(0) translateY(6px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+.chat-emoji-picker button:hover { background: #f0f4f4; transform: scale(1.5) translateY(-6px); }
+.chat-emoji-picker button.picked { animation: chatEmojiPicked .3s ease; }
+@keyframes chatEmojiPicked {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.7); }
+  100% { transform: scale(0); opacity: 0; }
+}
+
+/* ── Message actions (reply, react) — hidden until you hover (desktop)
+   or tap the bubble (phone). Always-visible caused layout squeeze against
+   tall bubbles (quotes) and neighboring sender labels. ── */
+.chat-msg-actions {
+  display: flex; align-items: center; gap: 2px;
+  opacity: 0; transform: scale(.92);
+  transition: opacity .12s ease, transform .12s ease;
+  pointer-events: none;
+  flex-shrink: 0;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+.chat-message:hover .chat-msg-actions,
+.chat-message.actions-pinned .chat-msg-actions {
+  opacity: 1; transform: scale(1); pointer-events: all;
+}
+.chat-msg-actions button {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: none; background: #fff; color: var(--text-muted);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .62rem; cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,.14);
+  transition: background .12s, color .12s, transform .12s;
+}
+.chat-msg-actions button:hover { background: var(--teal); color: #fff; transform: translateY(-1px); }
+@media (hover: none) {
+  .chat-msg-actions { opacity: 0; }
+  .chat-message.actions-pinned .chat-msg-actions { opacity: 1; pointer-events: all; }
+}
+
+/* Quoted "replying to" snippet shown inside a bubble */
+.chat-reply-quote {
+  font-size: .68rem; line-height: 1.3; padding: 4px 7px; margin-bottom: 4px;
+  border-left: 3px solid rgba(255,255,255,.7);
+  background: rgba(255,255,255,.16); border-radius: 5px;
+  opacity: .92; max-height: 2.4em; overflow: hidden;
+  cursor: pointer;
+}
+.chat-message.admin .chat-reply-quote {
+  border-left-color: rgba(6,59,63,.35);
+  background: rgba(6,59,63,.05);
+}
+.chat-reply-quote b { font-weight: 700; }
+
+/* "Replying to ..." bar shown above the input while composing a reply */
+.chat-reply-bar {
+  display: none; align-items: center; gap: 8px;
+  padding: 7px 12px; background: #f4f7f7;
+  border-top: 1px solid var(--border); border-left: 3px solid var(--orange);
+  font-size: .7rem; color: var(--text-muted);
+  flex-shrink: 0;
+}
+.chat-reply-bar.show { display: flex; }
+.chat-reply-bar-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat-reply-bar-text b { color: var(--teal); }
+.chat-reply-bar-close {
+  border: none; background: none; cursor: pointer; color: var(--text-muted);
+  font-size: .78rem; padding: 2px 6px;
+}
+.chat-reply-bar-close:hover { color: #d63030; }
 
 /* ── Sender label (first in group) ── */
 .chat-sender-label {
@@ -545,6 +648,12 @@ body { background: transparent; color: var(--text); font-size: 14px; }
     <button class="chat-chip" onclick="sendChip(this)">📞 Contact details</button>
   </div>
 
+  <!-- Replying-to bar -->
+  <div class="chat-reply-bar" id="chatReplyBar">
+    <div class="chat-reply-bar-text">Replying to <b id="chatReplyBarName"></b>: <span id="chatReplyBarText"></span></div>
+    <button class="chat-reply-bar-close" id="chatReplyBarClose" title="Cancel reply"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+
   <!-- Input -->
   <div class="chat-input-area" id="chatInputArea">
     <button class="chat-img-btn" id="chatImgBtn" style="display:none;" title="Send image">
@@ -558,7 +667,7 @@ body { background: transparent; color: var(--text); font-size: 14px; }
   </div>
 </div>
 
-
+<script>
 const chatBtn        = document.getElementById('chatWidgetBtn');
 const chatWindow     = document.getElementById('chatWindow');
 const chatCloseBtn   = document.getElementById('chatCloseBtn');
@@ -575,6 +684,53 @@ const unreadBadge    = document.getElementById('chatUnreadBadge');
 let currentSessionId = null;
 let visitorName      = null;
 let _lastSeenAdminMsgCount = 0;
+let widgetReplyTarget = null;
+
+const chatReplyBar      = document.getElementById('chatReplyBar');
+const chatReplyBarName  = document.getElementById('chatReplyBarName');
+const chatReplyBarText  = document.getElementById('chatReplyBarText');
+const chatReplyBarClose = document.getElementById('chatReplyBarClose');
+
+function startWidgetReplyTo(msgId) {
+  const msg = ChatSystem.getSessionMessages(currentSessionId).find(m => m.id === msgId);
+  if (!msg || msg.deleted) return;
+  closeWidgetEmojiPicker();
+  unpinAllWidgetActions();
+  widgetReplyTarget = {
+    id: msg.id,
+    senderName: msg.senderType === 'visitor' ? 'You' : 'Zami Mart',
+    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : '')
+  };
+  chatReplyBarName.textContent = widgetReplyTarget.senderName;
+  chatReplyBarText.textContent = widgetReplyTarget.text;
+  chatReplyBar.classList.add('show');
+  chatInput.focus();
+}
+function cancelWidgetReplyTo() {
+  widgetReplyTarget = null;
+  chatReplyBar.classList.remove('show');
+}
+chatReplyBarClose.addEventListener('click', cancelWidgetReplyTo);
+
+function scrollToWidgetMsg(msgId) {
+  const el = document.querySelector(`#chatMessages [data-msgid="${msgId}"]`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const bubble = el.querySelector('.chat-message-bubble');
+  if (!bubble) return;
+  bubble.style.transition = 'background-color .3s, box-shadow .3s';
+  const prevShadow = bubble.style.boxShadow;
+  bubble.style.boxShadow = '0 0 0 2px var(--orange)';
+  setTimeout(() => { bubble.style.boxShadow = prevShadow; }, 700);
+}
+
+// Mobile long-press: pin the reply/react icons so they're tappable
+function unpinAllWidgetActions() {
+  document.querySelectorAll('.chat-message.actions-pinned').forEach(el => el.classList.remove('actions-pinned'));
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.chat-msg-actions') && !e.target.closest('.chat-emoji-picker')) unpinAllWidgetActions();
+});
 
 // ── SOUNDS ──
 function _playSendSound() {
@@ -688,11 +844,12 @@ chatImgInput.addEventListener('change', () => {
 function sendMessage() {
   const text = chatInput.value.trim();
   if (!text || !currentSessionId) return;
-  ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, text);
+  ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, text, null, widgetReplyTarget);
   _playSendSound();
   chatInput.value = '';
   chatInput.style.height = 'auto';
   chatSuggestions.style.display = 'none';
+  cancelWidgetReplyTo();
   renderMessages();
 }
 
@@ -743,9 +900,18 @@ function renderMessages() {
       isLast && !isFirst ? 'last-in-group' : ''
     ].filter(Boolean).join(' ');
 
-    const reactionH = msg.reaction
-      ? `<div class="chat-reaction" data-msgid="${msg.id}" data-em="${msg.reaction}" title="React">${msg.reaction}</div>`
+    const reactionH = _reactionBadgesHtml(msg);
+    const quoteH = msg.replyTo
+      ? `<div class="chat-reply-quote" data-refid="${msg.replyTo.id}"><b>${escapeHtml(msg.replyTo.senderName||'')}</b>: ${escapeHtml(msg.replyTo.text||'')}</div>`
       : '';
+    const editedH = msg.edited
+      ? `<div class="chat-edited-tag">edited</div>`
+      : '';
+    const actionsH = `
+      <div class="chat-msg-actions">
+        <button class="chat-act-reply" title="Reply"><i class="fa-solid fa-reply"></i></button>
+        <button class="chat-act-react" title="React"><i class="fa-regular fa-face-smile"></i></button>
+      </div>`;
 
     el.dataset.msgid = msg.id;
 
@@ -754,30 +920,72 @@ function renderMessages() {
         <div class="chat-avatar admin-av ${isLast ? '' : 'hidden'}" title="Zami Mart">ZM</div>
         <div class="chat-message-content">
           ${isFirst ? '<div class="chat-sender-label">Zami Mart</div>' : ''}
-          <div class="chat-message-bubble">${bubbleContent}</div>
+          <div class="chat-message-bubble">${quoteH}${bubbleContent}</div>
           ${reactionH}
+          ${editedH}
           ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
-        </div>`;
+        </div>
+        ${actionsH}`;
     } else {
       el.innerHTML = `
         <div class="chat-message-content">
-          <div class="chat-message-bubble">${bubbleContent}</div>
+          <div class="chat-message-bubble">${quoteH}${bubbleContent}</div>
           ${reactionH}
+          ${editedH}
           ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
-        </div>`;
+        </div>
+        ${actionsH}`;
     }
 
-    // Long-press / right-click to react (both admin and visitor bubbles)
+    // Right-click (desktop) or long-press (phone) opens the emoji picker
+    // directly. A plain single TAP/click on the bubble just reveals/hides
+    // the Reply + React icons — no hold needed on phone.
     const bubble = el.querySelector('.chat-message-bubble');
-    let _lpTimer = null;
+    let _lpTimer = null, _lpFired = false;
     bubble.addEventListener('contextmenu', ev => { ev.preventDefault(); openWidgetEmojiPicker(ev, msg.id, isAdmin); });
-    bubble.addEventListener('touchstart',  () => { _lpTimer = setTimeout(() => openWidgetEmojiPicker(null, msg.id, isAdmin, bubble), 500); }, { passive: true });
+    bubble.addEventListener('touchstart',  () => {
+      _lpFired = false;
+      _lpTimer = setTimeout(() => {
+        _lpFired = true;
+        unpinAllWidgetActions();
+        el.classList.add('actions-pinned');
+        if (navigator.vibrate) navigator.vibrate(15);
+      }, 450);
+    }, { passive: true });
     bubble.addEventListener('touchend',    () => clearTimeout(_lpTimer));
-    bubble.addEventListener('touchmove',   () => clearTimeout(_lpTimer), { passive: true });
+    bubble.addEventListener('touchmove',   () => { clearTimeout(_lpTimer); _lpFired = true; }, { passive: true });
+    bubble.addEventListener('click', e => {
+      if (_lpFired) return; // long-press already opened the picker — don't also toggle
+      e.stopPropagation(); // keep the global "click elsewhere closes it" listener from undoing this same tap
+      const wasPinned = el.classList.contains('actions-pinned');
+      unpinAllWidgetActions();
+      if (!wasPinned) el.classList.add('actions-pinned');
+    });
 
-    // Tap existing reaction badge to toggle it off
-    const badge = el.querySelector('.chat-reaction');
-    if (badge) badge.addEventListener('click', () => { ChatSystem.reactToMessage(badge.dataset.msgid, badge.dataset.em); renderMessages(); });
+    // Tap YOUR OWN reaction badge to toggle it off. Tapping the other
+    // party's reaction badge does nothing — you can't remove their reaction.
+    el.querySelectorAll('.chat-reaction').forEach(badge => {
+      if (badge.dataset.owner === 'visitor' || badge.dataset.owner === 'legacy') {
+        badge.classList.add('mine');
+        badge.title = 'Remove reaction';
+        badge.addEventListener('click', () => {
+          ChatSystem.reactToMessage(badge.dataset.msgid, badge.dataset.em, badge.dataset.owner === 'legacy' ? 'legacy' : 'visitor');
+          renderMessages();
+        });
+      } else {
+        badge.title = '';
+      }
+    });
+
+    // Reply / react hover-action buttons
+    const replyBtn = el.querySelector('.chat-act-reply');
+    const reactBtn = el.querySelector('.chat-act-react');
+    if (replyBtn) replyBtn.addEventListener('click', e => { e.stopPropagation(); startWidgetReplyTo(msg.id); });
+    if (reactBtn) reactBtn.addEventListener('click', e => { e.stopPropagation(); openWidgetEmojiPicker(e, msg.id, isAdmin, e.currentTarget.closest('.chat-message').querySelector('.chat-message-bubble')); });
+
+    // Click a quoted reply snippet to jump to the original message
+    const quote = el.querySelector('.chat-reply-quote');
+    if (quote) quote.addEventListener('click', e => { e.stopPropagation(); scrollToWidgetMsg(quote.dataset.refid); });
 
     chatMessages.appendChild(el);
   });
@@ -816,10 +1024,20 @@ function openWidgetEmojiPicker(e, msgId, isAdmin, anchorEl) {
     const btn = ev.target.closest('button[data-em]');
     if (!btn) return;
     ev.stopPropagation();
-    ChatSystem.reactToMessage(msgId, btn.dataset.em);
-    closeWidgetEmojiPicker();
-    renderMessages();
+    btn.classList.add('picked');
+    ChatSystem.reactToMessage(msgId, btn.dataset.em, 'visitor');
+    setTimeout(() => { closeWidgetEmojiPicker(); renderMessages(); }, 130);
   });
+}
+
+function _reactionBadgesHtml(msg) {
+  if (msg.deleted) return '';
+  const reactions = msg.reactions || (msg.reaction ? { legacy: msg.reaction } : {});
+  const entries = Object.entries(reactions).filter(([, em]) => em);
+  if (!entries.length) return '';
+  return `<div class="chat-reaction-row">` + entries.map(([owner, em]) =>
+    `<div class="chat-reaction" data-msgid="${msg.id}" data-em="${em}" data-owner="${owner}">${em}</div>`
+  ).join('') + `</div>`;
 }
 
 function _dayLabel(date) {
