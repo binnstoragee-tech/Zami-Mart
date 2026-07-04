@@ -185,9 +185,35 @@ const InquirySystem = (function() {
     });
   }
 
+  // Assigns a stable quotation number (e.g. "ZM/QUO/2026/0009") to an
+  // inquiry the first time its admin quotation document is opened, so the
+  // same number keeps showing up on every later view/print.
+  function setQuoteNumber(inquiryId, quoteNumber) {
+    const inq = _inquiries.find(i => i.id === inquiryId);
+    if (inq) inq.quoteNumber = quoteNumber;
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'inquiries', inquiryId), { quoteNumber }).catch(() => {});
+    });
+  }
+
+  // Admin sets/updates per-item pricing for an inquiry and marks the
+  // quotation as 'pending' (draft, not yet approved) or 'approved'.
+  // `items` should be the inquiry's full items array with a `price`
+  // (number or null) added to each entry.
+  function saveQuotation(inquiryId, items, quoteStatus) {
+    const inq = _inquiries.find(i => i.id === inquiryId);
+    if (inq) { inq.items = items; inq.quoteStatus = quoteStatus; }
+    notifyListeners('inquiries-updated', _inquiries);
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'inquiries', inquiryId), { items, quoteStatus })
+        .catch(e => _reportErr('InquirySystem: saveQuotation error', e));
+    });
+  }
+
   return {
     init, on, getInquiries, getDeletedInquiries, submitInquiry, getInquiriesByEmail, getCustomers,
-    markRead, markAllRead, deleteInquiry, restoreInquiry, permanentlyDeleteInquiry, updateLinkedSessionId
+    markRead, markAllRead, deleteInquiry, restoreInquiry, permanentlyDeleteInquiry, updateLinkedSessionId,
+    saveQuotation, setQuoteNumber
   };
 })();
 

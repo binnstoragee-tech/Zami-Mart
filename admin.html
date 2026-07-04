@@ -811,7 +811,7 @@ select {
 
   /* Inline grids used across sections */
   div[style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns: 1fr 1fr !important; }
-  div[style*="grid-template-columns:260px 1fr"] { grid-template-columns: 1fr !important; }
+  div[style*="grid-template-columns:340px 1fr"] { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -1304,6 +1304,64 @@ select {
   #sec-chat .chat-sidebar { height: 240px; border-right: none; border-bottom: 1px solid var(--border); }
   #sec-chat .chat-panel   { height: 480px; }
 }
+
+/* ─── INQUIRY QUOTATION DOCUMENT (admin editable) ───────────── */
+.iq-doc {
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  padding: 16px; margin-bottom: 12px;
+}
+.iq-doc-head {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;
+  gap: 10px; flex-wrap: wrap;
+}
+.iq-doc-title {
+  font-size: 1.05rem; font-weight: 800; color: var(--teal);
+  border-left: 4px solid var(--orange); padding-left: 8px; margin-bottom: 6px;
+}
+.iq-doc-brand { display: flex; align-items: center; gap: 8px; }
+.iq-doc-logo {
+  width: 30px; height: 30px; border-radius: 8px; background: #fff;
+  border: 1px solid var(--border); display: flex; align-items: center;
+  justify-content: center; overflow: hidden; flex-shrink: 0;
+}
+.iq-doc-logo img { width: 100%; height: 100%; object-fit: contain; }
+.iq-doc-brandname { font-weight: 800; color: var(--teal); font-size: .85rem; }
+.iq-doc-brandsub { font-size: .64rem; color: var(--text-muted); }
+.iq-doc-meta {
+  display: flex; justify-content: space-between; gap: 18px;
+  margin-bottom: 14px; flex-wrap: wrap;
+}
+.iq-doc-label {
+  font-size: .62rem; font-weight: 800; letter-spacing: .06em;
+  color: var(--text-muted); margin-bottom: 5px;
+}
+.iq-doc-row { display: flex; gap: 6px; font-size: .76rem; color: var(--text); margin-bottom: 2px; }
+.iq-doc-row span { min-width: 52px; color: var(--text-muted); }
+.iq-doc-row b { color: var(--teal); font-weight: 700; }
+.iq-doc-table-wrap { overflow-x: auto; margin-bottom: 10px; }
+.iq-doc-table { width: 100%; border-collapse: collapse; font-size: .76rem; }
+.iq-doc-table thead th {
+  text-align: left; background: var(--cream); color: var(--text-muted);
+  font-size: .62rem; letter-spacing: .04em; padding: 7px 8px;
+  border-bottom: 1px solid var(--border);
+}
+.iq-doc-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+.iq-doc-table td.iq-doc-desc { color: var(--teal); font-weight: 600; }
+.iq-price-input {
+  width: 72px; padding: 5px 6px; border: 1px solid var(--border);
+  border-radius: 6px; font-size: .76rem; text-align: right; font-family: inherit;
+}
+.iq-price-input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(6,59,63,.07); }
+.iq-doc-row-total { font-weight: 700; color: var(--teal); white-space: nowrap; }
+.iq-doc-grandtotal {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--cream); border-radius: 8px; padding: 8px 12px;
+  font-size: .8rem; font-weight: 800; color: var(--teal); margin-bottom: 12px;
+}
+.iq-doc-status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+.iq-doc-status-row > span:first-child { font-size: .7rem; color: var(--text-muted); }
+.iq-doc-actions { display: flex; gap: 8px; }
 </style>
 </head>
 <body>
@@ -1777,7 +1835,7 @@ select {
             <table>
               <thead>
                 <tr>
-                  <th>#</th><th>Customer</th><th>Contact</th><th>Orders</th><th>Last Order</th><th>Status</th><th>Actions</th>
+                  <th>#</th><th>Customer</th><th>Contact</th><th>Orders</th><th>Quotation</th><th>Last Order</th><th>Status</th><th>Actions</th>
                 </tr>
               </thead>
               <tbody id="inquiriesTableBody"></tbody>
@@ -1808,16 +1866,59 @@ select {
             </button>
           </div>
           <div class="card-body" style="padding:16px 20px;">
-            <!-- Customer info + ordered items + live chat side by side on wide screens -->
-            <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;">
+            <!-- Quotation document + live chat side by side on wide screens -->
+            <div style="display:grid;grid-template-columns:340px 1fr;gap:20px;">
 
-              <!-- LEFT: customer info + items -->
+              <!-- LEFT: quotation document (editable price + status) -->
               <div>
-                <div style="font-size:.68rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Customer</div>
-                <div id="inqCustomerInfo" style="background:var(--cream);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:.84rem;"></div>
+                <div class="iq-doc" id="inqQuoteDoc">
+                  <div class="iq-doc-head">
+                    <div>
+                      <div class="iq-doc-title">Quotation</div>
+                    </div>
+                    <div class="iq-doc-brand">
+                      <div class="iq-doc-logo"><img src="img/logo.png" alt="Zami Mart" onerror="this.style.display='none'"></div>
+                      <div>
+                        <div class="iq-doc-brandname">ZamiMart</div>
+                        <div class="iq-doc-brandsub">Male&#39;, Maldives &middot; Zamimart.g3@gmail.com</div>
+                        <div class="iq-doc-brandsub">+960 9906025</div>
+                      </div>
+                    </div>
+                  </div>
 
-                <div style="font-size:.68rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Ordered Items</div>
-                <div id="inqItemsList" style="display:flex;flex-direction:column;gap:6px;"></div>
+                  <div class="iq-doc-meta">
+                    <div>
+                      <div class="iq-doc-label">DETAILS</div>
+                      <div class="iq-doc-row"><span>Number</span><b id="inqQuoteNumber">&mdash;</b></div>
+                      <div class="iq-doc-row"><span>Date</span><b id="inqQuoteDate">&mdash;</b></div>
+                    </div>
+                    <div>
+                      <div class="iq-doc-label">CUSTOMER</div>
+                      <div class="iq-doc-row"><span>Name</span><b id="inqQuoteCustomerName">&mdash;</b></div>
+                      <div class="iq-doc-row"><span>Contact</span><b id="inqQuoteCustomerContact">&mdash;</b></div>
+                    </div>
+                  </div>
+
+                  <div class="iq-doc-table-wrap">
+                    <table class="iq-doc-table">
+                      <thead><tr><th>#</th><th>DESCRIPTION</th><th>CODE</th><th>QTY</th><th>UNIT PRICE</th><th>TOTAL</th></tr></thead>
+                      <tbody id="inqItemsList"></tbody>
+                    </table>
+                  </div>
+
+                  <div class="iq-doc-grandtotal">
+                    <span>Grand Total</span><span id="inqQuoteGrandTotal">MVR 0.00</span>
+                  </div>
+
+                  <div class="iq-doc-status-row">
+                    <span>Status:</span>
+                    <span id="inqQuoteStatusBadge"></span>
+                  </div>
+                  <div class="iq-doc-actions">
+                    <button class="btn btn-outline btn-sm" onclick="saveInqQuotation('pending')" style="flex:1;">Save as Pending</button>
+                    <button class="btn btn-orange btn-sm" onclick="saveInqQuotation('approved')" style="flex:1;">Approve</button>
+                  </div>
+                </div>
               </div>
 
               <!-- RIGHT: chat -->
@@ -2930,6 +3031,56 @@ function escHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+function fmtMoney(n) {
+  return 'MVR ' + (Number(n) || 0).toFixed(2);
+}
+
+function _padInq(num, size) {
+  let s = String(Math.abs(Math.trunc(num)));
+  while (s.length < size) s = '0' + s;
+  return s;
+}
+
+// Look up a display "code" for a product by name from the seeded catalog,
+// same scheme used on the customer-facing quotation document, so codes
+// match between what the shopper sees and what the admin sees.
+function getInqProductCode(name) {
+  try {
+    const products = JSON.parse(localStorage.getItem('zm_products') || '[]');
+    const p = products.find(p => p.name === name);
+    if (p && p.id != null) return _padInq(p.id, 5);
+  } catch (e) {}
+  let hash = 0;
+  const str = String(name || '');
+  for (let i = 0; i < str.length; i++) { hash = (hash * 31 + str.charCodeAt(i)) >>> 0; }
+  return _padInq(hash % 100000, 5);
+}
+
+// Assigns/persists a stable "ZM/QUO/YYYY/NNNN" number the first time an
+// inquiry's quotation document is opened in admin, so it stays the same
+// on every later view.
+function ensureInqQuoteNumber(inq) {
+  if (inq.quoteNumber) return inq.quoteNumber;
+  const year = new Date(inq.sentAt || Date.now()).getFullYear();
+  const KEY = 'zm_admin_quote_counter_' + year;
+  let n = 1;
+  try { n = parseInt(localStorage.getItem(KEY) || '0', 10) + 1; } catch (e) {}
+  try { localStorage.setItem(KEY, String(n)); } catch (e) {}
+  const quoteNumber = 'ZM/QUO/' + year + '/' + _padInq(n, 4);
+  inq.quoteNumber = quoteNumber;
+  InquirySystem.setQuoteNumber(inq.id, quoteNumber);
+  return quoteNumber;
+}
+
+// Total cost of an inquiry's items, counting only items that have a
+// price set. Returns null if none of the items have a price yet.
+function inqQuoteTotal(inq) {
+  const items = (inq && inq.items) || [];
+  const priced = items.filter(it => it.price != null && it.price !== '');
+  if (priced.length === 0) return null;
+  return priced.reduce((sum, it) => sum + (Number(it.price) || 0) * (Number(it.qty) || 0), 0);
+}
+
 // =============================================
 // LIVE CHAT
 // =============================================
@@ -3699,6 +3850,7 @@ function renderInquiries() {
         <td style="padding-left:32px;color:var(--text-muted);font-size:.72rem;">↳</td>
         <td colspan="2" style="font-size:.76rem;color:var(--text-muted);">${itemNames}</td>
         <td style="font-size:.76rem;">${ic} item${ic!==1?'s':''}</td>
+        <td>${quoteBadgeHtml(inq)}</td>
         <td style="font-size:.76rem;color:var(--text-muted);">${d}</td>
         <td>${sBadge}</td>
         <td><button class="btn btn-outline btn-sm" onclick="viewInquiry(${globalIdx})" style="font-size:.72rem;padding:3px 10px;">View</button></td>
@@ -3708,6 +3860,17 @@ function renderInquiries() {
     // First inquiry's global index for the main View button
     const firstIdx = inqs.findIndex(x => x.id === lastInq.id);
 
+    // Aggregate quotation summary across every order for this customer
+    const pricedInqs = g.inqs.filter(inq => inqQuoteTotal(inq) != null);
+    const groupTotal = pricedInqs.reduce((sum, inq) => sum + inqQuoteTotal(inq), 0);
+    const groupQuoteBadge = pricedInqs.length === 0
+      ? `<span style="background:#eef2f2;color:#8a9f9f;padding:2px 8px;border-radius:100px;font-size:.7rem;font-weight:600;">No Pricing</span>`
+      : (() => {
+          const allApproved = pricedInqs.every(inq => inq.quoteStatus === 'approved');
+          const style = allApproved ? 'background:#eafaf1;color:#0a9a60;' : 'background:#fff2e8;color:#c9530a;';
+          return `<span style="${style}padding:2px 8px;border-radius:100px;font-size:.7rem;font-weight:700;margin-right:6px;">${allApproved ? 'Approved' : 'Pending'}</span><strong style="font-size:.78rem;">${fmtMoney(groupTotal)}</strong>`;
+        })();
+
     return `<tr class="inq-group-row" style="cursor:pointer;" onclick="toggleInqSubrows(${i}, event)">
       <td>${i + 1}</td>
       <td>
@@ -3716,6 +3879,7 @@ function renderInquiries() {
       </td>
       <td style="font-size:.8rem;color:var(--text-muted);">${escHtml(g.contact)}</td>
       <td>${totalItems} item${totalItems!==1?'s':''}</td>
+      <td>${groupQuoteBadge}</td>
       <td>${lastDate}</td>
       <td>${badge}</td>
       <td onclick="event.stopPropagation()">
@@ -3724,6 +3888,20 @@ function renderInquiries() {
       </td>
     </tr>${subRows}`;
   }).join('');
+}
+
+// Small badge summarizing an inquiry's quotation: whether it has been
+// priced yet, its total cost, and whether it's Pending or Approved.
+function quoteBadgeHtml(inq) {
+  const total = inqQuoteTotal(inq);
+  if (total == null) {
+    return `<span style="background:#eef2f2;color:#8a9f9f;padding:2px 8px;border-radius:100px;font-size:.7rem;font-weight:600;">No Pricing</span>`;
+  }
+  const approved = inq.quoteStatus === 'approved';
+  const badgeStyle = approved
+    ? 'background:#eafaf1;color:#0a9a60;'
+    : 'background:#fff2e8;color:#c9530a;';
+  return `<span style="${badgeStyle}padding:2px 8px;border-radius:100px;font-size:.7rem;font-weight:700;margin-right:6px;">${approved ? 'Approved' : 'Pending'}</span><strong style="font-size:.78rem;">${fmtMoney(total)}</strong>`;
 }
 
 function toggleInqSubrows(groupIdx, e) {
@@ -3822,15 +4000,30 @@ function viewInquiry(idx) {
     `<span style="font-size:.95rem;">Inquiry from <strong style="color:var(--teal);">${escHtml(inq.name||'Guest')}</strong></span>
      <span style="font-size:.72rem;font-weight:400;color:var(--text-muted);margin-left:8px;">${date}</span>`;
 
-  document.getElementById('inqCustomerInfo').innerHTML = `
-    <div style="font-weight:600;color:var(--teal);margin-bottom:2px;">${escHtml(inq.name||'Guest')}</div>
-    ${inq.email ? `<div style="color:var(--text-muted);font-size:.78rem;">${escHtml(inq.email)}</div>` : ''}`;
+  // Quotation document header fields
+  document.getElementById('inqQuoteNumber').textContent = ensureInqQuoteNumber(inq);
+  document.getElementById('inqQuoteDate').textContent = new Date(inq.sentAt).toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
+  document.getElementById('inqQuoteCustomerName').textContent = inq.name || 'Guest';
+  document.getElementById('inqQuoteCustomerContact').textContent = inq.email || '—';
 
-  document.getElementById('inqItemsList').innerHTML = (inq.items||[]).map(it => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--cream);border-radius:8px;">
-      <span style="font-size:.82rem;color:var(--teal);font-weight:500;">${escHtml(it.name)}</span>
-      <span style="font-size:.78rem;color:var(--text-muted);font-weight:700;background:#fff;padding:2px 8px;border-radius:100px;">×${it.qty}</span>
-    </div>`).join('');
+  document.getElementById('inqItemsList').innerHTML = (inq.items||[]).map((it, ii) => `
+    <tr>
+      <td>${ii + 1}</td>
+      <td class="iq-doc-desc">${escHtml(it.name)}</td>
+      <td>${getInqProductCode(it.name)}</td>
+      <td>${it.qty}</td>
+      <td>
+        <span style="display:flex;align-items:center;gap:3px;">
+          <span style="font-size:.68rem;color:var(--text-muted);">MVR</span>
+          <input type="number" min="0" step="0.01" class="inq-price-input" data-idx="${ii}"
+            value="${it.price != null ? it.price : ''}" placeholder="0.00" oninput="recalcInqQuoteTotal()">
+        </span>
+      </td>
+      <td class="iq-doc-row-total" id="inqRowTotal-${ii}">—</td>
+    </tr>`).join('');
+
+  renderInqQuoteStatusBadge(inq);
+  recalcInqQuoteTotal();
 
   document.getElementById('inqDeleteBtn').onclick = () => deleteInquiry(idx);
 
@@ -3979,6 +4172,77 @@ function closeInqDetail() {
   clearInqImg();
   document.getElementById('inqChatPanel').style.display = 'none';
   document.getElementById('inqListCard').style.display = 'block';
+}
+
+// =============================================
+// INQUIRY QUOTATION — pricing, total, pending/approved
+// =============================================
+
+// Recompute the on-screen grand total from whatever is currently typed
+// into the price inputs (doesn't save anything yet).
+function recalcInqQuoteTotal() {
+  let total = 0;
+  document.querySelectorAll('#inqItemsList .inq-price-input').forEach(inp => {
+    const idx = Number(inp.dataset.idx);
+    const inqs = _getInqs();
+    const inq = inqs[_inqCurrentIdx];
+    if (!inq || !inq.items || !inq.items[idx]) return;
+    const qty = Number(inq.items[idx].qty) || 0;
+    const hasPrice = inp.value !== '';
+    const price = hasPrice ? (Number(inp.value) || 0) : 0;
+    const rowTotalEl = document.getElementById('inqRowTotal-' + idx);
+    if (rowTotalEl) rowTotalEl.textContent = hasPrice ? fmtMoney(price * qty) : '—';
+    total += price * qty;
+  });
+  const totalEl = document.getElementById('inqQuoteGrandTotal');
+  if (totalEl) totalEl.textContent = fmtMoney(total);
+}
+
+function renderInqQuoteStatusBadge(inq) {
+  const badgeEl = document.getElementById('inqQuoteStatusBadge');
+  if (!badgeEl) return;
+  const total = inqQuoteTotal(inq);
+  if (total == null) {
+    badgeEl.innerHTML = `<span style="background:#eef2f2;color:#8a9f9f;padding:2px 9px;border-radius:100px;font-size:.72rem;font-weight:600;">No Pricing Yet</span>`;
+    return;
+  }
+  const approved = inq.quoteStatus === 'approved';
+  const style = approved ? 'background:#eafaf1;color:#0a9a60;' : 'background:#fff2e8;color:#c9530a;';
+  badgeEl.innerHTML = `<span style="${style}padding:2px 9px;border-radius:100px;font-size:.72rem;font-weight:700;">${approved ? 'Approved' : 'Pending'}</span>`;
+}
+
+// Reads whatever prices are currently typed in, saves them to the inquiry
+// along with the chosen status ('pending' or 'approved'), and re-renders.
+function saveInqQuotation(quoteStatus) {
+  const inqs = _getInqs();
+  const inq = inqs[_inqCurrentIdx];
+  if (!inq) return;
+
+  const items = (inq.items || []).map((it, idx) => ({ ...it }));
+  document.querySelectorAll('#inqItemsList .inq-price-input').forEach(inp => {
+    const idx = Number(inp.dataset.idx);
+    if (items[idx]) items[idx].price = inp.value === '' ? null : Number(inp.value);
+  });
+
+  const missingPrice = items.some(it => it.price == null);
+  if (quoteStatus === 'approved' && missingPrice) {
+    showConfirm(
+      'Some items have no price',
+      'One or more items don\'t have a price set yet. Approve this quotation anyway?',
+      () => _doSaveInqQuotation(inq, items, quoteStatus)
+    );
+    return;
+  }
+  _doSaveInqQuotation(inq, items, quoteStatus);
+}
+
+function _doSaveInqQuotation(inq, items, quoteStatus) {
+  InquirySystem.saveQuotation(inq.id, items, quoteStatus);
+  inq.items = items;
+  inq.quoteStatus = quoteStatus;
+  renderInqQuoteStatusBadge(inq);
+  renderInquiries();
+  showToast(quoteStatus === 'approved' ? 'Quotation approved.' : 'Quotation saved as pending.', 'success');
 }
 
 function deleteAllInquiries() {
