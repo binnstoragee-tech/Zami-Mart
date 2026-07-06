@@ -127,11 +127,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Track current product open in viewer
   let pvCurrentProduct = { name: null, img: null };
+  let pendingQty = 1; // quantity chosen before the item is actually added to cart
 
   function getPvQty() {
     if (!window.ZMCart || !pvCurrentProduct.name) return 0;
     const item = window.ZMCart.getItem(pvCurrentProduct.name);
     return item ? item.qty : 0;
+  }
+
+  function updatePvQtyDisplay(qty) {
+    pvQtyVal.textContent = qty;
   }
 
   function syncPvCartBtn(productName, productImg) {
@@ -141,14 +146,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (qty > 0) {
       pvAddCartBtn.style.display = 'none';
       pvRemoveBtn.style.display = '';
-      pvQtyCtrl.style.display = '';
-      pvQtyVal.textContent = qty;
+      updatePvQtyDisplay(qty);
     } else {
       pvAddCartBtn.style.display = '';
       pvAddCartBtn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
       pvAddCartBtn.classList.remove('pv-added');
       pvRemoveBtn.style.display = 'none';
-      pvQtyCtrl.style.display = 'none';
+      pendingQty = 1;
+      updatePvQtyDisplay(pendingQty);
     }
   }
 
@@ -167,11 +172,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Step 1: Loading
       pvAddCartBtn.classList.add('pv-loading');
-      pvAddCartBtn.innerHTML = '<div class="pv-btn-spinner"></div> Adding...';
+      pvAddCartBtn.innerHTML = '<div class="pv-btn-spinner zm-loader xs"><span></span><span></span><span></span><span></span></div> Adding...';
 
       // Step 2: Success after 900ms
       setTimeout(() => {
         window.ZMCart.addItem(pvCurrentProduct.name, pvCurrentProduct.img);
+        window.ZMCart.setQty(pvCurrentProduct.name, pendingQty);
         pvAddCartBtn.classList.remove('pv-loading');
         pvAddCartBtn.classList.add('pv-added');
         pvAddCartBtn.innerHTML = '<span class="pv-check-icon"><i class="fa-solid fa-check"></i></span> Added to Cart!';
@@ -192,23 +198,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (pvQtyDec) {
     pvQtyDec.addEventListener('click', () => {
-      if (!window.ZMCart || !pvCurrentProduct.name) return;
+      if (!pvCurrentProduct.name) return;
       const qty = getPvQty();
-      if (qty <= 1) {
-        window.ZMCart.removeItem(pvCurrentProduct.name);
+      if (qty > 0) {
+        // Already in cart — adjust the live cart quantity
+        if (qty <= 1) {
+          window.ZMCart.removeItem(pvCurrentProduct.name);
+        } else {
+          window.ZMCart.setQty(pvCurrentProduct.name, qty - 1);
+        }
+        syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
       } else {
-        window.ZMCart.setQty(pvCurrentProduct.name, qty - 1);
+        // Not yet added — just adjust the quantity to add
+        pendingQty = Math.max(1, pendingQty - 1);
+        updatePvQtyDisplay(pendingQty);
       }
-      syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
     });
   }
 
   if (pvQtyInc) {
     pvQtyInc.addEventListener('click', () => {
-      if (!window.ZMCart || !pvCurrentProduct.name) return;
+      if (!pvCurrentProduct.name) return;
       const qty = getPvQty();
-      window.ZMCart.setQty(pvCurrentProduct.name, qty + 1);
-      syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
+      if (qty > 0) {
+        // Already in cart — adjust the live cart quantity
+        window.ZMCart.setQty(pvCurrentProduct.name, qty + 1);
+        syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
+      } else {
+        // Not yet added — just adjust the quantity to add
+        pendingQty = pendingQty + 1;
+        updatePvQtyDisplay(pendingQty);
+      }
     });
   }
 

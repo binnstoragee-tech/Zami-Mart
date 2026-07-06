@@ -247,43 +247,110 @@
     transition: opacity .3s, visibility .3s;
   }
   .cart-overlay.open { opacity: 1; visibility: visible; }
+
   .cart-drawer {
-    position: fixed; top: 0; right: 0;
-    width: 380px; max-width: 100vw; height: 100%;
-    background: #fff; z-index: 1101;
+    position: fixed;
+    top: 0; right: 0;
+    width: 380px; max-width: 100vw;
+    height: 100%;
+    background: #fff;
+    z-index: 1101;
     display: flex; flex-direction: column;
     transform: translateX(100%);
     transition: transform .35s cubic-bezier(.4,0,.2,1);
     box-shadow: -12px 0 48px -8px rgba(6,59,63,.18);
   }
   .cart-overlay.open .cart-drawer { transform: translateX(0); }
+
   .cart-head {
     padding: 20px 20px 16px;
-    background: var(--teal); color: #fff;
+    background: var(--teal);
+    color: #fff;
     display: flex; align-items: center; justify-content: space-between;
   }
   .cart-head h3 { font-size: 1rem; font-weight: 700; }
   .cart-head-close {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.16);
+    color: #fff;
+    font-size: .85rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, transform .15s;
+  }
+  .cart-head-close:hover { background: rgba(255,255,255,.28); transform: scale(1.06); }
+  .cart-head-history {
+    height: 34px; padding: 0 12px 0 10px; border-radius: 100px;
+    background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.16); color: #fff;
+    font-size: .72rem; font-weight: 700; letter-spacing: -.01em; cursor: pointer; position: relative;
+    display: flex; align-items: center; gap: 6px; justify-content: center;
+    transition: background .2s, transform .15s;
+  }
+  .cart-head-history:hover { background: rgba(255,255,255,.28); transform: scale(1.03); }
+  .chh-badge {
+    position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px; padding: 0 4px;
+    border-radius: 100px; background: linear-gradient(135deg,#ff6a2b,var(--orange)); color: #fff; font-size: .58rem; font-weight: 800;
+    display: none; align-items: center; justify-content: center; line-height: 1;
+    border: 2px solid var(--teal); box-shadow: 0 2px 6px rgba(0,0,0,.25);
+  }
+  .cart-history-panel {
+    position: absolute; inset: 0; background: #fff; z-index: 30;
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform .32s cubic-bezier(.4,0,.2,1);
+  }
+  .cart-history-panel.open { transform: translateX(0); }
+  .chp-head {
+    padding: 20px 20px 16px; background: var(--teal); color: #fff;
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .chp-head h3 { font-size: 1rem; font-weight: 700; flex: 1; }
+  .chp-back {
     width: 32px; height: 32px; border-radius: 8px;
     background: rgba(255,255,255,.15); border: none; color: #fff;
-    font-size: .9rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    font-size: .9rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
     transition: background .2s;
   }
-  .cart-head-close:hover { background: rgba(255,255,255,.28); }
+  .chp-back:hover { background: rgba(255,255,255,.28); }
+  .chp-tab-toggle {
+    height: 32px; padding: 0 12px; border-radius: 100px;
+    background: rgba(255,255,255,.15); border: none; color: #fff;
+    font-size: .72rem; font-weight: 700; letter-spacing: -.01em; cursor: pointer;
+    display: flex; align-items: center; gap: 6px; justify-content: center;
+    transition: background .2s, transform .15s; flex-shrink: 0; white-space: nowrap;
+  }
+  .chp-tab-toggle:hover { background: rgba(255,255,255,.28); transform: scale(1.03); }
+  .chp-tab-toggle.active { background: #fff; color: var(--teal); }
+  .chp-body { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+  .chp-empty { text-align: center; padding: 70px 20px; color: #8a9f9f; }
+  .chp-empty i { font-size: 2.1rem; opacity: .28; display: block; margin-bottom: 12px; }
+  .chp-empty p { font-size: .84rem; line-height: 1.6; }
+
   .cart-items {
-    flex: 1; overflow-y: auto; padding: 16px;
-    display: flex; flex-direction: column; gap: 10px;
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    background: #f7f5f0;
+    display: flex; flex-direction: column; gap: 12px;
   }
   .cart-item {
     display: flex; align-items: center; gap: 12px;
-    background: var(--cream); border-radius: 12px; padding: 10px 12px;
-    animation: cartItemIn .22s ease;
+    background: #fff;
+    border-radius: 16px;
+    padding: 12px 12px;
+    box-shadow: 0 2px 10px rgba(6,59,63,.06);
+    border: 1px solid rgba(6,59,63,.05);
+    transition: box-shadow .2s, transform .2s;
   }
-  @keyframes cartItemIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  .cart-item:hover {
+    box-shadow: 0 6px 18px rgba(6,59,63,.1);
+    transform: translateY(-1px);
+  }
   .cart-item-img {
-    width: 48px; height: 48px; border-radius: 8px;
-    object-fit: cover; flex-shrink: 0; background: #e8eeeb;
+    width: 54px; height: 54px; border-radius: 12px;
+    object-fit: cover; flex-shrink: 0;
+    background: #e8eeeb;
+    border: 1px solid rgba(6,59,63,.06);
   }
   .cart-item-img.no-img-placeholder {
     display: flex; align-items: center; justify-content: center;
@@ -291,58 +358,94 @@
   }
   .cart-item-info { flex: 1; min-width: 0; }
   .cart-item-name {
-    font-size: .8rem; font-weight: 600; color: var(--teal);
-    line-height: 1.3; margin-bottom: 4px;
+    font-size: .82rem; font-weight: 700; color: var(--teal);
+    line-height: 1.3; margin-bottom: 6px; letter-spacing: -.01em;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .cart-item-qty { display: flex; align-items: center; gap: 6px; }
+  .cart-item-qty {
+    display: inline-flex; align-items: center; gap: 2px;
+    background: #f0efe9; border-radius: 100px; padding: 3px;
+  }
   .qty-btn {
-    width: 24px; height: 24px; border-radius: 6px;
-    border: 1.5px solid rgba(6,59,63,.2);
+    width: 24px; height: 24px; border-radius: 50%;
+    border: none;
     background: #fff; color: var(--teal);
-    font-size: .8rem; font-weight: 700; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 1px 3px rgba(6,59,63,.15);
     transition: all .15s;
   }
-  .qty-btn:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
-  .qty-val { font-size: .82rem; font-weight: 700; color: var(--teal); min-width: 20px; text-align: center; }
+  .qty-btn:hover { background: var(--teal); color: #fff; transform: scale(1.08); }
+  .qty-val { font-size: .8rem; font-weight: 700; color: var(--teal); min-width: 24px; text-align: center; }
   .cart-item-remove {
-    background: none; border: none; color: #c0a0a0;
-    font-size: .85rem; cursor: pointer; padding: 4px;
-    transition: color .2s; flex-shrink: 0;
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #fdf1ef; border: none; color: #e0685a;
+    font-size: .8rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .18s; flex-shrink: 0;
   }
-  .cart-item-remove:hover { color: #d63030; }
+  .cart-item-remove:hover { background: #e53935; color: #fff; transform: scale(1.06); }
+
   .cart-empty {
     flex: 1; display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    color: var(--text-muted); gap: 10px; padding: 2rem; text-align: center;
+    color: var(--text-muted); gap: 10px; padding: 2rem;
+    text-align: center;
   }
   .cart-empty i { font-size: 2.5rem; color: #c8d8d6; }
   .cart-empty p { font-size: .85rem; }
+
   .cart-footer {
-    padding: 16px 20px; border-top: 1px solid rgba(6,59,63,.08);
-    display: flex; flex-direction: column; gap: 10px;
+    padding: 16px 20px 20px;
+    border-top: 1px solid rgba(6,59,63,.08);
+    background: #fff;
+    display: flex; flex-direction: column; gap: 12px;
   }
-  .cart-count-label { font-size: .8rem; color: #6a8080; text-align: center; }
+  .cart-count-label {
+    font-size: .8rem; color: #6a8080; text-align: center;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
   .cart-count-label strong { color: var(--teal); }
   .cart-inquire-btn {
-    width: 100%; padding: 13px;
-    background: var(--orange); color: #fff;
-    border: none; border-radius: 12px;
-    font-family: var(--font-body); font-size: .9rem; font-weight: 700;
-    cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
-    transition: background .2s, transform .15s;
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #ff6a2b, var(--orange));
+    color: #fff;
+    border: none; border-radius: 100px;
+    font-family: var(--font-body);
+    font-size: .92rem; font-weight: 700; letter-spacing: -.01em;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 9px;
+    box-shadow: 0 8px 20px -6px rgba(253,77,2,.55);
+    transition: background .2s, transform .15s, box-shadow .2s;
   }
-  .cart-inquire-btn:hover { background: #e34602; transform: translateY(-1px); }
+  .cart-inquire-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -6px rgba(253,77,2,.65); }
+  .cart-inquire-btn i {
+    display: inline-block; font-size: .85em;
+    transition: transform .25s cubic-bezier(.34,1.56,.64,1);
+    animation: cartIconBreathe 1.8s ease-in-out infinite;
+  }
+  .cart-inquire-btn:active i { animation: none; transform: scale(1.35); }
+  @keyframes cartIconBreathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(.72); }
+    75% { transform: scale(1.15); }
+  }
   .cart-clear-btn {
-    width: 100%; padding: 9px; background: transparent;
-    color: #8a9f9f; border: 1.5px solid rgba(6,59,63,.12); border-radius: 10px;
-    font-family: var(--font-body); font-size: .8rem; font-weight: 600;
-    cursor: pointer; transition: all .2s;
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    color: #b46a63;
+    border: none; border-radius: 100px;
+    font-family: var(--font-body);
+    font-size: .8rem; font-weight: 600;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: all .2s;
   }
-  .cart-clear-btn:hover { border-color: #d63030; color: #d63030; }
+  .cart-clear-btn:hover { background: #fdf1ef; color: #d63030; }
 
-  /* ===== Shared Thank-you / Success panel ===== */
+  /* ===== Cart Thank-you Screen ===== */
   .cart-thankyou {
     display: none;
     flex-direction: column; align-items: center; justify-content: center;
@@ -351,33 +454,101 @@
   }
   .cart-thankyou.show { display: flex; }
   @keyframes tyFadeIn { from { opacity:0; transform:scale(.92); } to { opacity:1; transform:none; } }
-  .ty-icon-wrap { position: relative; width: 96px; height: 96px; margin-bottom: 1.4rem; animation: tyBounce .5s cubic-bezier(.4,0,.2,1) .1s both; }
-  @keyframes tyBounce { 0%{transform:scale(0);} 70%{transform:scale(1.12);} 100%{transform:scale(1);} }
-  .ty-icon-pulse { position: absolute; inset: 0; }
-  .ty-icon-pulse circle { fill: none; stroke: var(--teal); stroke-width: 2; opacity: .4; transform-origin: 50% 50%; animation: tyPulse 1.8s ease-out .3s infinite; }
-  @keyframes tyPulse { 0%{ r: 34; opacity:.5; } 100%{ r: 46; opacity:0; } }
+  @keyframes tyBounce { 0% { transform: scale(.4); opacity: 0; } 65% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+  .ty-icon-wrap { position: relative; width: 100px; height: 100px; margin-bottom: 1.4rem; }
+  .ty-icon-ring-svg { position: absolute; inset: 0; transform: rotate(-90deg); }
+  .ty-icon-ring-bg { fill: none; stroke: rgba(6,59,63,.08); stroke-width: 3; }
+  .ty-icon-ring-fg {
+    fill: none; stroke: url(#tyRingGrad); stroke-width: 3; stroke-linecap: round;
+    stroke-dasharray: 296; stroke-dashoffset: 296;
+    animation: tyRingDraw .7s cubic-bezier(.65,0,.35,1) .1s forwards;
+  }
+  @keyframes tyRingDraw { to { stroke-dashoffset: 0; } }
+  .ty-icon-glow {
+    position: absolute; inset: 10px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(14,122,110,.35), transparent 70%);
+    opacity: 0; animation: tyGlowPulse 2.2s ease-in-out .8s infinite;
+  }
+  @keyframes tyGlowPulse { 0%,100%{opacity:.45;transform:scale(.9)} 50%{opacity:.9;transform:scale(1.1)} }
   .ty-icon-circle {
     position: absolute; inset: 0; margin: auto;
-    width: 76px; height: 76px; border-radius: 50%;
-    background: linear-gradient(135deg, #063b3f 0%, #0e7a6e 100%);
-    box-shadow: 0 8px 22px -6px rgba(6,59,63,.55), inset 0 1px 0 rgba(255,255,255,.18);
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, #0e7a6e 0%, #063b3f 100%);
+    box-shadow: 0 10px 26px -6px rgba(6,59,63,.55), inset 0 1px 0 rgba(255,255,255,.2);
     display: flex; align-items: center; justify-content: center;
+    transform: scale(0); animation: tyCirclePop .5s cubic-bezier(.34,1.56,.64,1) .3s forwards;
   }
+  @keyframes tyCirclePop { to { transform: scale(1); } }
   .ty-icon-circle svg path {
     stroke-dasharray: 22; stroke-dashoffset: 22;
-    animation: checkDraw .4s ease .35s forwards;
+    animation: checkDraw .35s ease .75s forwards;
   }
   @keyframes checkDraw { to { stroke-dashoffset: 0; } }
-  .ty-confetti-row { display: flex; gap: 6px; margin-bottom: 1rem; }
-  .ty-dot { width: 8px; height: 8px; border-radius: 50%; animation: tyDotPop .4s ease both; }
-  .ty-dot:nth-child(1){background:var(--orange);animation-delay:.25s}
-  .ty-dot:nth-child(2){background:var(--teal);animation-delay:.33s}
-  .ty-dot:nth-child(3){background:#f0b429;animation-delay:.41s}
-  .ty-dot:nth-child(4){background:var(--orange);animation-delay:.49s}
-  .ty-dot:nth-child(5){background:var(--teal);animation-delay:.57s}
-  @keyframes tyDotPop { from{transform:scale(0)} to{transform:scale(1)} }
+  .ty-spark-burst { position: absolute; inset: 0; pointer-events: none; }
+  .ty-spark {
+    position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; border-radius: 50%;
+    opacity: 0; animation: tySparkFly .75s cubic-bezier(.2,.8,.3,1) forwards;
+  }
+  @keyframes tySparkFly {
+    0% { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(.3); }
+  }
+  .ty-spark:nth-child(1){ background:#fd4d02; --tx:-58px; --ty:-16px; animation-delay:.52s; }
+  .ty-spark:nth-child(2){ background:#f5c842; --tx:-36px; --ty:-54px; animation-delay:.58s; }
+  .ty-spark:nth-child(3){ background:#0e7a6e; --tx:2px;  --ty:-64px; animation-delay:.5s; }
+  .ty-spark:nth-child(4){ background:#f5c842; --tx:40px; --ty:-50px; animation-delay:.6s; }
+  .ty-spark:nth-child(5){ background:#fd4d02; --tx:58px; --ty:-14px; animation-delay:.54s; }
+  .ty-spark:nth-child(6){ background:#0e7a6e; --tx:46px; --ty:34px;  animation-delay:.62s; }
+  .ty-spark:nth-child(7){ background:#f5c842; --tx:0px;  --ty:56px;  animation-delay:.56s; }
+  .ty-spark:nth-child(8){ background:#fd4d02; --tx:-46px; --ty:32px; animation-delay:.64s; }
   .ty-title { font-size: 1.2rem; font-weight: 800; color: var(--teal); margin-bottom: .4rem; letter-spacing: -.02em; }
   .ty-sub { font-size: .82rem; color: #6a8080; line-height: 1.7; margin-bottom: 1.4rem; max-width: 260px; }
+
+  /* ===== Sending / Loading panel (lightning) ===== */
+  .cart-loading {
+    display: none;
+    position: fixed; top: 0; right: 0;
+    width: 380px; max-width: 100vw; height: 100%;
+    flex-direction: column; align-items: center; justify-content: center;
+    padding: 2rem 2rem; text-align: center; gap: 0;
+    background: linear-gradient(160deg, rgba(6,59,63,.04) 0%, rgba(253,77,2,.04) 100%);
+    z-index: 1103;
+  }
+  .cart-loading.show { display: flex; animation: tyFadeIn .3s ease; }
+  /* Hide the cart header + item list behind the loading panel so only the loader shows */
+  .cart-drawer:has(.cart-loading.show) .cart-head,
+  .cart-drawer:has(.cart-loading.show) .cart-items { visibility: hidden; }
+  .cl-wave { display: flex; align-items: center; justify-content: center; height: 96px; margin-bottom: 1.3rem; }
+  .cl-icon-wrap {
+    width: 84px; height: 84px; border-radius: 50%;
+    background: linear-gradient(135deg, #ff6a2b, var(--orange));
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 2rem;
+    box-shadow: 0 10px 30px -6px rgba(253,77,2,.5);
+    transform: scale(.35); opacity: 0;
+  }
+  .cart-loading.show .cl-icon-wrap {
+    animation: clIconGrow .55s cubic-bezier(.34,1.56,.64,1) forwards,
+               clIconPulse 1.7s ease-in-out .55s infinite;
+  }
+  @keyframes clIconGrow {
+    0% { transform: scale(.35); opacity: 0; }
+    60% { transform: scale(1.12); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes clIconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+  }
+  .cl-title { font-size: 1.02rem; font-weight: 800; color: var(--teal); margin-bottom: .3rem; letter-spacing: -.02em; display: flex; align-items: center; justify-content: center; gap: 1px; }
+  .cl-dots span { animation: clDotBlink 1.2s infinite; opacity: 0; }
+  .cl-dots span:nth-child(1){ animation-delay: 0s; }
+  .cl-dots span:nth-child(2){ animation-delay: .2s; }
+  .cl-dots span:nth-child(3){ animation-delay: .4s; }
+  @keyframes clDotBlink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+  .cl-sub { font-size: .78rem; color: #6a8080; margin-bottom: 1.6rem; }
+  .cl-bar { width: 100%; max-width: 220px; height: 6px; border-radius: 100px; background: rgba(6,59,63,.08); overflow: hidden; }
+  .cl-bar-fill { height: 100%; width: 0%; border-radius: 100px; background: linear-gradient(90deg, #fd4d02, #f5c842); transition: width 3s linear; }
   .ty-browse-btn {
     display: inline-flex; align-items: center; justify-content: center; gap: 9px;
     padding: 11px 28px;
@@ -415,22 +586,37 @@
     background: linear-gradient(135deg,#063b3f,#0a5a62); color: #fff;
     display: flex; align-items: center; justify-content: center;
   }
-  .chi-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
-  .chi-number { font-size: .78rem; font-weight: 700; color: var(--teal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .chi-date { font-size: .68rem; color: #8a9f9f; }
+  .chi-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+  .chi-row1 { display: flex; align-items: center; gap: 8px; }
+  .chi-number { flex: 1; min-width: 0; font-size: .8rem; font-weight: 700; color: var(--teal); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chi-row2 { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .chi-date { font-size: .68rem; color: #8a9f9f; flex-shrink: 0; }
   .chi-count {
     font-size: .66rem; font-weight: 700; color: #c9530a; background: #fff2e8;
     padding: 3px 8px; border-radius: 100px; flex-shrink: 0; white-space: nowrap;
   }
   .chi-chevron { color: #c8d8d6; font-size: .7rem; flex-shrink: 0; }
+  .chi-status { font-size: .62rem; font-weight: 700; letter-spacing: .02em; padding: 3px 9px; border-radius: 100px; white-space: nowrap; flex-shrink: 0; }
+  .chi-status-none { background: #eef2f2; color: #6d8080; }
+  .chi-status-pending { background: #fff2e8; color: #c9530a; }
+  .chi-status-approved { background: #e3f8ee; color: #0a9a60; }
+  .chi-status-completed { background: #063b3f; color: #fff; }
 
   /* ===== Mobile phone view ===== */
   @media (max-width: 480px) {
     .cart-drawer { width: 100vw; }
+    .cart-items { padding: 12px; gap: 10px; }
+    .cart-item { padding: 10px; gap: 10px; }
+    .cart-item-img { width: 48px; height: 48px; }
+    .cart-footer { padding: 14px 16px 18px; gap: 10px; }
+    .cart-inquire-btn { padding: 13px; font-size: .88rem; }
+    .cl-icon-wrap { width: 72px; height: 72px; font-size: 1.7rem; }
     .cart-thankyou { padding: 2rem 1.3rem; }
-    .ty-icon-wrap { width: 78px; height: 78px; margin-bottom: 1.1rem; }
-    .ty-icon-circle { width: 62px; height: 62px; }
-    .ty-icon-circle svg { width: 30px; height: 30px; }
+    .cart-loading { padding: 2rem 1.3rem; }
+    .ty-icon-wrap { width: 82px; height: 82px; margin-bottom: 1.1rem; }
+    .ty-icon-circle { width: 60px; height: 60px; }
+    .ty-icon-circle svg { width: 28px; height: 28px; }
+    .cl-wave { height: 76px; }
     .ty-title { font-size: 1.05rem; }
     .ty-sub { font-size: .78rem; max-width: 100%; }
     .ty-actions { gap: .5rem; }
@@ -440,9 +626,12 @@
     .cart-history-divider { margin: 14px 0 10px; }
     .cart-history-item { padding: 8px 10px; gap: 8px; }
     .chi-icon { width: 28px; height: 28px; border-radius: 8px; }
+    .chi-main { gap: 4px; }
+    .chi-row2 { gap: 6px; }
     .chi-number { font-size: .74rem; }
     .chi-date { font-size: .64rem; }
-    .chi-count { font-size: .62rem; padding: 2px 7px; }
+    .chi-count { font-size: .6rem; padding: 2px 6px; }
+    .chi-status { font-size: .6rem; padding: 2px 7px; }
   }
   /* Inquiry confirm panel */
   .cart-confirm {
@@ -484,6 +673,14 @@
     cursor: pointer; transition: background .2s, transform .15s;
   }
   .confirm-no-btn:hover { background: #e4e4e4; transform: translateY(-1px); }
+
+  /* Delete confirm (danger variant) */
+  .confirm-icon.danger-icon {
+    background: linear-gradient(135deg, #ef4444, #c62828);
+    box-shadow: 0 8px 32px -8px rgba(198,40,40,.4);
+  }
+  .confirm-yes-btn.danger-btn { background: #e53935; }
+  .confirm-yes-btn.danger-btn:hover { background: #c62828; }
 
   /* ===== Contact Form Submit Overlay ===== */
   .form-success-overlay {
@@ -734,12 +931,26 @@
 <div class="cart-overlay" id="cartOverlay">
   <div class="cart-drawer" id="cartDrawer">
     <div class="cart-head">
+      <button class="cart-head-history" id="cartHistoryBtn" title="Order History">
+        <i class="fa-solid fa-clock-rotate-left"></i><span>Orders</span>
+        <span class="chh-badge" id="chhBadge">0</span>
+      </button>
       <h3><i class="fa-solid fa-cart-shopping" style="margin-right:8px;"></i>My Cart</h3>
       <button class="cart-head-close" id="cartClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
     <div class="cart-items" id="cartItems"></div>
+    <div class="cart-history-panel" id="cartHistoryPanel">
+      <div class="chp-head">
+        <button class="chp-back" id="chpBackBtn"><i class="fa-solid fa-arrow-left"></i></button>
+        <h3 id="chpTitle"><i class="fa-solid fa-clock-rotate-left" id="chpTitleIcon" style="margin-right:8px;"></i><span id="chpTitleText">Quotation History</span></h3>
+        <button class="chp-tab-toggle" id="chpTabToggle" title="View Completed Orders">
+          <i class="fa-solid fa-box-archive" id="chpTabToggleIcon"></i><span id="chpTabToggleText">Completed</span>
+        </button>
+      </div>
+      <div class="chp-body" id="chpBody"></div>
+    </div>
     <div class="cart-confirm" id="cartConfirm">
-      <div class="confirm-icon"><i class="fa-solid fa-paper-plane"></i></div>
+      <div class="confirm-icon"><i class="fa-solid fa-file-invoice"></i></div>
       <div class="confirm-title">Send Inquiry?</div>
       <div class="confirm-sub">Are you sure you want to send this inquiry to Zami Mart?</div>
       <div class="confirm-actions">
@@ -747,20 +958,46 @@
         <button class="confirm-no-btn" id="confirmNoBtn"><i class="fa-solid fa-xmark" style="margin-right:5px;"></i>Cancel</button>
       </div>
     </div>
+
+    <div class="cart-confirm danger" id="cartDeleteConfirm">
+      <div class="confirm-icon danger-icon"><i class="fa-solid fa-trash"></i></div>
+      <div class="confirm-title" id="deleteConfirmTitle">Remove item?</div>
+      <div class="confirm-sub" id="deleteConfirmSub">Are you sure you want to remove this item from your cart?</div>
+      <div class="confirm-actions">
+        <button class="confirm-yes-btn danger-btn" id="deleteConfirmYesBtn"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Yes, Remove</button>
+        <button class="confirm-no-btn" id="deleteConfirmNoBtn"><i class="fa-solid fa-xmark" style="margin-right:5px;"></i>Cancel</button>
+      </div>
+    </div>
+    <div class="cart-loading" id="cartLoading">
+      <div class="cl-wave">
+        <div class="cl-icon-wrap"><i class="fa-solid fa-file-invoice"></i></div>
+      </div>
+      <div class="cl-title">Sending your inquiry<span class="cl-dots"><span>.</span><span>.</span><span>.</span></span></div>
+      <div class="cl-sub">Hang tight, almost there</div>
+      <div class="cl-bar"><div class="cl-bar-fill" id="clBarFill"></div></div>
+    </div>
     <div class="cart-thankyou" id="cartThankyou">
       <div class="ty-icon-wrap">
-        <svg class="ty-icon-pulse" viewBox="0 0 96 96" width="96" height="96">
-          <circle cx="48" cy="48" r="44"/>
+        <svg class="ty-icon-ring-svg" viewBox="0 0 100 100" width="100" height="100">
+          <defs>
+            <linearGradient id="tyRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#0e7a6e"/>
+              <stop offset="100%" stop-color="#fd4d02"/>
+            </linearGradient>
+          </defs>
+          <circle class="ty-icon-ring-bg" cx="50" cy="50" r="47"/>
+          <circle class="ty-icon-ring-fg" cx="50" cy="50" r="47"/>
         </svg>
+        <div class="ty-icon-glow"></div>
         <div class="ty-icon-circle">
-          <svg viewBox="0 0 24 24" width="36" height="36" fill="none">
+          <svg viewBox="0 0 24 24" width="34" height="34" fill="none">
             <path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </div>
-      </div>
-      <div class="ty-confetti-row">
-        <span class="ty-dot"></span><span class="ty-dot"></span><span class="ty-dot"></span>
-        <span class="ty-dot"></span><span class="ty-dot"></span>
+        <div class="ty-spark-burst">
+          <span class="ty-spark"></span><span class="ty-spark"></span><span class="ty-spark"></span><span class="ty-spark"></span>
+          <span class="ty-spark"></span><span class="ty-spark"></span><span class="ty-spark"></span><span class="ty-spark"></span>
+        </div>
       </div>
       <div class="ty-title">Inquiry Sent!</div>
       <div class="ty-sub">Thank you! We received your cart inquiry and will get back to you shortly via Viber or WhatsApp.</div>
@@ -776,13 +1013,14 @@
       </div>
     </div>
     <div class="cart-footer" id="cartFooter" style="display:none;">
-      <div class="cart-count-label">You have <strong id="cartTotalCount">0</strong> item(s) in cart</div>
-      <button class="cart-inquire-btn" id="cartInquireBtn">
-        <i class="fa-solid fa-paper-plane"></i> Send Inquiry
+      <div class="cart-count-label"><i class="fa-solid fa-cart-shopping" style="opacity:.55;font-size:.75rem;"></i> You have <strong id="cartTotalCount">0</strong> item(s) in cart</div>
+      <button class="cart-inquire-btn"  id="cartInquireBtn">
+        <i class="fa-solid fa-file-invoice"></i> Send Inquiry
       </button>
-      <button class="cart-clear-btn" id="cartClearBtn">Clear cart</button>
+      <button class="cart-clear-btn" id="cartClearBtn"><i class="fa-solid fa-trash-can"></i> Clear cart</button>
     </div>
   </div>
+</div>
 </div>
 
 <!-- ===== CONTACT FORM SUCCESS OVERLAY ===== -->
@@ -801,56 +1039,443 @@
 
 <script src="main.js"></script>
 <script>
-// =============================================
-// ZAMI MART — Cart (contact.html)
-// =============================================
+// ============================================
+// ZAMI MART — Cart
+// ============================================
 (function() {
   'use strict';
+
   const CART_KEY = 'zm_inquiry_cart';
-  function loadCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; } }
-  function saveCart(c) { localStorage.setItem(CART_KEY, JSON.stringify(c)); }
+  const WHATSAPP_NUMBER = '9609906025'; // change if needed
+
+  function loadCart() {
+    try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch { return []; }
+  }
+  function saveCart(cart) {
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  }
+
   let cart = loadCart();
 
+
+
+  function addToCart(name, img, btn) {
+    const existing = cart.find(i => i.name === name);
+    if (existing) {
+      existing.qty++;
+    } else {
+      cart.push({ name, img, qty: 1 });
+    }
+    btn.innerHTML = '<i class="fa-solid fa-check"></i> Added';
+    btn.classList.add('added');
+    saveCart(cart);
+    updateBadge();
+    renderCartItems();
+    openCart();
+  }
+
+  // ---- Badge ----
   const badge = document.getElementById('cartBadge');
   function updateBadge() {
     const total = cart.reduce((s, i) => s + i.qty, 0);
     badge.textContent = total;
     badge.classList.toggle('show', total > 0);
-    const countEl = document.getElementById('cartTotalCount');
-    if (countEl) countEl.textContent = total;
-    const footer = document.getElementById('cartFooter');
-    if (footer) footer.style.display = total > 0 ? 'flex' : 'none';
+    document.getElementById('cartTotalCount').textContent = total;
+    document.getElementById('cartFooter').style.display = total > 0 ? 'flex' : 'none';
   }
   updateBadge();
-  window.addEventListener('storage', (e) => { if (e.key === CART_KEY) { cart = loadCart(); updateBadge(); renderCartItems(); } });
 
+  // ---- Render ----
   const cartItemsEl = document.getElementById('cartItems');
 
-  function buildHistoryHTML() {
+  // ---- Quotation History view state: 'active' (pending/awaiting) vs 'completed' (approved) ----
+  let zmHistFilter = 'active';
+
+  function renderHistoryPanel() {
     let hist = [];
     try { hist = (window.ZamiQuotation && window.ZamiQuotation.getHistory) ? window.ZamiQuotation.getHistory() : []; } catch (e) {}
-    if (!hist.length) return '';
+
+    // Badge always reflects items still awaiting action — i.e. not yet
+    // marked completed by admin (regardless of pricing status).
+    const activeCount = hist.filter(h => !h.completed).length;
+    const badge = document.getElementById('chhBadge');
+    if (badge) {
+      if (activeCount) { badge.textContent = activeCount > 9 ? '9+' : activeCount; badge.style.display = 'flex'; }
+      else { badge.style.display = 'none'; }
+    }
+
+    // Update header title/icon + toggle button based on current view
+    const titleText = document.getElementById('chpTitleText');
+    const titleIcon = document.getElementById('chpTitleIcon');
+    const toggleBtn = document.getElementById('chpTabToggle');
+    const toggleIcon = document.getElementById('chpTabToggleIcon');
+    const toggleText = document.getElementById('chpTabToggleText');
+    const isCompleted = zmHistFilter === 'completed';
+    if (titleText) titleText.textContent = isCompleted ? 'Completed Orders' : 'Quotation History';
+    if (titleIcon) titleIcon.className = isCompleted ? 'fa-solid fa-circle-check' : 'fa-solid fa-clock-rotate-left';
+    if (toggleBtn) {
+      toggleBtn.classList.toggle('active', isCompleted);
+      toggleBtn.title = isCompleted ? 'View Pending Quotations' : 'View Completed Orders';
+    }
+    if (toggleIcon) toggleIcon.className = isCompleted ? 'fa-solid fa-clock-rotate-left' : 'fa-solid fa-box-archive';
+    if (toggleText) toggleText.textContent = isCompleted ? 'Pending' : 'Completed';
+
+    // "Completed Orders" is now driven purely by admin explicitly marking
+    // the order done — NOT by quotation pricing approval. An approved
+    // quotation still shows here in the normal list (with an "Approved"
+    // badge) until admin flips it to Completed on their end.
+    const filteredHist = hist.filter(h => isCompleted ? h.completed : !h.completed);
+
+    const body = document.getElementById('chpBody');
+    if (!body) return;
+    if (!filteredHist.length) {
+      body.innerHTML = isCompleted
+        ? '<div class="chp-empty"><i class="fa-solid fa-circle-check"></i><p>No completed orders yet.<br>Orders marked done by our team will show up here.</p></div>'
+        : '<div class="chp-empty"><i class="fa-solid fa-box-open"></i><p>No quotations yet.<br>Send an inquiry to see it here.</p></div>';
+      return;
+    }
     const icon = (window.ZamiQuotation && window.ZamiQuotation.icon) ? window.ZamiQuotation.icon(16) : '';
-    const rows = hist.map(h => `
-      <button type="button" class="cart-history-item" data-quote="${h.quoteNumber}">
+    const statusCls = { none: 'chi-status-none', pending: 'chi-status-pending', approved: 'chi-status-approved' };
+    body.innerHTML = filteredHist.map(h => {
+      // Locked once priced/approved (pricing shouldn't change under the
+      // customer anymore) AND always locked once the order is completed.
+      const locked = h.statusKey === 'approved' || h.completed;
+      const lockTitle = locked ? (h.completed ? 'Locked — order completed' : 'Locked — already approved') : '';
+      return `
+      <div class="cart-history-item" data-id="${h.inquiryId}">
         <span class="chi-icon">${icon}</span>
-        <span class="chi-info">
-          <span class="chi-number">${h.quoteNumber}</span>
-          <span class="chi-date">${h.dateStr}</span>
+        <span class="chi-main">
+          <span class="chi-row1">
+            <span class="chi-number">${h.quoteNumber}</span>
+            <span class="chi-status ${h.completed ? 'chi-status-completed' : (statusCls[h.statusKey] || 'chi-status-none')}">${h.completed ? 'Completed' : h.statusLabel}</span>
+          </span>
+          <span class="chi-row2">
+            <span class="chi-date">${h.dateStr}</span>
+            <span class="chi-count">${h.itemCount} item${h.itemCount === 1 ? '' : 's'}</span>
+            <span class="chi-actions">
+              <button type="button" class="chi-act-btn" data-act="edit" data-id="${h.inquiryId}" title="${locked ? lockTitle : 'Edit'}" ${locked ? 'disabled' : ''}><i class="fa-solid fa-pen"></i></button>
+              <button type="button" class="chi-act-btn chi-act-danger" data-act="delete" data-id="${h.inquiryId}" title="${locked ? lockTitle : 'Delete'}" ${locked ? 'disabled' : ''}><i class="fa-solid fa-trash"></i></button>
+            </span>
+          </span>
         </span>
-        <span class="chi-count">${h.itemCount} item${h.itemCount === 1 ? '' : 's'}</span>
-        <i class="fa-solid fa-chevron-right chi-chevron"></i>
-      </button>`).join('');
-    return `
-      <div class="cart-history-divider"><span><i class="fa-solid fa-clock-rotate-left"></i>Quotation History</span></div>
-      <div class="cart-history-list">${rows}</div>`;
+      </div>`;
+    }).join('');
+  }
+
+  const chpTabToggleBtn = document.getElementById('chpTabToggle');
+  if (chpTabToggleBtn) chpTabToggleBtn.addEventListener('click', () => {
+    zmHistFilter = zmHistFilter === 'completed' ? 'active' : 'completed';
+    renderHistoryPanel();
+  });
+
+  // Delegated clicks for the Quotation History row actions — attached once
+  // since #chpBody itself is never replaced, only its innerHTML re-rendered.
+  (function attachHistoryActionDelegation() {
+    const body = document.getElementById('chpBody');
+    if (!body || body.dataset.zmActionsBound) return;
+    body.dataset.zmActionsBound = '1';
+    body.addEventListener('click', function (e) {
+      const btn = e.target.closest('.chi-act-btn');
+      if (btn) {
+        e.stopPropagation();
+        if (btn.disabled) return;
+        const id = btn.dataset.id;
+        const act = btn.dataset.act;
+        if (act === 'view') { window.ZamiQuotation && window.ZamiQuotation.viewHistoryEntry(id); }
+        else if (act === 'edit') { openEditQuotation(id); }
+        else if (act === 'delete') { confirmDeleteQuotation(id); }
+        return;
+      }
+      const row = e.target.closest('.cart-history-item');
+      if (row) { window.ZamiQuotation && window.ZamiQuotation.viewHistoryEntry(row.dataset.id); }
+    });
+  })();
+
+  (function injectHistoryActionStyles() {
+    if (document.getElementById('zmHistActStyles')) return;
+    const s = document.createElement('style');
+    s.id = 'zmHistActStyles';
+    s.textContent = `
+      .cart-history-item{cursor:pointer;}
+      .chi-actions{display:flex;align-items:center;gap:4px;margin-left:auto;flex-shrink:0;}
+      .chi-act-btn{width:26px;height:26px;border-radius:7px;border:1px solid rgba(6,59,63,.12);background:#fff;color:var(--teal,#063B3F);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.72rem;transition:background .15s;}
+      .chi-act-btn:hover{background:rgba(6,59,63,.06);}
+      .chi-act-btn:disabled{opacity:.3;cursor:not-allowed;}
+      .chi-act-btn.chi-act-danger{color:#d63030;}
+      .chi-act-btn.chi-act-danger:hover{background:#fff0f0;}
+    `;
+    document.head.appendChild(s);
+  })();
+
+  // ---------------------------------------------------------------
+  // Reusable themed Cancel / Delete confirm dialog — replaces the plain
+  // browser confirm() everywhere in the cart/quotation flow.
+  // ---------------------------------------------------------------
+  let zmConfirmModal = null, zmConfirmOnYes = null;
+
+  function zmBuildConfirmModal() {
+    if (zmConfirmModal) return;
+    zmConfirmModal = document.createElement('div');
+    zmConfirmModal.className = 'zmConfirm-overlay';
+    zmConfirmModal.innerHTML =
+      '<div class="zmConfirm-panel">' +
+        '<div class="zmConfirm-icon"><i class="fa-solid fa-trash"></i></div>' +
+        '<div class="zmConfirm-title" id="zmConfirmTitle">Delete this?</div>' +
+        '<div class="zmConfirm-sub" id="zmConfirmSub"></div>' +
+        '<div class="zmConfirm-actions">' +
+          '<button type="button" class="zmConfirm-cancel" id="zmConfirmCancelBtn">Cancel</button>' +
+          '<button type="button" class="zmConfirm-delete" id="zmConfirmDeleteBtn"><i class="fa-solid fa-trash" style="margin-right:6px;"></i>Delete</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(zmConfirmModal);
+
+    const style = document.createElement('style');
+    style.textContent =
+      '.zmConfirm-overlay{position:fixed;inset:0;background:rgba(6,20,20,.55);display:flex;align-items:center;justify-content:center;z-index:10001;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;}' +
+      '.zmConfirm-overlay.open{opacity:1;pointer-events:auto;}' +
+      '.zmConfirm-panel{background:#fff;border-radius:16px;max-width:340px;width:100%;padding:1.8rem 1.6rem;text-align:center;box-shadow:0 20px 60px -12px rgba(0,0,0,.35);font-family:var(--font-body,inherit);}' +
+      '.zmConfirm-icon{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#ef4444,#c62828);display:flex;align-items:center;justify-content:center;margin:0 auto .9rem;box-shadow:0 8px 24px -6px rgba(198,40,40,.4);}' +
+      '.zmConfirm-icon i{font-size:1.4rem;color:#fff;}' +
+      '.zmConfirm-title{font-size:1rem;font-weight:800;color:var(--teal,#063B3F);margin-bottom:.35rem;}' +
+      '.zmConfirm-sub{font-size:.8rem;color:#6a8080;line-height:1.55;margin-bottom:1.3rem;}' +
+      '.zmConfirm-actions{display:flex;gap:10px;}' +
+      '.zmConfirm-actions button{flex:1;padding:10px;border-radius:10px;border:none;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;}' +
+      '.zmConfirm-cancel{background:#f0f0f0;color:#555;}' +
+      '.zmConfirm-cancel:hover{background:#e4e4e4;}' +
+      '.zmConfirm-delete{background:#e53935;color:#fff;}' +
+      '.zmConfirm-delete:hover{background:#c62828;}';
+    document.head.appendChild(style);
+
+    zmConfirmModal.querySelector('#zmConfirmCancelBtn').addEventListener('click', zmHideConfirm);
+    zmConfirmModal.addEventListener('click', function (e) { if (e.target === zmConfirmModal) zmHideConfirm(); });
+    zmConfirmModal.querySelector('#zmConfirmDeleteBtn').addEventListener('click', function () {
+      const cb = zmConfirmOnYes;
+      zmHideConfirm();
+      if (cb) cb();
+    });
+  }
+
+  function zmHideConfirm() {
+    if (zmConfirmModal) zmConfirmModal.classList.remove('open');
+    zmConfirmOnYes = null;
+  }
+
+  function zmShowConfirm(title, sub, onYes) {
+    zmBuildConfirmModal();
+    zmConfirmModal.querySelector('#zmConfirmTitle').textContent = title;
+    zmConfirmModal.querySelector('#zmConfirmSub').textContent = sub;
+    zmConfirmOnYes = onYes;
+    zmConfirmModal.classList.add('open');
+  }
+
+  // ---------------------------------------------------------------
+  // DELETE — soft-deletes the inquiry (same as admin's delete: moves it to
+  // the Recycle Bin, admin can restore). Locked once approved.
+  // ---------------------------------------------------------------
+  function confirmDeleteQuotation(inquiryId) {
+    if (!window.InquirySystem) return;
+    const inq = InquirySystem.getInquiries().find(i => i.id === inquiryId);
+    if (inq && inq.quoteStatus === 'approved') {
+      alert('This quotation has already been approved and can no longer be deleted.');
+      return;
+    }
+    zmShowConfirm(
+      'Delete this quotation?',
+      'Admin will still be able to restore it from the Recycle Bin if needed.',
+      function () { InquirySystem.deleteInquiry(inquiryId); }
+    );
+  }
+
+  // ---------------------------------------------------------------
+  // EDIT — lets the customer add/remove items and adjust quantities on an
+  // inquiry that hasn't been approved yet. Saves straight back to
+  // InquirySystem, so admin's side updates automatically (live sync).
+  // ---------------------------------------------------------------
+  let zmEditModal = null, zmEditState = null;
+
+  function zmEscapeHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, function (s) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s];
+    });
+  }
+
+  function zmGetProducts() {
+    try { return JSON.parse(localStorage.getItem('zm_products') || '[]'); } catch (e) { return []; }
+  }
+
+  function zmBuildEditModal() {
+    if (zmEditModal) return;
+    zmEditModal = document.createElement('div');
+    zmEditModal.className = 'zmEdit-overlay';
+    zmEditModal.innerHTML =
+      '<div class="zmEdit-panel">' +
+        '<div class="zmEdit-head"><span>Edit Quotation Items</span><button type="button" class="zmEdit-close" id="zmEditCloseBtn"><i class="fa-solid fa-xmark"></i></button></div>' +
+        '<div class="zmEdit-body">' +
+          '<div class="zmEdit-items" id="zmEditItems"></div>' +
+          '<div class="zmEdit-add">' +
+            '<input type="text" id="zmEditSearch" placeholder="Search products to add..." autocomplete="off">' +
+            '<div class="zmEdit-suggest" id="zmEditSuggest"></div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="zmEdit-actions">' +
+          '<button type="button" class="zmEdit-cancel" id="zmEditCancelBtn">Cancel</button>' +
+          '<button type="button" class="zmEdit-save" id="zmEditSaveBtn">Save Changes</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(zmEditModal);
+
+    const style = document.createElement('style');
+    style.textContent =
+      '.zmEdit-overlay{position:fixed;inset:0;background:rgba(6,20,20,.55);display:flex;align-items:center;justify-content:center;z-index:10000;padding:16px;opacity:0;pointer-events:none;transition:opacity .2s;}' +
+      '.zmEdit-overlay.open{opacity:1;pointer-events:auto;}' +
+      '.zmEdit-panel{background:#fff;border-radius:16px;max-width:440px;width:100%;max-height:86vh;display:flex;flex-direction:column;box-shadow:0 20px 60px -12px rgba(0,0,0,.35);overflow:hidden;font-family:var(--font-body,inherit);}' +
+      '.zmEdit-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(6,59,63,.08);font-weight:800;color:var(--teal,#063B3F);font-size:.92rem;}' +
+      '.zmEdit-close{background:rgba(6,59,63,.08);border:none;width:28px;height:28px;border-radius:50%;color:var(--teal,#063B3F);cursor:pointer;}' +
+      '.zmEdit-body{padding:16px 18px;overflow-y:auto;flex:1;}' +
+      '.zmEdit-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(6,59,63,.06);}' +
+      '.zmEdit-row-name{flex:1;font-size:.82rem;color:#1e2b2b;font-weight:600;}' +
+      '.zmEdit-qtybox{display:flex;align-items:center;gap:6px;}' +
+      '.zmEdit-qtybtn{width:24px;height:24px;border-radius:6px;border:1px solid rgba(6,59,63,.15);background:#fff;color:var(--teal,#063B3F);cursor:pointer;font-weight:700;}' +
+      '.zmEdit-qtyval{min-width:20px;text-align:center;font-size:.82rem;font-weight:700;}' +
+      '.zmEdit-remove{background:none;border:none;color:#d63030;cursor:pointer;font-size:.9rem;padding:4px;}' +
+      '.zmEdit-add{position:relative;margin-top:12px;}' +
+      '.zmEdit-add input{width:100%;padding:9px 12px;border:1.5px solid rgba(6,59,63,.15);border-radius:9px;font-family:inherit;font-size:.82rem;box-sizing:border-box;}' +
+      '.zmEdit-suggest{position:absolute;left:0;right:0;top:100%;background:#fff;border:1px solid rgba(6,59,63,.12);border-radius:9px;margin-top:4px;max-height:180px;overflow-y:auto;box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:2;display:none;}' +
+      '.zmEdit-suggest.show{display:block;}' +
+      '.zmEdit-suggest-item{padding:8px 12px;font-size:.8rem;cursor:pointer;color:#1e2b2b;display:flex;align-items:center;gap:10px;}' +
+      '.zmEdit-suggest-item:hover{background:rgba(6,59,63,.05);}' +
+      '.zmEdit-suggest-img{width:34px;height:34px;border-radius:8px;object-fit:cover;background:#f0f5f2;flex-shrink:0;}' +
+      '.zmEdit-suggest-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
+      '.zmEdit-empty{text-align:center;color:#8a9f9f;font-size:.8rem;padding:14px 0;}' +
+      '.zmEdit-actions{display:flex;gap:10px;padding:14px 18px;border-top:1px solid rgba(6,59,63,.08);}' +
+      '.zmEdit-actions button{flex:1;padding:10px;border-radius:10px;border:none;font-weight:700;font-size:.85rem;cursor:pointer;font-family:inherit;}' +
+      '.zmEdit-cancel{background:#fff;border:1.5px solid rgba(6,59,63,.18);color:var(--teal,#063B3F);}' +
+      '.zmEdit-save{background:linear-gradient(135deg,#063b3f,#0a5a62);color:#fff;}';
+    document.head.appendChild(style);
+
+    zmEditModal.querySelector('#zmEditCloseBtn').addEventListener('click', zmCloseEdit);
+    zmEditModal.querySelector('#zmEditCancelBtn').addEventListener('click', zmCloseEdit);
+    zmEditModal.addEventListener('click', function (e) { if (e.target === zmEditModal) zmCloseEdit(); });
+    zmEditModal.querySelector('#zmEditSaveBtn').addEventListener('click', zmSaveEdit);
+
+    const searchInput = zmEditModal.querySelector('#zmEditSearch');
+    const suggestBox = zmEditModal.querySelector('#zmEditSuggest');
+    searchInput.addEventListener('input', function () {
+      const q = searchInput.value.trim().toLowerCase();
+      if (!q) { suggestBox.classList.remove('show'); suggestBox.innerHTML = ''; return; }
+      const products = zmGetProducts().filter(p => p.name && p.name.toLowerCase().includes(q)).slice(0, 8);
+      if (!products.length) {
+        suggestBox.innerHTML = '<div class="zmEdit-suggest-item" style="color:#8a9f9f;cursor:default;">No matches</div>';
+        suggestBox.classList.add('show');
+        return;
+      }
+      suggestBox.innerHTML = products.map(p => `<div class="zmEdit-suggest-item" data-name="${zmEscapeHtml(p.name)}"><img class="zmEdit-suggest-img" src="${zmEscapeHtml(p.image || '')}" alt="" onerror="this.style.visibility='hidden'"><span class="zmEdit-suggest-name">${zmEscapeHtml(p.name)}</span></div>`).join('');
+      suggestBox.classList.add('show');
+    });
+    suggestBox.addEventListener('click', function (e) {
+      const item = e.target.closest('.zmEdit-suggest-item');
+      if (!item || !item.dataset.name) return;
+      zmAddEditItem(item.dataset.name);
+      searchInput.value = '';
+      suggestBox.classList.remove('show');
+      suggestBox.innerHTML = '';
+    });
+  }
+
+  function zmAddEditItem(name) {
+    if (!zmEditState) return;
+    const existing = zmEditState.items.find(it => it.name === name);
+    if (existing) { existing.qty = (Number(existing.qty) || 0) + 1; }
+    else { zmEditState.items.push({ name: name, qty: 1 }); }
+    zmRenderEditItems();
+  }
+
+  function zmRenderEditItems() {
+    const wrap = zmEditModal.querySelector('#zmEditItems');
+    if (!zmEditState.items.length) {
+      wrap.innerHTML = '<div class="zmEdit-empty">No items yet. Search below to add one.</div>';
+      return;
+    }
+    wrap.innerHTML = zmEditState.items.map((it, idx) => `
+      <div class="zmEdit-row" data-idx="${idx}">
+        <span class="zmEdit-row-name">${zmEscapeHtml(it.name)}</span>
+        <span class="zmEdit-qtybox">
+          <button type="button" class="zmEdit-qtybtn" data-idx="${idx}" data-d="-1">−</button>
+          <span class="zmEdit-qtyval">${it.qty}</span>
+          <button type="button" class="zmEdit-qtybtn" data-idx="${idx}" data-d="1">+</button>
+        </span>
+        <button type="button" class="zmEdit-remove" data-idx="${idx}" title="Remove"><i class="fa-solid fa-trash"></i></button>
+      </div>`).join('');
+
+    wrap.querySelectorAll('.zmEdit-qtybtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = +btn.dataset.idx, d = +btn.dataset.d;
+        const it = zmEditState.items[idx];
+        it.qty = Math.max(1, (Number(it.qty) || 1) + d);
+        zmRenderEditItems();
+      });
+    });
+    wrap.querySelectorAll('.zmEdit-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = +btn.dataset.idx;
+        const itemName = zmEditState.items[idx] ? zmEditState.items[idx].name : 'this item';
+        zmShowConfirm(
+          'Remove item?',
+          'Remove "' + itemName + '" from this quotation.',
+          function () {
+            zmEditState.items.splice(idx, 1);
+            zmRenderEditItems();
+          }
+        );
+      });
+    });
+  }
+
+  function openEditQuotation(inquiryId) {
+    if (!window.InquirySystem) return;
+    const inq = InquirySystem.getInquiries().find(i => i.id === inquiryId);
+    if (!inq) return;
+    if (inq.quoteStatus === 'approved') {
+      alert('This quotation has already been approved and can no longer be edited.');
+      return;
+    }
+    zmEditState = { inquiryId: inquiryId, items: JSON.parse(JSON.stringify(inq.items || [])) };
+    zmBuildEditModal();
+    zmRenderEditItems();
+    zmEditModal.classList.add('open');
+  }
+
+  function zmCloseEdit() {
+    if (zmEditModal) zmEditModal.classList.remove('open');
+    zmEditState = null;
+  }
+
+  function zmSaveEdit() {
+    if (!zmEditState || !window.InquirySystem) return;
+    if (!zmEditState.items.length) {
+      const inquiryId = zmEditState.inquiryId;
+      zmCloseEdit();
+      zmShowConfirm(
+        'No items left',
+        'This quotation has no items left. Delete it instead?',
+        function () { InquirySystem.deleteInquiry(inquiryId); }
+      );
+      return;
+    }
+    const cleanItems = zmEditState.items.map(it => {
+      const obj = { name: it.name, qty: Number(it.qty) || 1 };
+      if (it.price != null) obj.price = it.price;
+      return obj;
+    });
+    InquirySystem.updateInquiryItems(zmEditState.inquiryId, cleanItems);
+    zmCloseEdit();
   }
 
   function renderCartItems() {
     const itemsHtml = cart.length === 0
       ? `<div class="cart-empty">
           <i class="fa-solid fa-cart-shopping"></i>
-          <p>Your cart is empty.<br>Add items from the <a href="categories.html" style="color:var(--teal);font-weight:600;">catalog</a>.</p>
+          <p>Your cart is empty.<br>Add items from the catalog above.</p>
         </div>`
       : cart.map((item, idx) => `
       <div class="cart-item" data-idx="${idx}">
@@ -869,51 +1494,90 @@
       </div>
     `).join('');
 
-    cartItemsEl.innerHTML = itemsHtml + buildHistoryHTML();
+    cartItemsEl.innerHTML = itemsHtml;
+    renderHistoryPanel();
 
+    // Qty buttons
     cartItemsEl.querySelectorAll('.qty-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         const idx = +btn.dataset.idx;
-        if (btn.dataset.action === 'inc') cart[idx].qty++;
+        const action = btn.dataset.action;
+        if (action === 'inc') cart[idx].qty++;
         else cart[idx].qty--;
         if (cart[idx].qty <= 0) cart.splice(idx, 1);
-        saveCart(cart); updateBadge(); renderCartItems();
+        saveCart(cart);
+        updateBadge();
+        renderCartItems();
+    
       });
     });
+
+    // Remove buttons — ask for confirmation first
     cartItemsEl.querySelectorAll('.cart-item-remove').forEach(btn => {
       btn.addEventListener('click', () => {
-        cart.splice(+btn.dataset.idx, 1);
-        saveCart(cart); updateBadge(); renderCartItems();
+        const idx = +btn.dataset.idx;
+        const item = cart[idx];
+        openDeleteConfirm({
+          title: 'Remove item?',
+          sub: `Remove "${item ? item.name : 'this item'}" from your cart?`,
+          onConfirm: () => {
+            cart.splice(idx, 1);
+            saveCart(cart);
+            updateBadge();
+            renderCartItems();
+          }
+        });
       });
     });
-    cartItemsEl.querySelectorAll('.cart-history-item').forEach(btn => {
-      btn.addEventListener('click', () => {
-        if (window.ZamiQuotation && window.ZamiQuotation.viewHistoryEntry) window.ZamiQuotation.viewHistoryEntry(btn.dataset.quote);
-      });
-    });
+
+    // History rows
   }
   renderCartItems();
   window.addEventListener('zm-quote-history-updated', renderCartItems);
 
+  // ---- Quotation History panel (opens from the cart header icon) ----
+  const cartHistoryPanel = document.getElementById('cartHistoryPanel');
+  const cartHistoryBtn = document.getElementById('cartHistoryBtn');
+  const chpBackBtn = document.getElementById('chpBackBtn');
+  if (cartHistoryBtn) cartHistoryBtn.addEventListener('click', () => {
+    zmHistFilter = 'active';
+    renderHistoryPanel();
+    cartHistoryPanel.classList.add('open');
+  });
+  if (chpBackBtn) chpBackBtn.addEventListener('click', () => cartHistoryPanel.classList.remove('open'));
+
+
+
+  // ---- Open/Close ----
   const overlay = document.getElementById('cartOverlay');
   function openCart() { overlay.classList.add('open'); }
   function closeCart() {
     overlay.classList.remove('open');
+    // Reset thank-you and confirm screens after slide-out
     setTimeout(() => {
       const ty = document.getElementById('cartThankyou');
       const confirm = document.getElementById('cartConfirm');
+      const deleteConfirm = document.getElementById('cartDeleteConfirm');
+      const loading = document.getElementById('cartLoading');
+      const barFill = document.getElementById('clBarFill');
       const footer = document.getElementById('cartFooter');
       if (ty) ty.classList.remove('show');
       if (confirm) confirm.classList.remove('show');
+      if (deleteConfirm) deleteConfirm.classList.remove('show');
+      if (loading) loading.classList.remove('show');
+      if (barFill) barFill.style.width = '0%';
       if (footer) footer.style.display = '';
       if (cartItemsEl) cartItemsEl.style.display = '';
+      const hp = document.getElementById('cartHistoryPanel');
+      if (hp) hp.classList.remove('open');
     }, 380);
   }
 
-  document.getElementById('cartNavBtn').addEventListener('click', openCart);
   document.getElementById('cartClose').addEventListener('click', closeCart);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCart(); });
+  document.getElementById('cartNavBtn').addEventListener('click', openCart);
 
+  // Quotation actions in thank-you screen
   const tyViewBtn = document.getElementById('tyViewBtn');
   if (tyViewBtn) tyViewBtn.addEventListener('click', () => { if (window.ZamiQuotation) window.ZamiQuotation.openView(); });
   const tyPrintBtn = document.getElementById('tyPrintBtn');
@@ -921,10 +1585,44 @@
   const tyDownloadBtn = document.getElementById('tyDownloadBtn');
   if (tyDownloadBtn) tyDownloadBtn.addEventListener('click', () => { if (window.ZamiQuotation) window.ZamiQuotation.download(); });
 
+  // ---- Delete confirmation (shared: single item + clear all) ----
+  let _pendingDeleteAction = null;
+  function openDeleteConfirm({ title, sub, onConfirm }) {
+    const panel = document.getElementById('cartDeleteConfirm');
+    const titleEl = document.getElementById('deleteConfirmTitle');
+    const subEl = document.getElementById('deleteConfirmSub');
+    if (titleEl) titleEl.textContent = title;
+    if (subEl) subEl.textContent = sub;
+    _pendingDeleteAction = onConfirm;
+    if (panel) panel.classList.add('show');
+  }
+  function closeDeleteConfirm() {
+    const panel = document.getElementById('cartDeleteConfirm');
+    if (panel) panel.classList.remove('show');
+    _pendingDeleteAction = null;
+  }
+  document.getElementById('deleteConfirmYesBtn').addEventListener('click', () => {
+    if (typeof _pendingDeleteAction === 'function') _pendingDeleteAction();
+    closeDeleteConfirm();
+  });
+  document.getElementById('deleteConfirmNoBtn').addEventListener('click', closeDeleteConfirm);
+
+  // ---- Clear / Delete All ----
   document.getElementById('cartClearBtn').addEventListener('click', () => {
-    cart = []; saveCart(cart); updateBadge(); renderCartItems();
+    if (cart.length === 0) return;
+    openDeleteConfirm({
+      title: 'Remove all items?',
+      sub: `This will remove all ${cart.length} item(s) from your cart. This cannot be undone.`,
+      onConfirm: () => {
+        cart = [];
+        saveCart(cart);
+        updateBadge();
+        renderCartItems();
+      }
+    });
   });
 
+  // ---- Send Inquiry to Admin ----
   document.getElementById('cartInquireBtn').addEventListener('click', () => {
     if (cart.length === 0) return;
     const footer = document.getElementById('cartFooter');
@@ -934,25 +1632,53 @@
   });
 
   document.getElementById('confirmYesBtn').addEventListener('click', () => {
-    let senderName = 'Guest', senderEmail = '';
-    try { const _u = window.fb && window.fb.auth ? window.fb.auth.currentUser : null; if (_u) { senderName = _u.displayName || _u.email || 'Guest'; senderEmail = _u.email || ''; } } catch(e) {}
-    // Pass the customer's current chat session ID so admin replies reach the right thread
-    let _inqChatSessionId = null;
-    try { const _s = JSON.parse(localStorage.getItem('zm_cv_session') || 'null'); if (_s && _s.id) _inqChatSessionId = _s.id; } catch(e) {}
-    try {
-      InquirySystem.submitInquiry({ name: senderName, email: senderEmail, items: cart.map(i=>({name:i.name,qty:i.qty})), chatSessionId: _inqChatSessionId });
-    } catch(e) {}
-    try {
-      if (window.ZamiQuotation) {
-        window.ZamiQuotation.setData({ items: cart.map(i => ({ name: i.name, qty: i.qty })), customerName: senderName, customerContact: senderEmail });
-      }
-    } catch(e) {}
-    cart = []; saveCart(cart); updateBadge(); renderCartItems();
     const confirm = document.getElementById('cartConfirm');
-    const ty = document.getElementById('cartThankyou');
+    const loading = document.getElementById('cartLoading');
+    const barFill = document.getElementById('clBarFill');
     if (confirm) confirm.classList.remove('show');
-    if (cartItemsEl) cartItemsEl.style.display = 'none';
-    if (ty) ty.classList.add('show');
+    if (loading) loading.classList.add('show');
+    if (barFill) {
+      barFill.style.width = '0%';
+      requestAnimationFrame(() => requestAnimationFrame(() => { barFill.style.width = '100%'; }));
+    }
+
+    setTimeout(() => {
+      let senderName = 'Guest';
+      let senderEmail = '';
+      try {
+        const _u = window.fb && window.fb.auth ? window.fb.auth.currentUser : null;
+        if (_u) { senderName = _u.displayName || _u.email || 'Guest'; senderEmail = _u.email || ''; }
+      } catch(e) {}
+      // Pass the customer's current chat session ID so admin replies reach the right thread
+      let _inqChatSessionId = null;
+      try { const _s = JSON.parse(localStorage.getItem('zm_cv_session') || 'null'); if (_s && _s.id) _inqChatSessionId = _s.id; } catch(e) {}
+
+      let _submittedInqId = null;
+      try {
+        _submittedInqId = InquirySystem.submitInquiry({
+          name: senderName,
+          email: senderEmail,
+          items: cart.map(i => ({ name: i.name, qty: i.qty })),
+          chatSessionId: _inqChatSessionId
+        });
+      } catch(e) {}
+
+      try {
+        if (window.ZamiQuotation) {
+          window.ZamiQuotation.setData({ inquiryId: _submittedInqId, items: cart.map(i => ({ name: i.name, qty: i.qty })), customerName: senderName, customerContact: senderEmail });
+        }
+      } catch(e) {}
+
+      cart = [];
+      saveCart(cart);
+      updateBadge();
+      renderCartItems();
+
+      const ty = document.getElementById('cartThankyou');
+      if (loading) loading.classList.remove('show');
+      if (cartItemsEl) cartItemsEl.style.display = 'none';
+      if (ty) ty.classList.add('show');
+    }, 3000);
   });
 
   document.getElementById('confirmNoBtn').addEventListener('click', () => {
@@ -961,6 +1687,138 @@
     if (confirm) confirm.classList.remove('show');
     if (footer) footer.style.display = '';
   });
+
+  // ---- Expose global so catalog.js viewer can call addToCart ----
+  // ---- Login check helper ----
+  function isUserLoggedIn() {
+    try {
+      return !!(window.fb && window.fb.auth && window.fb.auth.currentUser);
+    } catch(e) { return false; }
+  }
+
+  function showLoginPrompt() {
+    const existing = document.getElementById('zmLoginToast');
+    if (existing) existing.remove();
+
+    if (!document.getElementById('zmToastStyle')) {
+      const s = document.createElement('style');
+      s.id = 'zmToastStyle';
+      s.textContent = `
+        @keyframes zmToastIn {
+          from { opacity:0; transform:translate(-50%,-50%) scale(.92); }
+          to   { opacity:1; transform:translate(-50%,-50%) scale(1); }
+        }
+        @keyframes zmToastOut {
+          from { opacity:1; transform:translate(-50%,-50%) scale(1); }
+          to   { opacity:0; transform:translate(-50%,-50%) scale(.92); }
+        }
+        #zmLoginToast {
+          position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+          z-index:999999; width:max-content; max-width:min(440px,92vw);
+          background:#fff; border-radius:20px;
+          box-shadow:0 20px 60px rgba(6,59,63,.16), 0 4px 16px rgba(0,0,0,.08);
+          display:flex; align-items:stretch; overflow:hidden;
+          animation:zmToastIn .35s cubic-bezier(.34,1.56,.64,1) forwards;
+          font-family:'Poppins',sans-serif;
+        }
+        #zmLoginToast .zt-bar {
+          width:5px; flex-shrink:0;
+          background:linear-gradient(180deg,#FD4D02 0%,#c73a00 100%);
+        }
+        #zmLoginToast .zt-body {
+          display:flex; align-items:center; gap:14px; padding:16px 20px 16px 16px;
+        }
+        #zmLoginToast .zt-icon {
+          width:42px; height:42px; border-radius:12px; flex-shrink:0;
+          background:linear-gradient(135deg,#fff4f0,#ffe3d9);
+          display:flex; align-items:center; justify-content:center;
+        }
+        #zmLoginToast .zt-icon i { font-size:1.05rem; color:#FD4D02; }
+        #zmLoginToast .zt-copy { flex:1; min-width:0; }
+        #zmLoginToast .zt-title {
+          font-size:.85rem; font-weight:700; color:#063b3f;
+          line-height:1.3; margin-bottom:2px;
+        }
+        #zmLoginToast .zt-sub {
+          font-size:.72rem; color:#7a9090; line-height:1.4;
+        }
+        #zmLoginToast .zt-btn {
+          flex-shrink:0; margin-left:4px;
+          background:linear-gradient(135deg,#FD4D02,#d94000);
+          color:#fff; border:none; border-radius:11px;
+          padding:9px 16px; font-size:.78rem; font-weight:700;
+          text-decoration:none; cursor:pointer; white-space:nowrap;
+          display:flex; align-items:center; gap:6px;
+          box-shadow:0 4px 16px rgba(253,77,2,.32);
+          transition:transform .15s,box-shadow .15s;
+        }
+        #zmLoginToast .zt-btn:hover { transform:translateY(-1px); box-shadow:0 6px 20px rgba(253,77,2,.44); }
+
+      `;
+      document.head.appendChild(s);
+    }
+
+    const toast = document.createElement('div');
+    toast.id = 'zmLoginToast';
+    toast.innerHTML = `
+      <div class="zt-bar"></div>
+      <div class="zt-body">
+        <div class="zt-icon"><i class="fa-solid fa-cart-shopping"></i></div>
+        <div class="zt-copy">
+          <div class="zt-title">Sign in to add items to your cart</div>
+          <div class="zt-sub">You need an account to start shopping.</div>
+        </div>
+        <a href="login.html" class="zt-btn">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i> Log In
+        </a>
+      </div>
+    `;
+    document.body.appendChild(toast);
+
+    const dismiss = () => {
+      toast.style.animation = 'zmToastOut .22s ease forwards';
+      setTimeout(() => { if (toast.parentNode) toast.remove(); }, 230);
+    };
+    setTimeout(dismiss, 5000);
+  }
+
+  window.ZMCart = {
+    addItem: function(name, img) {
+      if (!isUserLoggedIn()) { showLoginPrompt(); return false; }
+      const existing = cart.find(i => i.name === name);
+      if (existing) { existing.qty++; } else { cart.push({ name, img, qty: 1 }); }
+      saveCart(cart);
+      updateBadge();
+      renderCartItems();
+      return true;
+    },
+    isInCart: function(name) {
+      return !!cart.find(i => i.name === name);
+    },
+    getItem: function(name) {
+      return cart.find(i => i.name === name) || null;
+    },
+    removeItem: function(name) {
+      const idx = cart.findIndex(i => i.name === name);
+      if (idx !== -1) cart.splice(idx, 1);
+      saveCart(cart);
+      updateBadge();
+      renderCartItems();
+    },
+    setQty: function(name, qty) {
+      const item = cart.find(i => i.name === name);
+      if (!item) return;
+      if (qty <= 0) {
+        this.removeItem(name);
+      } else {
+        item.qty = qty;
+        saveCart(cart);
+        updateBadge();
+        renderCartItems();
+      }
+    }
+  };
+
 })();
 
 // =============================================
@@ -1007,6 +1865,33 @@
 .zm-chat-btn{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:#FD4D02;border:none;color:#fff;font-size:1.4rem;cursor:pointer;box-shadow:0 8px 28px -4px rgba(253,77,2,.45);display:flex;align-items:center;justify-content:center;transition:all .35s cubic-bezier(.4,0,.2,1);z-index:9999;}
 .zm-chat-btn:hover{transform:scale(1.1);box-shadow:0 12px 36px -4px rgba(253,77,2,.5);}
 .zm-chat-btn.open{opacity:0;pointer-events:none;transform:scale(.75);}
+.zm-chat-btn-icon-wrap{position:relative;width:1em;height:1em;display:inline-block;}
+.zm-chat-btn-icon-wrap i{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1em;line-height:1;}
+.zm-chat-icon-wave{animation:zmWaveIcon 6s cubic-bezier(.4,0,.2,1) infinite;transform-origin:50% 85%;}
+.zm-chat-icon-msg{animation:zmMsgIcon 6s cubic-bezier(.4,0,.2,1) infinite;}
+@keyframes zmWaveIcon{
+  0%{opacity:1;transform:rotate(0deg) scale(1);}
+  3%{opacity:1;transform:rotate(-18deg) scale(1);}
+  6%{opacity:1;transform:rotate(14deg) scale(1);}
+  9%{opacity:1;transform:rotate(-11deg) scale(1);}
+  12%{opacity:1;transform:rotate(8deg) scale(1);}
+  15%{opacity:1;transform:rotate(0deg) scale(1);}
+  30%{opacity:1;transform:rotate(0deg) scale(1);}
+  38%{opacity:0;transform:rotate(0deg) scale(.4) translateY(6px);}
+  70%{opacity:0;transform:rotate(0deg) scale(.4) translateY(6px);}
+  78%{opacity:1;transform:rotate(0deg) scale(1);}
+  100%{opacity:1;transform:rotate(0deg) scale(1);}
+}
+@keyframes zmMsgIcon{
+  0%{opacity:0;transform:scale(.4) translateY(-6px);}
+  30%{opacity:0;transform:scale(.4) translateY(-6px);}
+  38%{opacity:1;transform:scale(1) translateY(0);}
+  52%{transform:scale(1.14) translateY(0);}
+  58%{transform:scale(1) translateY(0);}
+  70%{opacity:1;transform:scale(1) translateY(0);}
+  78%{opacity:0;transform:scale(.4) translateY(-6px);}
+  100%{opacity:0;transform:scale(.4) translateY(-6px);}
+}
 .zm-chat-unread{position:absolute;top:-3px;right:-3px;background:#d6483a;color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;border:2px solid #fff;}
 .zm-chat-win{position:fixed;bottom:96px;right:24px;width:380px;max-width:calc(100vw - 32px);height:580px;background:#fff;border-radius:22px;box-shadow:0 20px 70px -10px rgba(6,59,63,.25),0 4px 20px rgba(0,0,0,.08);display:none;flex-direction:column;z-index:9998;overflow:hidden;}
 .zm-chat-win.open{display:flex;animation:zmChatUp .3s cubic-bezier(.4,0,.2,1);}
@@ -1162,7 +2047,10 @@
 
 <!-- Chat FAB -->
 <button class="zm-chat-btn" id="zmChatBtn" title="Chat with us">
-  <i class="fa-solid fa-message"></i>
+  <span class="zm-chat-btn-icon-wrap">
+    <i class="fa-solid fa-hand zm-chat-icon-wave" aria-hidden="true"></i>
+    <i class="fa-solid fa-message zm-chat-icon-msg" aria-hidden="true"></i>
+  </span>
   <div class="zm-chat-unread" id="zmChatUnread" style="display:none">0</div>
 </button>
 

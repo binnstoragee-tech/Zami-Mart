@@ -796,3 +796,45 @@ a:focus-visible, button:focus-visible{
   outline-offset: 3px;
   border-radius:6px;
 }
+
+/* =============================================
+   ZM UNIVERSAL LOADER — orange, 4s cycle
+   Used everywhere a loading/spinner animation
+   is needed across Zami Mart (cart, forms, auth,
+   buttons, tables). Sizes: default / .lg / .sm / .xs
+   ============================================= */
+.zm-loader{
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:12px;
+}
+.zm-loader span{
+  display:inline-block; border-radius:50%;
+  animation: zmLoaderPulse 4s ease-in-out infinite;
+}
+.zm-loader span:nth-child(1){ width:26px; height:26px; background:#ffb27a; animation-delay:0s; }
+.zm-loader span:nth-child(2){ width:26px; height:26px; background:#ff8a3d; animation-delay:-1s; }
+.zm-loader span:nth-child(3){ width:18px; height:18px; background:#fd4d02; animation-delay:-2s; }
+.zm-loader span:nth-child(4){ width:11px; height:11px; background:#c93e00; animation-delay:-3s; }
+
+@keyframes zmLoaderPulse{
+  0%,100%{ transform:scale(.55); opacity:.35; }
+  50%{ transform:scale(1.15); opacity:1; }
+}
+
+.zm-loader.lg{ gap:16px; }
+.zm-loader.lg span:nth-child(1),
+.zm-loader.lg span:nth-child(2){ width:34px; height:34px; }
+.zm-loader.lg span:nth-child(3){ width:24px; height:24px; }
+.zm-loader.lg span:nth-child(4){ width:15px; height:15px; }
+
+.zm-loader.sm{ gap:7px; }
+.zm-loader.sm span:nth-child(1),
+.zm-loader.sm span:nth-child(2){ width:12px; height:12px; }
+.zm-loader.sm span:nth-child(3){ width:9px; height:9px; }
+.zm-loader.sm span:nth-child(4){ width:6px; height:6px; }
+
+.zm-loader.xs{ gap:4px; vertical-align:middle; }
+.zm-loader.xs span:nth-child(1),
+.zm-loader.xs span:nth-child(2){ width:6px; height:6px; }
+.zm-loader.xs span:nth-child(3){ width:5px; height:5px; }
+.zm-loader.xs span:nth-child(4){ width:3.5px; height:3.5px; }

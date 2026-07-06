@@ -433,6 +433,12 @@ const ChatSystem = (function() {
   };
 })();
 
+// Expose on window explicitly — see the matching note in inquiry-system.js.
+// inquiry-system.js itself checks `window.ChatSystem` when auto-linking a
+// new inquiry to an existing chat session, so without this that link-up
+// silently never happens either.
+window.ChatSystem = ChatSystem;
+
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => ChatSystem.init());
 } else {

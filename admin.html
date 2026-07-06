@@ -7,6 +7,7 @@
 <script type="module" src="firebase-init.js"></script>
 <script src="inquiry-system.js"></script>
 <script src="chat-system.js"></script>
+<script src="quotation.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -663,6 +664,11 @@ select {
   transition: box-shadow .3s var(--ease-smooth), transform .3s var(--ease-smooth), border-color .3s var(--ease-smooth);
   position: relative;
   overflow: hidden;
+  animation: cardFloat 3s ease-in-out infinite;
+}
+@keyframes cardFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
 }
 .stat-card::before {
   content: '';
@@ -673,7 +679,12 @@ select {
   transform-origin: left;
   transition: transform .35s var(--ease-smooth);
 }
-.stat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: rgba(6,59,63,.18); }
+.stat-card:nth-child(1) { animation-delay: 0s; }
+.stat-card:nth-child(2) { animation-delay: 0.15s; }
+.stat-card:nth-child(3) { animation-delay: 0.3s; }
+.stat-card:nth-child(4) { animation-delay: 0.45s; }
+.stat-card:nth-child(5) { animation-delay: 0.6s; }
+.stat-card:hover { box-shadow: var(--shadow-lg); border-color: rgba(6,59,63,.18); }
 .stat-card:hover::before { transform: scaleX(1); }
 .stat-icon-wrap {
   width: 44px; height: 44px; border-radius: 50%;
@@ -811,7 +822,6 @@ select {
 
   /* Inline grids used across sections */
   div[style*="grid-template-columns:repeat(3,1fr)"] { grid-template-columns: 1fr 1fr !important; }
-  div[style*="grid-template-columns:340px 1fr"] { grid-template-columns: 1fr !important; }
 }
 @media (max-width: 480px) {
   .stats-grid { grid-template-columns: 1fr 1fr; }
@@ -992,6 +1002,9 @@ select {
 }
 #sec-chat .chat-messages-area::-webkit-scrollbar { width: 4px; }
 #sec-chat .chat-messages-area::-webkit-scrollbar-thumb { background: rgba(6,59,63,.1); border-radius: 4px; }
+
+#inqChatMessages::-webkit-scrollbar { width: 4px; }
+#inqChatMessages::-webkit-scrollbar-thumb { background: rgba(6,59,63,.12); border-radius: 4px; }
 
 /* Message rows */
 .zm-chat-msg {
@@ -1305,64 +1318,150 @@ select {
   #sec-chat .chat-panel   { height: 480px; }
 }
 
-/* ─── INQUIRY QUOTATION DOCUMENT (admin editable) ───────────── */
-.iq-doc {
-  background: #fff; border: 1px solid var(--border); border-radius: 12px;
-  padding: 16px; margin-bottom: 12px;
+.iq-panel-grid { display: grid; grid-template-columns: minmax(420px, 620px) minmax(340px, 1fr); gap: 22px; align-items: stretch; }
+@media (max-width: 1180px) {
+  .iq-panel-grid { grid-template-columns: 1fr; }
 }
+.iq-doc {
+  position: relative;
+  background: #fff; border: 1px solid var(--border); border-radius: 14px;
+  padding: 22px 24px 20px; margin-bottom: 14px; box-shadow: 0 4px 20px -8px rgba(6,59,63,.12);
+  transition: box-shadow .2s var(--ease);
+}
+.iq-doc:hover { box-shadow: 0 8px 28px -8px rgba(6,59,63,.18); }
+.iq-doc::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  border-radius: 14px 14px 0 0;
+  background: linear-gradient(90deg, var(--teal), #0a5a62 55%, var(--orange));
+}
+
+/* Section dividers used to separate the quotation document, the
+   share-with-customer actions, and the admin pricing controls into
+   clear, labeled zones. */
+.iq-section-divider {
+  display: flex; align-items: center; gap: 10px;
+  margin: 4px 0 12px;
+}
+.iq-section-divider:not(:first-child) { margin-top: 18px; }
+.iq-section-divider .iq-sd-line { flex: 1; height: 1px; background: var(--border); }
+.iq-section-divider .iq-sd-label {
+  display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  font-size: .64rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.iq-section-divider .iq-sd-label i { color: var(--orange); font-size: .72rem; }
+
+/* Share-with-customer action row (View / Print / Download) — this is
+   powered by the exact same renderer the customer sees, so what admin
+   previews here is guaranteed identical to the customer's document. */
+.iq-doc-sharebar { display: flex; gap: 8px; margin-bottom: 6px; }
+.iq-share-btn {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 8px; border-radius: 10px; font-size: .78rem; font-weight: 700;
+  font-family: inherit; border: 1.5px solid var(--border); background: #fff;
+  color: var(--teal); cursor: pointer; transition: all .18s var(--ease);
+}
+.iq-share-btn:hover { background: var(--teal-soft); border-color: var(--teal); transform: translateY(-1px); }
+.iq-share-btn.primary {
+  background: linear-gradient(135deg, var(--teal), var(--teal-mid)); color: #fff; border: none;
+}
+.iq-share-btn.primary:hover { opacity: .92; transform: translateY(-1px); }
+.iq-doc-sync-note {
+  display: flex; align-items: center; gap: 6px; font-size: .68rem; color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.iq-doc-sync-note i { color: #0a9a60; }
 .iq-doc-head {
   display: flex; justify-content: space-between; align-items: flex-start;
-  border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 12px;
-  gap: 10px; flex-wrap: wrap;
+  padding-bottom: 16px; margin-bottom: 18px;
+  gap: 10px; flex-wrap: wrap; position: relative;
+}
+.iq-doc-head::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: linear-gradient(90deg, rgba(6,59,63,.14), rgba(6,59,63,.02));
+}
+.iq-doc-kicker {
+  font-size: .6rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 5px;
 }
 .iq-doc-title {
-  font-size: 1.05rem; font-weight: 800; color: var(--teal);
-  border-left: 4px solid var(--orange); padding-left: 8px; margin-bottom: 6px;
+  font-size: 1.25rem; font-weight: 800; color: var(--teal);
+  letter-spacing: -.01em; margin-bottom: 8px; line-height: 1;
 }
-.iq-doc-brand { display: flex; align-items: center; gap: 8px; }
+.iq-doc-brand { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
 .iq-doc-logo {
-  width: 30px; height: 30px; border-radius: 8px; background: #fff;
-  border: 1px solid var(--border); display: flex; align-items: center;
-  justify-content: center; overflow: hidden; flex-shrink: 0;
+  width: 48px; height: 48px; flex-shrink: 0; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
 }
 .iq-doc-logo img { width: 100%; height: 100%; object-fit: contain; }
-.iq-doc-brandname { font-weight: 800; color: var(--teal); font-size: .85rem; }
-.iq-doc-brandsub { font-size: .64rem; color: var(--text-muted); }
+.iq-doc-brandsub { display: flex; align-items: center; justify-content: flex-end; gap: 6px; font-size: .64rem; color: var(--text-muted); line-height: 1.6; white-space: nowrap; }
+.iq-doc-brandsub i { color: var(--orange); font-size: .6rem; width: 11px; text-align: center; flex-shrink: 0; }
 .iq-doc-meta {
-  display: flex; justify-content: space-between; gap: 18px;
-  margin-bottom: 14px; flex-wrap: wrap;
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+@media (max-width: 460px) { .iq-doc-meta { flex-direction: column; } }
+.iq-doc-meta > div {
+  flex: 1; min-width: 150px; padding: 13px 15px;
+  background: linear-gradient(155deg, rgba(6,59,63,.035), rgba(6,59,63,.015));
+  border: 1px solid rgba(6,59,63,.06); border-radius: 12px;
+  border-left: 3px solid rgba(6,59,63,.35);
 }
 .iq-doc-label {
-  font-size: .62rem; font-weight: 800; letter-spacing: .06em;
-  color: var(--text-muted); margin-bottom: 5px;
+  display: flex; align-items: center; gap: 5px;
+  font-size: .6rem; font-weight: 800; letter-spacing: .07em;
+  color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase;
 }
-.iq-doc-row { display: flex; gap: 6px; font-size: .76rem; color: var(--text); margin-bottom: 2px; }
-.iq-doc-row span { min-width: 52px; color: var(--text-muted); }
-.iq-doc-row b { color: var(--teal); font-weight: 700; }
-.iq-doc-table-wrap { overflow-x: auto; margin-bottom: 10px; }
-.iq-doc-table { width: 100%; border-collapse: collapse; font-size: .76rem; }
+.iq-doc-label i { color: var(--orange); font-size: .66rem; }
+.iq-doc-row { display: flex; gap: 8px; font-size: .78rem; color: var(--text); margin-bottom: 5px; align-items: baseline; }
+.iq-doc-row:last-child { margin-bottom: 0; }
+.iq-doc-row span { min-width: 46px; color: var(--text-muted); flex-shrink: 0; }
+.iq-doc-row b { color: var(--teal); font-weight: 700; min-width: 0; word-break: break-word; overflow-wrap: anywhere; }
+.iq-doc-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 1px 2px rgba(6,59,63,.04); }
+.iq-doc-table { width: 100%; min-width: 380px; border-collapse: collapse; font-size: .78rem; table-layout: fixed; }
 .iq-doc-table thead th {
-  text-align: left; background: var(--cream); color: var(--text-muted);
-  font-size: .62rem; letter-spacing: .04em; padding: 7px 8px;
-  border-bottom: 1px solid var(--border);
+  text-align: left; background: linear-gradient(135deg, var(--teal), #0a5a62); color: #fff;
+  font-size: .62rem; font-weight: 800; letter-spacing: .05em; padding: 11px 8px;
+  white-space: nowrap;
 }
-.iq-doc-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-.iq-doc-table td.iq-doc-desc { color: var(--teal); font-weight: 600; }
+.iq-doc-table th:nth-child(1), .iq-doc-table td:nth-child(1) { width: 24px; }
+.iq-doc-table th:nth-child(2), .iq-doc-table td:nth-child(2) { width: auto; }
+.iq-doc-table th:nth-child(3), .iq-doc-table td:nth-child(3) { width: 44px; }
+.iq-doc-table th:nth-child(4), .iq-doc-table td:nth-child(4) { width: 126px; }
+.iq-doc-table th:nth-child(5), .iq-doc-table td:nth-child(5) { width: 92px; text-align: right; }
+.iq-doc-table td { padding: 9px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; line-height: 1.35; }
+.iq-doc-table tbody tr:nth-child(even) { background: rgba(6,59,63,.018); }
+.iq-doc-table tr:last-child td { border-bottom: none; }
+.iq-doc-table td.iq-doc-desc { color: var(--text); font-weight: 600; word-break: break-word; }
+.iq-doc-table td:nth-child(5) { text-align: right; }
 .iq-price-input {
-  width: 72px; padding: 5px 6px; border: 1px solid var(--border);
-  border-radius: 6px; font-size: .76rem; text-align: right; font-family: inherit;
+  width: 100%; padding: 7px 7px 7px 30px; border: 1px solid var(--border);
+  border-radius: 8px; font-size: .78rem; text-align: right; font-family: inherit;
+  background: #fff; transition: border-color .18s, box-shadow .18s;
 }
 .iq-price-input:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(6,59,63,.07); }
+.iq-price-wrap { position: relative; display: block; min-width: 0; }
+.iq-price-wrap::before {
+  content: 'MVR'; position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+  font-size: .6rem; font-weight: 700; color: var(--text-muted); pointer-events: none;
+}
 .iq-doc-row-total { font-weight: 700; color: var(--teal); white-space: nowrap; }
 .iq-doc-grandtotal {
   display: flex; justify-content: space-between; align-items: center;
-  background: var(--cream); border-radius: 8px; padding: 8px 12px;
-  font-size: .8rem; font-weight: 800; color: var(--teal); margin-bottom: 12px;
+  background: var(--cream); border: 1px solid rgba(6,59,63,.06); border-radius: 14px; padding: 16px 20px;
+  font-size: .88rem; font-weight: 800; color: var(--teal); margin-bottom: 14px;
+  letter-spacing: -.01em;
+  transition: background .2s, color .2s, border-color .2s;
 }
-.iq-doc-status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
-.iq-doc-status-row > span:first-child { font-size: .7rem; color: var(--text-muted); }
+.iq-doc-grandtotal-approved {
+  background: linear-gradient(135deg, #0a5a62, var(--teal)); border-color: transparent;
+  color: #fff; box-shadow: 0 8px 20px -8px rgba(6,59,63,.45);
+}
+.iq-doc-status-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.iq-doc-status-row > span:first-child { font-size: .7rem; font-weight: 600; color: var(--text-muted); }
 .iq-doc-actions { display: flex; gap: 8px; }
 </style>
+
 </head>
 <body>
 
@@ -1520,7 +1619,7 @@ select {
         </div>
 
         <!-- Low Stock -->
-        <div class="stat-card stat-card-warn" onclick="navigate('products')" style="cursor:pointer;">
+        <div class="stat-card stat-card-warn" onclick="navigate('products', 'low')" style="cursor:pointer;">
           <div class="stat-icon-wrap yellow">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
           </div>
@@ -1532,7 +1631,7 @@ select {
         </div>
 
         <!-- Out of Stock -->
-        <div class="stat-card stat-card-danger" onclick="navigate('products')" style="cursor:pointer;">
+        <div class="stat-card stat-card-danger" onclick="navigate('products', 'out')" style="cursor:pointer;">
           <div class="stat-icon-wrap red">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/></svg>
           </div>
@@ -1674,6 +1773,12 @@ select {
               <option value="Pantry & Cooking">Pantry &amp; Cooking</option>
               <option value="Beverages & Hydration">Beverages &amp; Hydration</option>
               <option value="Stationery & Misc">Stationery &amp; Misc</option>
+            </select>
+            <select id="productStockFilter" onchange="renderProducts()" style="width:auto;min-width:140px;">
+              <option value="">All Stock</option>
+              <option value="in">In Stock</option>
+              <option value="low">Low Stock</option>
+              <option value="out">Out of Stock</option>
             </select>
             <button class="btn btn-orange" onclick="openProductModal()">
               <i class="fa-solid fa-plus"></i> Add Product
@@ -1827,8 +1932,8 @@ select {
       <!-- Inquiries List -->
       <div class="card" id="inqListCard">
         <div class="card-header">
-          <span class="card-title"><i class="fa-solid fa-cart-shopping" style="color:var(--orange);margin-right:8px;"></i>Customer Inquiries</span>
-          <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-outline btn-sm" onclick="clearNewInquiryBadge()">Mark all read</button><button class="btn btn-outline btn-sm" onclick="openRecycleBin()" id="recycleBinBtn"><i class="fa-solid fa-trash-can" style="margin-right:5px;"></i>Recycle Bin</button><button class="btn btn-sm" onclick="deleteAllInquiries()" style="background:#fff0f0;color:#d63030;border:1.5px solid #d63030;font-weight:600;"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Delete All</button></div>
+          <span class="card-title" id="inqListTitle"><i class="fa-solid fa-cart-shopping" style="color:var(--orange);margin-right:8px;"></i>Customer Inquiries</span>
+          <div style="display:flex;gap:8px;align-items:center;"><button class="btn btn-outline btn-sm" onclick="clearNewInquiryBadge()" id="inqMarkAllReadBtn">Mark all read</button><button class="btn btn-outline btn-sm" onclick="toggleCompletedOrdersView()" id="inqCompletedToggleBtn"><i class="fa-solid fa-box-archive" style="margin-right:5px;"></i>Completed Orders</button><button class="btn btn-outline btn-sm" onclick="openRecycleBin()" id="recycleBinBtn"><i class="fa-solid fa-trash-can" style="margin-right:5px;"></i>Recycle Bin</button><button class="btn btn-sm" onclick="deleteAllInquiries()" style="background:#fff0f0;color:#d63030;border:1.5px solid #d63030;font-weight:600;" id="inqDeleteAllBtn"><i class="fa-solid fa-trash" style="margin-right:5px;"></i>Delete All</button></div>
         </div>
         <div class="card-body" style="padding:0;">
           <div class="table-wrap">
@@ -1855,45 +1960,55 @@ select {
 
       <!-- Inquiry Chat Panel (shown when an inquiry is opened) -->
       <div id="inqChatPanel" style="display:none;margin-top:20px;">
-        <div class="card" style="margin-bottom:16px;">
-          <div class="card-header" style="gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-outline btn-sm" onclick="closeInqDetail()" style="flex-shrink:0;">
-              <i class="fa-solid fa-arrow-left"></i> Back
-            </button>
-            <span class="card-title" id="inqChatTitle" style="flex:1;min-width:0;"></span>
+        <div class="card" style="margin-bottom:16px;overflow:hidden;">
+          <div class="card-header" style="gap:14px;flex-wrap:wrap;padding:16px 22px;background:linear-gradient(135deg, rgba(6,59,63,.04), rgba(253,77,2,.04));">
+            <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;">
+              <button class="btn btn-outline btn-sm" onclick="closeInqDetail()" style="flex-shrink:0;">
+                <i class="fa-solid fa-arrow-left"></i> Back
+              </button>
+              <span style="width:1px;align-self:stretch;background:var(--border);flex-shrink:0;"></span>
+              <span class="card-title" id="inqChatTitle" style="flex:1;min-width:0;display:flex;align-items:center;gap:10px;"></span>
+            </div>
             <button class="btn btn-outline btn-sm" id="inqDeleteBtn" style="border-color:#d63030;color:#d63030;flex-shrink:0;">
               <i class="fa-solid fa-trash"></i> Delete
             </button>
           </div>
           <div class="card-body" style="padding:16px 20px;">
             <!-- Quotation document + live chat side by side on wide screens -->
-            <div style="display:grid;grid-template-columns:340px 1fr;gap:20px;">
+            <div class="iq-panel-grid">
 
               <!-- LEFT: quotation document (editable price + status) -->
               <div>
+                <div class="iq-section-divider">
+                  <span class="iq-sd-line"></span>
+                  <span class="iq-sd-label"><i class="fa-solid fa-file-invoice"></i>Quotation Document</span>
+                  <span class="iq-sd-line"></span>
+                </div>
+
                 <div class="iq-doc" id="inqQuoteDoc">
                   <div class="iq-doc-head">
                     <div>
+                      <div class="iq-doc-kicker">Zami Mart &middot; Order Quotation</div>
                       <div class="iq-doc-title">Quotation</div>
                     </div>
                     <div class="iq-doc-brand">
                       <div class="iq-doc-logo"><img src="img/logo.png" alt="Zami Mart" onerror="this.style.display='none'"></div>
                       <div>
-                        <div class="iq-doc-brandname">ZamiMart</div>
-                        <div class="iq-doc-brandsub">Male&#39;, Maldives &middot; Zamimart.g3@gmail.com</div>
-                        <div class="iq-doc-brandsub">+960 9906025</div>
+                        <div class="iq-doc-brandsub"><i class="fa-solid fa-location-dot"></i>Male&#39;, Maldives</div>
+                        <div class="iq-doc-brandsub"><i class="fa-solid fa-envelope"></i>Zamimart.g3@gmail.com</div>
+                        <div class="iq-doc-brandsub"><i class="fa-solid fa-phone"></i>+960 9906025</div>
                       </div>
                     </div>
                   </div>
 
                   <div class="iq-doc-meta">
                     <div>
-                      <div class="iq-doc-label">DETAILS</div>
+                      <div class="iq-doc-label"><i class="fa-solid fa-file-invoice"></i>Details</div>
                       <div class="iq-doc-row"><span>Number</span><b id="inqQuoteNumber">&mdash;</b></div>
                       <div class="iq-doc-row"><span>Date</span><b id="inqQuoteDate">&mdash;</b></div>
                     </div>
                     <div>
-                      <div class="iq-doc-label">CUSTOMER</div>
+                      <div class="iq-doc-label"><i class="fa-solid fa-user"></i>Customer</div>
                       <div class="iq-doc-row"><span>Name</span><b id="inqQuoteCustomerName">&mdash;</b></div>
                       <div class="iq-doc-row"><span>Contact</span><b id="inqQuoteCustomerContact">&mdash;</b></div>
                     </div>
@@ -1901,7 +2016,7 @@ select {
 
                   <div class="iq-doc-table-wrap">
                     <table class="iq-doc-table">
-                      <thead><tr><th>#</th><th>DESCRIPTION</th><th>CODE</th><th>QTY</th><th>UNIT PRICE</th><th>TOTAL</th></tr></thead>
+                      <thead><tr><th>#</th><th>DESCRIPTION</th><th>QTY</th><th>UNIT PRICE</th><th>TOTAL</th></tr></thead>
                       <tbody id="inqItemsList"></tbody>
                     </table>
                   </div>
@@ -1914,23 +2029,49 @@ select {
                     <span>Status:</span>
                     <span id="inqQuoteStatusBadge"></span>
                   </div>
-                  <div class="iq-doc-actions">
-                    <button class="btn btn-outline btn-sm" onclick="saveInqQuotation('pending')" style="flex:1;">Save as Pending</button>
-                    <button class="btn btn-orange btn-sm" onclick="saveInqQuotation('approved')" style="flex:1;">Approve</button>
-                  </div>
                 </div>
+
+                
+                <div class="iq-doc-sharebar">
+                  <button class="iq-share-btn" onclick="openAdminQuoteView()"><i class="fa-solid fa-eye"></i>View</button>
+                  <button class="iq-share-btn" onclick="printAdminQuote()"><i class="fa-solid fa-print"></i>Print</button>
+                  <button class="iq-share-btn primary" onclick="downloadAdminQuote()"><i class="fa-solid fa-download"></i>Download</button>
+                </div>
+
+                <div class="iq-section-divider">
+                  <span class="iq-sd-line"></span>
+                  <span class="iq-sd-label"><i class="fa-solid fa-pen-to-square"></i>Admin Pricing</span>
+                  <span class="iq-sd-line"></span>
+                </div>
+                <div class="iq-doc-actions">
+                  <button class="btn btn-outline btn-sm" onclick="saveInqQuotation('pending')" style="flex:1;">Save as Pending</button>
+                  <button class="btn btn-orange btn-sm" onclick="saveInqQuotation('approved')" style="flex:1;">Approve</button>
+                </div>
+
+                <div class="iq-section-divider">
+                  <span class="iq-sd-line"></span>
+                  <span class="iq-sd-label"><i class="fa-solid fa-box-archive"></i>Order Status</span>
+                  <span class="iq-sd-line"></span>
+                </div>
+                <div id="inqCompletedRow" class="iq-doc-actions"></div>
               </div>
 
               <!-- RIGHT: chat -->
-              <div style="display:flex;flex-direction:column;min-height:420px;">
+              <div style="display:flex;flex-direction:column;height:100%;">
                 <div style="font-size:.68rem;font-weight:700;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;">Live Chat</div>
                 <!-- messages -->
-                <div id="inqChatMessages" style="flex:1;min-height:320px;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fafaf8;margin-bottom:12px;"></div>
+                <div id="inqChatMessages" style="height:420px;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fafaf8;margin-bottom:12px;"></div>
 
                 <!-- image preview -->
                 <div id="inqImgPreview" style="display:none;margin-bottom:8px;position:relative;width:fit-content;">
                   <img id="inqImgPreviewImg" style="max-height:80px;border-radius:8px;border:1px solid var(--border);">
                   <button onclick="clearInqImg()" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#d63030;color:#fff;border:none;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <!-- Replying-to bar -->
+                <div class="zm-reply-bar" id="inqReplyBar" style="border-radius:8px;margin-bottom:8px;">
+                  <div class="zm-reply-bar-text">Replying to <b id="inqReplyBarName"></b>: <span id="inqReplyBarText"></span></div>
+                  <button class="zm-reply-bar-close" onclick="cancelInqReplyTo()" title="Cancel"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
                 <!-- input row -->
@@ -2421,16 +2562,21 @@ const pageTitles = {
   settings:  'Store Settings'
 };
 
-function navigate(section) {
+function navigate(section, filter) {
   document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.querySelector(`[data-section="${section}"]`).classList.add('active');
+  const navItem = document.querySelector(`[data-section="${section}"]`);
+  if (navItem) navItem.classList.add('active');
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('sec-' + section).classList.add('active');
   document.getElementById('pageTitle').textContent = pageTitles[section] || section;
   document.getElementById('pageBreadcrumb').textContent = 'Zami Mart / ' + (pageTitles[section] || section);
   closeSidebar();
   if (section === 'dashboard') updateDashboard();
-  if (section === 'products')  renderProducts();
+  if (section === 'products') {
+    const stockFilter = document.getElementById('productStockFilter');
+    if (stockFilter) stockFilter.value = filter || '';
+    renderProducts();
+  }
   if (section === 'arrivals')  renderArrivals();
   if (section === 'inquiries') renderInquiries();
   if (section === 'chat')      renderChatSessions();
@@ -2751,10 +2897,24 @@ function renderProducts() {
   renderProductStats();
   const search = (document.getElementById('productSearch').value || '').toLowerCase();
   const catFilter = document.getElementById('productCatFilter').value;
+  const stockFilter = document.getElementById('productStockFilter').value;
   const filtered = products.filter(p => {
     const matchSearch = !search || p.name.toLowerCase().includes(search) || (p.desc || '').toLowerCase().includes(search);
     const matchCat = !catFilter || p.category === catFilter;
-    return matchSearch && matchCat;
+    
+    let matchStock = true;
+    const hasStock = p.stock !== '' && p.stock !== undefined && p.stock !== null;
+    const stockNum = hasStock ? parseInt(p.stock) : NaN;
+    
+    if (stockFilter === 'out') {
+      matchStock = hasStock && !isNaN(stockNum) && stockNum === 0;
+    } else if (stockFilter === 'low') {
+      matchStock = hasStock && !isNaN(stockNum) && stockNum > 0 && stockNum <= 10;
+    } else if (stockFilter === 'in') {
+      matchStock = !hasStock || isNaN(stockNum) || stockNum > 10;
+    }
+    
+    return matchSearch && matchCat && matchStock;
   });
 
   const tbody = document.getElementById('productsTableBody');
@@ -3803,14 +3963,49 @@ InquirySystem.on('inquiries-updated', () => {
 // =============================================
 // INQUIRIES
 // =============================================
+// false = normal active list (awaiting review / pending / approved, not yet
+// completed). true = Completed Orders view — orders admin has explicitly
+// marked as done. Toggled by the "Completed Orders" header button.
+let _inqShowCompleted = false;
+
+function toggleCompletedOrdersView() {
+  _inqShowCompleted = !_inqShowCompleted;
+  renderInquiries();
+}
+
 function renderInquiries() {
-  const inqs = InquirySystem.getInquiries();
+  const allInqs = InquirySystem.getInquiries();
+  const inqs = allInqs.filter(inq => !!inq.completed === _inqShowCompleted);
   const tbody = document.getElementById('inquiriesTableBody');
   const empty = document.getElementById('inquiriesEmpty');
+
+  // Reflect current view in the header (title, toggle button, empty state)
+  const titleEl = document.getElementById('inqListTitle');
+  const toggleBtn = document.getElementById('inqCompletedToggleBtn');
+  if (titleEl) {
+    titleEl.innerHTML = _inqShowCompleted
+      ? '<i class="fa-solid fa-box-archive" style="color:#0a9a60;margin-right:8px;"></i>Completed Orders'
+      : '<i class="fa-solid fa-cart-shopping" style="color:var(--orange);margin-right:8px;"></i>Customer Inquiries';
+  }
+  if (toggleBtn) {
+    toggleBtn.innerHTML = _inqShowCompleted
+      ? '<i class="fa-solid fa-arrow-left" style="margin-right:5px;"></i>Back to Inquiries'
+      : '<i class="fa-solid fa-box-archive" style="margin-right:5px;"></i>Completed Orders';
+    toggleBtn.style.background = _inqShowCompleted ? '#0a9a60' : '';
+    toggleBtn.style.color = _inqShowCompleted ? '#fff' : '';
+    toggleBtn.style.borderColor = _inqShowCompleted ? '#0a9a60' : '';
+  }
+  const markAllBtn = document.getElementById('inqMarkAllReadBtn');
+  const deleteAllBtn = document.getElementById('inqDeleteAllBtn');
+  if (markAllBtn) markAllBtn.style.display = _inqShowCompleted ? 'none' : '';
+  if (deleteAllBtn) deleteAllBtn.style.display = _inqShowCompleted ? 'none' : '';
 
   if (inqs.length === 0) {
     tbody.innerHTML = '';
     empty.style.display = 'flex';
+    empty.innerHTML = _inqShowCompleted
+      ? '<div class="empty-icon"><i class="fa-solid fa-box-archive"></i></div><h3>No completed orders yet</h3><p>Orders you mark as completed will show up here.</p>'
+      : '<div class="empty-icon"><i class="fa-solid fa-cart-shopping"></i></div><h3>No inquiries yet</h3><p>Cart inquiries from customers will appear here.</p>';
     return;
   }
   empty.style.display = 'none';
@@ -3839,7 +4034,7 @@ function renderInquiries() {
 
     // Sub-rows for each order, hidden by default
     const subRows = g.inqs.map(inq => {
-      const globalIdx = inqs.findIndex(x => x.id === inq.id);
+      const globalIdx = allInqs.findIndex(x => x.id === inq.id);
       const d = new Date(inq.sentAt).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
       const ic = inq.items ? inq.items.length : 0;
       const itemNames = inq.items ? inq.items.map(it => `${it.name}${it.qty > 1 ? ' ×'+it.qty : ''}`).join(', ') : '—';
@@ -3858,7 +4053,7 @@ function renderInquiries() {
     }).join('');
 
     // First inquiry's global index for the main View button
-    const firstIdx = inqs.findIndex(x => x.id === lastInq.id);
+    const firstIdx = allInqs.findIndex(x => x.id === lastInq.id);
 
     // Aggregate quotation summary across every order for this customer
     const pricedInqs = g.inqs.filter(inq => inqQuoteTotal(inq) != null);
@@ -3996,9 +4191,13 @@ function viewInquiry(idx) {
   // Populate UI
   const date = new Date(inq.sentAt).toLocaleString('en-US', { month:'long', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' });
 
+  const inqAvatarInitial = (inq.name || 'G').trim().charAt(0).toUpperCase();
   document.getElementById('inqChatTitle').innerHTML =
-    `<span style="font-size:.95rem;">Inquiry from <strong style="color:var(--teal);">${escHtml(inq.name||'Guest')}</strong></span>
-     <span style="font-size:.72rem;font-weight:400;color:var(--text-muted);margin-left:8px;">${date}</span>`;
+    `<span style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;">${inqAvatarInitial}</span>
+     <span style="min-width:0;">
+       <span style="font-size:.95rem;display:block;">Inquiry from <strong style="color:var(--teal);">${escHtml(inq.name||'Guest')}</strong></span>
+       <span style="font-size:.72rem;font-weight:400;color:var(--text-muted);">${date}</span>
+     </span>`;
 
   // Quotation document header fields
   document.getElementById('inqQuoteNumber').textContent = ensureInqQuoteNumber(inq);
@@ -4010,12 +4209,10 @@ function viewInquiry(idx) {
     <tr>
       <td>${ii + 1}</td>
       <td class="iq-doc-desc">${escHtml(it.name)}</td>
-      <td>${getInqProductCode(it.name)}</td>
       <td>${it.qty}</td>
       <td>
-        <span style="display:flex;align-items:center;gap:3px;">
-          <span style="font-size:.68rem;color:var(--text-muted);">MVR</span>
-          <input type="number" min="0" step="0.01" class="inq-price-input" data-idx="${ii}"
+        <span class="iq-price-wrap">
+          <input type="number" min="0" step="0.01" class="iq-price-input" data-idx="${ii}"
             value="${it.price != null ? it.price : ''}" placeholder="0.00" oninput="recalcInqQuoteTotal()">
         </span>
       </td>
@@ -4023,6 +4220,7 @@ function viewInquiry(idx) {
     </tr>`).join('');
 
   renderInqQuoteStatusBadge(inq);
+  renderInqCompletedControls(inq);
   recalcInqQuoteTotal();
 
   document.getElementById('inqDeleteBtn').onclick = () => deleteInquiry(idx);
@@ -4032,6 +4230,7 @@ function viewInquiry(idx) {
   document.getElementById('inqChatPanel').style.display = 'block';
 
   clearInqImg();
+  cancelInqReplyTo();
   renderInqChat();
   ChatSystem.markSessionAsRead(_inqSessionId);
   document.getElementById('inqChatInput').focus();
@@ -4088,32 +4287,200 @@ function renderInqChat() {
     const role      = isAdmin ? 'admin' : 'visitor';
     const initials  = (msg.senderName||'C').charAt(0).toUpperCase();
     const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
+    const quoteHInq    = msg.replyTo ? `<div class="zm-chat-reply-quote" data-refid="${msg.replyTo.id}"><b>${escHtml(msg.replyTo.senderName||'')}</b>: ${escHtml(msg.replyTo.text||'')}</div>` : '';
+    const reactionHInq = _zmReactionBadgesHtml(msg);
+    const actionsHInq  = msg.deleted
+      ? ''
+      : `
+      <div class="zm-chat-msg-actions">
+        <button class="zm-act-reply" title="Reply"><i class="fa-solid fa-reply"></i></button>
+        <button class="zm-act-react" title="React"><i class="fa-regular fa-face-smile"></i></button>
+        <button class="zm-act-more" title="More"><i class="fa-solid fa-ellipsis"></i></button>
+      </div>`;
 
     const el = document.createElement('div');
     el.className = classList;
+    el.dataset.msgid = msg.id;
     if (isAdmin) {
       el.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:68%;">
           ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
-          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}">${textHtml}${imgHtmlFinal}</div>
+          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}</div>
+          ${reactionHInq}
           ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
-        </div>`;
+        </div>
+        ${actionsHInq}`;
     } else {
       const avatarHtml = `<div class="zm-chat-avatar${isLast ? '' : ' hidden'}">${initials}</div>`;
       el.innerHTML = `
         ${avatarHtml}
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:68%;">
           ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Customer')}</div>` : ''}
-          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}">${textHtml}${imgHtmlFinal}</div>
+          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}</div>
+          ${reactionHInq}
           ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}
-        </div>`;
+        </div>
+        ${actionsHInq}`;
     }
     container.appendChild(el);
   });
 
   container.scrollTop = container.scrollHeight;
+  bindInqMsgEvents();
+}
+
+// ── Reply / react wiring for the Inquiries live-chat panel ──
+// Mirrors the Chat-tab's zm-chat-* behavior but targets #inqChatMessages,
+// _inqSessionId, and calls renderInqChat() to refresh.
+function bindInqMsgEvents(){
+  const container = document.getElementById('inqChatMessages');
+  if (!container) return;
+  container.querySelectorAll('[data-msgid]').forEach(el => {
+    const msgId = el.dataset.msgid;
+    el.addEventListener('contextmenu', e => showInqCtxMenu(e, msgId));
+
+    let lpt, moved = false;
+    el.addEventListener('touchstart', e => {
+      moved = false;
+      lpt = setTimeout(() => {
+        if (moved) return;
+        unpinAllChatActions();
+        el.classList.add('zm-actions-pinned');
+        if (navigator.vibrate) navigator.vibrate(15);
+      }, 450);
+    }, { passive: true });
+    el.addEventListener('touchend', () => clearTimeout(lpt));
+    el.addEventListener('touchmove', () => { moved = true; clearTimeout(lpt); });
+
+    const replyBtn = el.querySelector('.zm-act-reply');
+    const reactBtn = el.querySelector('.zm-act-react');
+    const moreBtn  = el.querySelector('.zm-act-more');
+    if (replyBtn) replyBtn.addEventListener('click', e => { e.stopPropagation(); startInqReplyTo(msgId); });
+    if (reactBtn) reactBtn.addEventListener('click', e => openInqEmojiPicker(e, msgId));
+    if (moreBtn)  moreBtn.addEventListener('click', e => { e.stopPropagation(); showInqCtxMenu(e, msgId); });
+
+    el.querySelectorAll('.zm-chat-reaction').forEach(badge => {
+      if (badge.dataset.owner === 'admin' || badge.dataset.owner === 'legacy') {
+        badge.classList.add('mine');
+        badge.title = 'Remove reaction';
+        badge.addEventListener('click', e => {
+          e.stopPropagation();
+          ChatSystem.reactToMessage(msgId, badge.dataset.em, badge.dataset.owner === 'legacy' ? 'legacy' : 'admin');
+          renderInqChat();
+        });
+      } else {
+        badge.title = '';
+      }
+    });
+
+    const quote = el.querySelector('.zm-chat-reply-quote');
+    if (quote) quote.addEventListener('click', e => { e.stopPropagation(); scrollToInqMsg(quote.dataset.refid); });
+  });
+}
+
+function scrollToInqMsg(msgId) {
+  const el = document.querySelector(`#inqChatMessages [data-msgid="${msgId}"]`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.style.transition = 'background-color .3s';
+  el.style.backgroundColor = 'rgba(253,77,2,.12)';
+  setTimeout(() => { el.style.backgroundColor = ''; }, 700);
+}
+
+function showInqCtxMenu(e, msgId){
+  e.preventDefault();
+  closeAdminCtxMenu();
+  const msg = ChatSystem.getMessages().find(m => m.id === msgId);
+  if (!msg || msg.senderType !== 'admin' || msg.deleted) return;
+  const menu = document.createElement('div');
+  menu.className = 'zm-ctx-menu';
+  menu.innerHTML = `
+    <div class="zm-ctx-item" id="zmInqEditMsg"><i class="fa-solid fa-pen" style="font-size:.75rem;"></i> Edit message</div>
+    <div class="zm-ctx-item danger" id="zmInqDelMsg"><i class="fa-solid fa-ban" style="font-size:.75rem;"></i> Delete for everyone</div>`;
+  const x = Math.min(e.clientX, window.innerWidth - 170);
+  const y = Math.min(e.clientY, window.innerHeight - 80);
+  menu.style.left = x + 'px';
+  menu.style.top = y + 'px';
+  document.body.appendChild(menu);
+  zmAdminCtxMenu = menu;
+  menu.querySelector('#zmInqDelMsg').addEventListener('click', () => {
+    ChatSystem.deleteMessage(msgId);
+    closeAdminCtxMenu();
+    renderInqChat();
+  });
+  menu.querySelector('#zmInqEditMsg').addEventListener('click', () => {
+    closeAdminCtxMenu();
+    zmEditPrompt(msg.text || '', (newText) => {
+      ChatSystem.editMessage(msgId, newText);
+      renderInqChat();
+    });
+  });
+}
+
+// ── Reply-to state (Inquiries panel) ──
+let inqReplyTarget = null; // { id, senderName, text }
+function startInqReplyTo(msgId) {
+  const msg = ChatSystem.getMessages().find(m => m.id === msgId);
+  if (!msg || msg.deleted) return;
+  closeAdminCtxMenu(); closeInqEmojiPicker(); unpinAllChatActions();
+  inqReplyTarget = {
+    id: msg.id,
+    senderName: msg.senderType === 'admin' ? 'You' : (msg.senderName || 'Customer'),
+    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : '')
+  };
+  document.getElementById('inqReplyBarName').textContent = inqReplyTarget.senderName;
+  document.getElementById('inqReplyBarText').textContent = inqReplyTarget.text;
+  document.getElementById('inqReplyBar').classList.add('show');
+  const input = document.getElementById('inqChatInput');
+  if (input) input.focus();
+}
+function cancelInqReplyTo() {
+  inqReplyTarget = null;
+  const bar = document.getElementById('inqReplyBar');
+  if (bar) bar.classList.remove('show');
+}
+
+// ── Emoji reaction picker (Inquiries panel) ──
+let inqEmojiPicker = null;
+function closeInqEmojiPicker() { if (inqEmojiPicker) { inqEmojiPicker.remove(); inqEmojiPicker = null; } }
+document.addEventListener('click', closeInqEmojiPicker);
+
+function openInqEmojiPicker(e, msgId) {
+  e.stopPropagation();
+  closeAdminCtxMenu(); closeInqEmojiPicker();
+  const msgEl = e.currentTarget.closest('.zm-chat-msg');
+  const bubbleEl = msgEl ? msgEl.querySelector('.zm-chat-bubble') : e.currentTarget;
+  const anchorRect = bubbleEl.getBoundingClientRect();
+  const isAdmin = msgEl && msgEl.classList.contains('admin');
+
+  const picker = document.createElement('div');
+  picker.className = 'zm-emoji-picker';
+  picker.style.position = 'fixed';
+  picker.innerHTML = ZM_QUICK_EMOJIS.map(em => `<button data-em="${em}">${em}</button>`).join('');
+  document.body.appendChild(picker);
+
+  const pw = picker.offsetWidth;
+  const ph = picker.offsetHeight;
+  let left = isAdmin ? anchorRect.right - pw : anchorRect.left;
+  left = Math.max(8, Math.min(left, window.innerWidth - pw - 8));
+  const top = Math.max(8, anchorRect.top - ph - 6);
+  picker.style.left = left + 'px';
+  picker.style.top  = top + 'px';
+  inqEmojiPicker = picker;
+  picker.addEventListener('click', ev => {
+    const btn = ev.target.closest('button[data-em]');
+    if (!btn) return;
+    ev.stopPropagation();
+    btn.classList.add('picked');
+    ChatSystem.reactToMessage(msgId, btn.dataset.em, 'admin');
+    setTimeout(() => {
+      closeInqEmojiPicker();
+      unpinAllChatActions();
+      renderInqChat();
+    }, 130);
+  });
 }
 
 function sendInqReply() {
@@ -4122,7 +4489,8 @@ function sendInqReply() {
   const text  = input.value.trim();
   if (!text && !_inqPendingImg) return;
 
-  ChatSystem.sendMessage(_inqSessionId, 'admin', 'Admin', text, _inqPendingImg);
+  ChatSystem.sendMessage(_inqSessionId, 'admin', 'Admin', text, _inqPendingImg, inqReplyTarget);
+  cancelInqReplyTo();
   input.value = '';
   input.style.height = 'auto';
   clearInqImg();
@@ -4182,7 +4550,7 @@ function closeInqDetail() {
 // into the price inputs (doesn't save anything yet).
 function recalcInqQuoteTotal() {
   let total = 0;
-  document.querySelectorAll('#inqItemsList .inq-price-input').forEach(inp => {
+  document.querySelectorAll('#inqItemsList .iq-price-input').forEach(inp => {
     const idx = Number(inp.dataset.idx);
     const inqs = _getInqs();
     const inq = inqs[_inqCurrentIdx];
@@ -4198,6 +4566,78 @@ function recalcInqQuoteTotal() {
   if (totalEl) totalEl.textContent = fmtMoney(total);
 }
 
+// Admin "View / Print / Download" — reuses the exact same ZamiQuotation
+// renderer the customer sees, loaded straight from the live inquiry
+// record, so admin's preview and the customer's document never diverge.
+function openAdminQuoteView() {
+  if (!_inqCurrentInqId || !window.ZamiQuotation) return;
+  if (window.ZamiQuotation.loadFromInquiry(_inqCurrentInqId)) window.ZamiQuotation.openView();
+}
+function printAdminQuote() {
+  if (!_inqCurrentInqId || !window.ZamiQuotation) return;
+  if (window.ZamiQuotation.loadFromInquiry(_inqCurrentInqId)) window.ZamiQuotation.print();
+}
+function downloadAdminQuote() {
+  if (!_inqCurrentInqId || !window.ZamiQuotation) return;
+  if (window.ZamiQuotation.loadFromInquiry(_inqCurrentInqId)) window.ZamiQuotation.download();
+}
+
+// ---------------------------------------------------------------
+// Order completion — separate from quotation pricing/approval above.
+// This is the ONLY thing that moves an order into "Completed Orders"
+// on the customer side (and into admin's own Completed view). Approving
+// a quotation no longer does this automatically.
+// ---------------------------------------------------------------
+function renderInqCompletedControls(inq) {
+  const row = document.getElementById('inqCompletedRow');
+  if (!row) return;
+  if (inq.completed) {
+    const d = inq.completedAt
+      ? new Date(inq.completedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+      : '';
+    row.innerHTML =
+      '<span style="flex:1;display:flex;align-items:center;gap:7px;color:#0a9a60;font-weight:700;font-size:.8rem;">' +
+        '<i class="fa-solid fa-circle-check"></i>Completed' + (d ? ' on ' + d : '') +
+      '</span>' +
+      '<button class="btn btn-outline btn-sm" onclick="unmarkInqCompleted()">Undo</button>';
+  } else {
+    const approved = inq.quoteStatus === 'approved';
+    row.innerHTML =
+      '<button class="btn btn-sm" onclick="markInqCompleted()" ' + (approved ? '' : 'disabled title="Approve the quotation first"') +
+      ' style="flex:1;background:' + (approved ? '#0a9a60' : '#cfd9d9') + ';color:#fff;font-weight:700;' + (approved ? '' : 'cursor:not-allowed;') + '">' +
+        '<i class="fa-solid fa-circle-check" style="margin-right:6px;"></i>Mark as Completed' +
+      '</button>';
+  }
+}
+
+function markInqCompleted() {
+  const inqs = _getInqs();
+  const inq = inqs[_inqCurrentIdx];
+  if (!inq) return;
+  if (inq.quoteStatus !== 'approved') {
+    showToast('Approve the quotation before marking this order as completed.', 'info');
+    return;
+  }
+  InquirySystem.markInquiryCompleted(inq.id);
+  inq.completed = true;
+  inq.completedAt = new Date().toISOString();
+  renderInqCompletedControls(inq);
+  renderInquiries();
+  showToast('Order marked as completed. The customer will now see it under Completed Orders.', 'success');
+}
+
+function unmarkInqCompleted() {
+  const inqs = _getInqs();
+  const inq = inqs[_inqCurrentIdx];
+  if (!inq) return;
+  InquirySystem.unmarkInquiryCompleted(inq.id);
+  inq.completed = false;
+  inq.completedAt = null;
+  renderInqCompletedControls(inq);
+  renderInquiries();
+  showToast('Order moved back to active.', 'info');
+}
+
 function renderInqQuoteStatusBadge(inq) {
   const badgeEl = document.getElementById('inqQuoteStatusBadge');
   if (!badgeEl) return;
@@ -4209,6 +4649,8 @@ function renderInqQuoteStatusBadge(inq) {
   const approved = inq.quoteStatus === 'approved';
   const style = approved ? 'background:#eafaf1;color:#0a9a60;' : 'background:#fff2e8;color:#c9530a;';
   badgeEl.innerHTML = `<span style="${style}padding:2px 9px;border-radius:100px;font-size:.72rem;font-weight:700;">${approved ? 'Approved' : 'Pending'}</span>`;
+  const gtEl = document.querySelector('#inqQuoteDoc .iq-doc-grandtotal');
+  if (gtEl) gtEl.classList.toggle('iq-doc-grandtotal-approved', approved);
 }
 
 // Reads whatever prices are currently typed in, saves them to the inquiry
@@ -4219,7 +4661,7 @@ function saveInqQuotation(quoteStatus) {
   if (!inq) return;
 
   const items = (inq.items || []).map((it, idx) => ({ ...it }));
-  document.querySelectorAll('#inqItemsList .inq-price-input').forEach(inp => {
+  document.querySelectorAll('#inqItemsList .iq-price-input').forEach(inp => {
     const idx = Number(inp.dataset.idx);
     if (items[idx]) items[idx].price = inp.value === '' ? null : Number(inp.value);
   });
@@ -4241,6 +4683,7 @@ function _doSaveInqQuotation(inq, items, quoteStatus) {
   inq.items = items;
   inq.quoteStatus = quoteStatus;
   renderInqQuoteStatusBadge(inq);
+  renderInqCompletedControls(inq); // "Mark as Completed" only unlocks once approved
   renderInquiries();
   showToast(quoteStatus === 'approved' ? 'Quotation approved.' : 'Quotation saved as pending.', 'success');
 }

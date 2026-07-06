@@ -984,6 +984,23 @@
       </div>
 
       <!-- =============================================
+           CARD: MY QUOTATIONS (live, synced with admin)
+           ============================================= -->
+      <div class="profile-card reveal" id="pfQuotesCard" style="display:none;">
+        <div class="profile-card-header">
+          <div class="card-icon"><i class="fa-solid fa-file-invoice"></i></div>
+          <h2>My Quotations</h2>
+        </div>
+        <div class="profile-card-body">
+          <div id="pfQuotesEmpty" style="display:none;text-align:center;padding:1.2rem .5rem;color:var(--text-muted,#7a8f8f);font-size:.85rem;">
+            <i class="fa-solid fa-file-invoice" style="font-size:1.5rem;opacity:.35;display:block;margin-bottom:8px;"></i>
+            No inquiries yet. Add items to your cart and send an inquiry to see it here.
+          </div>
+          <div id="pfQuotesList" style="display:flex;flex-direction:column;gap:8px;"></div>
+        </div>
+      </div>
+
+      <!-- =============================================
            DANGER ZONE — LOGOUT
            ============================================= -->
       <div class="danger-zone reveal">
@@ -1219,6 +1236,80 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!currentUser) { pfGate.classList.add('show'); return; }
     pfContent.classList.remove('pf-hidden');
     populatePage();
+    renderMyQuotations();
+  }
+
+  // =============================================
+  // MY QUOTATIONS — live list of this customer's inquiries, synced
+  // straight from InquirySystem (Firestore). Status/pricing shown here
+  // always reflects whatever admin currently has saved — no stale data.
+  // =============================================
+  function renderMyQuotations() {
+    const card  = document.getElementById('pfQuotesCard');
+    const list  = document.getElementById('pfQuotesList');
+    const empty = document.getElementById('pfQuotesEmpty');
+    if (!card || !list || !empty) return;
+    if (!currentUser || !currentUser.email || !window.InquirySystem) { card.style.display = 'none'; return; }
+
+    let inqs = [];
+    try { inqs = InquirySystem.getInquiriesByEmail(currentUser.email); } catch (e) {}
+
+    card.style.display = 'block';
+    if (!inqs.length) {
+      empty.style.display = 'block';
+      list.innerHTML = '';
+      return;
+    }
+    empty.style.display = 'none';
+
+    function money(n) { return 'MVR ' + (Number(n) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function quoteTotal(items) {
+      const priced = (items || []).filter(it => it.price != null && it.price !== '');
+      if (!priced.length) return null;
+      return priced.reduce((s, it) => s + (Number(it.price) || 0) * (Number(it.qty) || 0), 0);
+    }
+
+    list.innerHTML = inqs.map(inq => {
+      const total = quoteTotal(inq.items);
+      const approved = inq.quoteStatus === 'approved';
+      const statusLabel = inq.completed ? 'Completed' : (total == null ? 'Awaiting Review' : (approved ? 'Approved' : 'Pending'));
+      const statusStyle = inq.completed
+        ? 'background:#063b3f;color:#fff;'
+        : (total == null
+          ? 'background:#eef2f2;color:#6d8080;'
+          : (approved ? 'background:#e3f8ee;color:#0a9a60;' : 'background:#fff2e8;color:#c9530a;'));
+      const itemCount = (inq.items || []).reduce((s, it) => s + (Number(it.qty) || 0), 0);
+      const dateStr = new Date(inq.sentAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+      const ref = inq.quoteNumber || ('INQ-' + String(inq.id).replace(/[^a-zA-Z0-9]/g, '').slice(-6).toUpperCase());
+      return `
+        <button type="button" class="pfq-item" data-id="${inq.id}" style="display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:#fff;border:1px solid rgba(6,59,63,.1);border-radius:10px;padding:10px 12px;cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s;">
+          <span style="width:34px;height:34px;border-radius:9px;background:rgba(6,59,63,.06);color:var(--teal,#063B3F);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-file-invoice"></i></span>
+          <span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;">
+            <span style="font-size:.82rem;font-weight:700;color:var(--teal,#063B3F);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${ref}</span>
+            <span style="font-size:.7rem;color:#8a9f9f;">${dateStr} &middot; ${itemCount} item${itemCount === 1 ? '' : 's'}</span>
+          </span>
+          <span style="font-size:.66rem;font-weight:700;letter-spacing:.02em;padding:3px 9px;border-radius:100px;white-space:nowrap;${statusStyle}">${statusLabel}</span>
+          ${total != null ? `<span style="font-size:.8rem;font-weight:800;color:var(--teal,#063B3F);white-space:nowrap;">${money(total)}</span>` : ''}
+          <i class="fa-solid fa-chevron-right" style="color:#c8d8d6;font-size:.7rem;flex-shrink:0;"></i>
+        </button>`;
+    }).join('');
+
+    list.querySelectorAll('.pfq-item').forEach(btn => {
+      btn.addEventListener('mouseenter', () => { btn.style.borderColor = 'var(--teal,#063B3F)'; btn.style.background = 'rgba(6,59,63,.02)'; });
+      btn.addEventListener('mouseleave', () => { btn.style.borderColor = 'rgba(6,59,63,.1)'; btn.style.background = '#fff'; });
+      btn.addEventListener('click', () => {
+        const inq = inqs.find(i => i.id === btn.dataset.id);
+        if (!inq || !window.ZamiQuotation) return;
+        window.ZamiQuotation.setData({ inquiryId: inq.id, items: inq.items, customerName: inq.name, customerContact: inq.email });
+        window.ZamiQuotation.openView();
+      });
+    });
+  }
+
+  // Keep the list live: re-render the instant admin edits pricing/status,
+  // whether that happens in this tab or another (Firestore realtime).
+  if (window.InquirySystem && InquirySystem.on) {
+    InquirySystem.on('inquiries-updated', renderMyQuotations);
   }
 
   // =============================================
@@ -1322,7 +1413,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!valid) return;
 
     detailsSaveBtn.disabled = true;
-    detailsSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px"></i>Saving…';
+    detailsSaveBtn.innerHTML = '<div class="zm-loader xs" style="margin-right:8px"><span></span><span></span><span></span><span></span></div>Saving…';
 
     try {
       // Update Firebase Auth displayName
@@ -1457,7 +1548,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!valid) return;
 
     pwSaveBtn.disabled = true;
-    pwSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px"></i>Saving…';
+    pwSaveBtn.innerHTML = '<div class="zm-loader xs" style="margin-right:8px"><span></span><span></span><span></span><span></span></div>Saving…';
 
     (async () => {
       try {
@@ -1510,7 +1601,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const btn = document.getElementById('googleReauthBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="margin-right:6px"></i>Verifying…';
+    btn.innerHTML = '<div class="zm-loader xs" style="margin-right:8px"><span></span><span></span><span></span><span></span></div>Verifying…';
 
     (async () => {
       try {
@@ -1633,11 +1724,40 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- ============================================
      ZAMI MART — LIVE CHAT WIDGET
      ============================================ -->
+<script src="inquiry-system.js"></script>
+<script src="quotation.js"></script>
 <script src="chat-system.js"></script>
 <style>
 .zm-chat-btn{position:fixed;bottom:24px;right:24px;width:60px;height:60px;border-radius:50%;background:#FD4D02;border:none;color:#fff;font-size:1.4rem;cursor:pointer;box-shadow:0 8px 28px -4px rgba(253,77,2,.45);display:flex;align-items:center;justify-content:center;transition:all .35s cubic-bezier(.4,0,.2,1);z-index:9999;}
 .zm-chat-btn:hover{transform:scale(1.1);box-shadow:0 12px 36px -4px rgba(253,77,2,.5);}
 .zm-chat-btn.open{opacity:0;pointer-events:none;transform:scale(.75);}
+.zm-chat-btn-icon-wrap{position:relative;width:1em;height:1em;display:inline-block;}
+.zm-chat-btn-icon-wrap i{position:absolute;top:0;left:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:1em;line-height:1;}
+.zm-chat-icon-wave{animation:zmWaveIcon 6s cubic-bezier(.4,0,.2,1) infinite;transform-origin:50% 85%;}
+.zm-chat-icon-msg{animation:zmMsgIcon 6s cubic-bezier(.4,0,.2,1) infinite;}
+@keyframes zmWaveIcon{
+  0%{opacity:1;transform:rotate(0deg) scale(1);}
+  3%{opacity:1;transform:rotate(-18deg) scale(1);}
+  6%{opacity:1;transform:rotate(14deg) scale(1);}
+  9%{opacity:1;transform:rotate(-11deg) scale(1);}
+  12%{opacity:1;transform:rotate(8deg) scale(1);}
+  15%{opacity:1;transform:rotate(0deg) scale(1);}
+  30%{opacity:1;transform:rotate(0deg) scale(1);}
+  38%{opacity:0;transform:rotate(0deg) scale(.4) translateY(6px);}
+  70%{opacity:0;transform:rotate(0deg) scale(.4) translateY(6px);}
+  78%{opacity:1;transform:rotate(0deg) scale(1);}
+  100%{opacity:1;transform:rotate(0deg) scale(1);}
+}
+@keyframes zmMsgIcon{
+  0%{opacity:0;transform:scale(.4) translateY(-6px);}
+  30%{opacity:0;transform:scale(.4) translateY(-6px);}
+  38%{opacity:1;transform:scale(1) translateY(0);}
+  52%{transform:scale(1.14) translateY(0);}
+  58%{transform:scale(1) translateY(0);}
+  70%{opacity:1;transform:scale(1) translateY(0);}
+  78%{opacity:0;transform:scale(.4) translateY(-6px);}
+  100%{opacity:0;transform:scale(.4) translateY(-6px);}
+}
 .zm-chat-unread{position:absolute;top:-3px;right:-3px;background:#d6483a;color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;border:2px solid #fff;}
 .zm-chat-win{position:fixed;bottom:96px;right:24px;width:380px;max-width:calc(100vw - 32px);height:580px;background:#fff;border-radius:22px;box-shadow:0 20px 70px -10px rgba(6,59,63,.25),0 4px 20px rgba(0,0,0,.08);display:none;flex-direction:column;z-index:9998;overflow:hidden;}
 .zm-chat-win.open{display:flex;animation:zmChatUp .3s cubic-bezier(.4,0,.2,1);}
@@ -1793,7 +1913,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <!-- Chat FAB -->
 <button class="zm-chat-btn" id="zmChatBtn" title="Chat with us">
-  <i class="fa-solid fa-message"></i>
+  <span class="zm-chat-btn-icon-wrap">
+    <i class="fa-solid fa-hand zm-chat-icon-wave" aria-hidden="true"></i>
+    <i class="fa-solid fa-message zm-chat-icon-msg" aria-hidden="true"></i>
+  </span>
   <div class="zm-chat-unread" id="zmChatUnread" style="display:none">0</div>
 </button>
 

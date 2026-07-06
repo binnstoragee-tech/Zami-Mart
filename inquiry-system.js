@@ -210,12 +210,65 @@ const InquirySystem = (function() {
     });
   }
 
+  // Customer-side edit: add/remove items or change quantities on their own
+  // inquiry before admin approves it. Unlike saveQuotation (admin pricing),
+  // this never touches quoteStatus. Items should already carry a `price`
+  // field on any entry admin has priced, and the caller is expected to keep
+  // that field intact for unchanged items so existing pricing isn't lost.
+  function updateInquiryItems(inquiryId, items) {
+    const inq = _inquiries.find(i => i.id === inquiryId);
+    if (inq) inq.items = items;
+    notifyListeners('inquiries-updated', _inquiries);
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'inquiries', inquiryId), { items })
+        .catch(e => _reportErr('InquirySystem: updateInquiryItems error', e));
+    });
+  }
+
+  // Marks an order as fully completed/fulfilled. This is intentionally a
+  // separate flag from `quoteStatus` (which only tracks pricing approval) —
+  // approving a quotation no longer, by itself, moves anything anywhere.
+  // Only this explicit admin action moves the order into the customer's
+  // "Completed Orders" tab (and admin's own Completed view).
+  function markInquiryCompleted(id) {
+    const inq = _inquiries.find(i => i.id === id);
+    const completedAt = new Date().toISOString();
+    if (inq) { inq.completed = true; inq.completedAt = completedAt; }
+    notifyListeners('inquiries-updated', _inquiries);
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'inquiries', id), { completed: true, completedAt })
+        .catch(e => _reportErr('InquirySystem: markInquiryCompleted error', e));
+    });
+  }
+
+  // Reverts a completed order back to active — in case admin marked it
+  // done by mistake.
+  function unmarkInquiryCompleted(id) {
+    const inq = _inquiries.find(i => i.id === id);
+    if (inq) { inq.completed = false; inq.completedAt = null; }
+    notifyListeners('inquiries-updated', _inquiries);
+    whenReady(({ db, doc, updateDoc }) => {
+      updateDoc(doc(db, 'inquiries', id), { completed: false, completedAt: null })
+        .catch(e => _reportErr('InquirySystem: unmarkInquiryCompleted error', e));
+    });
+  }
+
   return {
     init, on, getInquiries, getDeletedInquiries, submitInquiry, getInquiriesByEmail, getCustomers,
     markRead, markAllRead, deleteInquiry, restoreInquiry, permanentlyDeleteInquiry, updateLinkedSessionId,
-    saveQuotation, setQuoteNumber
+    saveQuotation, setQuoteNumber, updateInquiryItems, markInquiryCompleted, unmarkInquiryCompleted
   };
 })();
+
+// Expose on window explicitly. A top-level `const` in a classic <script>
+// does NOT become a `window` property, but many places across the app
+// (quotation.js's getLiveInquiry/getActiveInquiry, profile.html's "My
+// Quotations" card, the cart's edit/delete quotation buttons, etc.) guard
+// on `window.InquirySystem` / `global.InquirySystem`. Without this line
+// those guards are always falsy, so — among other things — the customer's
+// Quotation History always renders as empty even when a real inquiry was
+// sent and is visible to admin.
+window.InquirySystem = InquirySystem;
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => InquirySystem.init());
