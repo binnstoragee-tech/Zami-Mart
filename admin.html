@@ -583,6 +583,21 @@ select {
   from { opacity: 0; transform: translateX(30px) scale(.9); }
   to   { opacity: 1; transform: translateX(0) scale(1); }
 }
+.toast-undo {
+  background: #1e2b2b; flex-direction: column; align-items: stretch;
+  gap: 0; padding: 12px 14px 10px; max-width: 320px; overflow: hidden;
+}
+.toast-undo-row { display: flex; align-items: center; gap: 9px; }
+.toast-undo-row i { color: #ff8a5c; }
+.toast-undo-msg { flex: 1; font-size: .8rem; font-weight: 500; line-height: 1.4; }
+.toast-undo-btn {
+  background: rgba(255,255,255,.14); color: #fff; border: none; border-radius: 7px;
+  padding: 5px 12px; font-size: .74rem; font-weight: 700; cursor: pointer;
+  font-family: inherit; flex-shrink: 0; transition: background .15s;
+}
+.toast-undo-btn:hover { background: rgba(255,255,255,.24); }
+.toast-undo-bar { height: 3px; background: rgba(255,255,255,.14); border-radius: 2px; margin-top: 10px; overflow: hidden; }
+.toast-undo-bar-fill { height: 100%; width: 100%; background: #ff8a5c; border-radius: 2px; }
 
 /* ─── CONFIRM ──────────────────────────────── */
 .confirm-overlay {
@@ -1401,6 +1416,11 @@ select {
   margin-bottom: 18px;
 }
 @media (max-width: 460px) { .iq-doc-meta { flex-direction: column; } }
+@media (max-width: 460px) {
+  .iq-doc-head { flex-direction: column; align-items: center; text-align: center; gap: 12px; }
+  .iq-doc-brand { align-items: center; width: 100%; }
+  .iq-doc-brandsub { justify-content: center; }
+}
 .iq-doc-meta > div {
   flex: 1; min-width: 150px; padding: 13px 15px;
   background: linear-gradient(155deg, rgba(6,59,63,.035), rgba(6,59,63,.015));
@@ -2010,7 +2030,9 @@ select {
                     <div>
                       <div class="iq-doc-label"><i class="fa-solid fa-user"></i>Customer</div>
                       <div class="iq-doc-row"><span>Name</span><b id="inqQuoteCustomerName">&mdash;</b></div>
-                      <div class="iq-doc-row"><span>Contact</span><b id="inqQuoteCustomerContact">&mdash;</b></div>
+                      <div class="iq-doc-row"><span>Phone</span><b id="inqQuoteCustomerPhone">&mdash;</b></div>
+                      <div class="iq-doc-row"><span>Location</span><b id="inqQuoteCustomerLocation">&mdash;</b></div>
+                      <div class="iq-doc-row"><span>Email</span><b id="inqQuoteCustomerContact">&mdash;</b></div>
                     </div>
                   </div>
 
@@ -2641,6 +2663,59 @@ function showToast(msg, type = 'success') {
 }
 
 // =============================================
+// UNDO TOAST — shows a 5-second window to reverse
+// a delete action before it's treated as final.
+// `onCommit` (optional) fires only if the 5s window elapses
+// without the person clicking Undo — use this to defer any
+// truly irreversible step (e.g. a permanent delete).
+// `onUndo` fires immediately if Undo is clicked.
+// =============================================
+function showUndoToast(msg, { onUndo, onCommit } = {}) {
+  const tc = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast toast-undo';
+  t.innerHTML = `
+    <div class="toast-undo-row">
+      <i class="fa-solid fa-trash-can"></i>
+      <span class="toast-undo-msg">${msg}</span>
+      <button class="toast-undo-btn" type="button">Undo</button>
+    </div>
+    <div class="toast-undo-bar"><div class="toast-undo-bar-fill"></div></div>
+  `;
+  tc.appendChild(t);
+
+  let settled = false;
+  function remove() {
+    t.style.animation = 'toastOut .3s ease forwards';
+    setTimeout(() => t.remove(), 300);
+  }
+
+  const timer = setTimeout(() => {
+    if (settled) return;
+    settled = true;
+    remove();
+    if (typeof onCommit === 'function') onCommit();
+  }, 5000);
+
+  // Shrinking timer bar
+  const fill = t.querySelector('.toast-undo-bar-fill');
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      fill.style.transition = 'width 5s linear';
+      fill.style.width = '0%';
+    });
+  });
+
+  t.querySelector('.toast-undo-btn').addEventListener('click', () => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(timer);
+    remove();
+    if (typeof onUndo === 'function') onUndo();
+  });
+}
+
+// =============================================
 // CONFIRM DIALOG
 // =============================================
 let confirmCallback = null;
@@ -3033,13 +3108,23 @@ function editProduct(id) { openProductModal(id); }
 function deleteProduct(id) {
   const p = products.find(x => x.id === id);
   showConfirm('Delete Product?', `Are you sure you want to delete "${p ? p.name : 'this product'}"?`, () => {
+    const idx = products.findIndex(x => x.id === id);
     products = products.filter(x => x.id !== id);
     save();
     renderProducts();
     updateBadges();
     updateDashboard();
     addActivity(`Deleted product: ${p ? p.name : id}`);
-    showToast('Product deleted.', 'success');
+    showUndoToast(`Deleted "${p ? p.name : 'product'}".`, {
+      onUndo: () => {
+        if (p) products.splice(idx, 0, p);
+        save();
+        renderProducts();
+        updateBadges();
+        updateDashboard();
+        showToast('Product restored.', 'success');
+      }
+    });
   });
 }
 
@@ -3131,13 +3216,23 @@ function editArrival(id) { openArrivalModal(id); }
 function deleteArrival(id) {
   const a = arrivals.find(x => x.id === id);
   showConfirm('Delete Arrival?', `Delete "${a ? a.name : 'this item'}"?`, () => {
+    const idx = arrivals.findIndex(x => x.id === id);
     arrivals = arrivals.filter(x => x.id !== id);
     save();
     renderArrivals();
     updateBadges();
     updateDashboard();
     addActivity(`Deleted arrival: ${a ? a.name : id}`);
-    showToast('Arrival deleted.', 'success');
+    showUndoToast(`Deleted "${a ? a.name : 'arrival'}".`, {
+      onUndo: () => {
+        if (a) arrivals.splice(idx, 0, a);
+        save();
+        renderArrivals();
+        updateBadges();
+        updateDashboard();
+        showToast('Arrival restored.', 'success');
+      }
+    });
   });
 }
 
@@ -3265,12 +3360,15 @@ function renderChatSessions() {
   sessions.forEach(s => {
     const key = (s.email || s.name || 'guest').toLowerCase().trim();
     if (!keyMap[key]) {
-      keyMap[key] = { name: s.name, contact: s.email || '', sessions: [], totalUnread: 0 };
+      keyMap[key] = { name: s.name, contact: s.email || '', sessions: [], totalUnread: 0, avatarPhoto: null, avatarColor: null };
       grouped.push(keyMap[key]);
     }
     keyMap[key].sessions.push(s);
     keyMap[key].totalUnread += ChatSystem.getAdminUnreadBySession(s.id);
     if (s.email) keyMap[key].contact = s.email;
+    // Mirror the customer's own profile avatar/color (most recent session wins)
+    if (s.avatarPhoto) keyMap[key].avatarPhoto = s.avatarPhoto;
+    if (s.avatarColor) keyMap[key].avatarColor = s.avatarColor;
   });
 
   // Sort by most recent message
@@ -3294,13 +3392,19 @@ function renderChatSessions() {
     const initials = (g.name || '?').charAt(0).toUpperCase();
     const unread   = g.totalUnread;
     const isActive = latest.id === currentChatSessionId;
+    const avatarInner = g.avatarPhoto
+      ? `<img src="${escHtml(g.avatarPhoto)}" alt="${escHtml(g.name || '')}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+      : initials;
+    const avatarStyle = g.avatarPhoto
+      ? 'background:transparent;'
+      : (g.avatarColor ? `background:${escHtml(g.avatarColor)};` : '');
 
     const item = document.createElement('div');
     item.className = 'chat-session-item' + (isActive ? ' active' : '');
     item.dataset.sessionId = latest.id;
     item.innerHTML = `
-      <div class="chat-session-avatar">
-        ${initials}
+      <div class="chat-session-avatar" style="${avatarStyle}">
+        ${avatarInner}
         ${unread > 0 ? '<span class="unread-dot"></span>' : ''}
       </div>
       <div class="chat-session-info">
@@ -3329,7 +3433,14 @@ function openChatDetail(sessionId) {
   if (!session) return;
 
   const initials = (session.name || '?').charAt(0).toUpperCase();
-  document.getElementById('chatHeaderAvatar').textContent = initials;
+  const headerAvatarEl = document.getElementById('chatHeaderAvatar');
+  if (session.avatarPhoto) {
+    headerAvatarEl.style.background = 'transparent';
+    headerAvatarEl.innerHTML = `<img src="${escHtml(session.avatarPhoto)}" alt="${escHtml(session.name || '')}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+  } else {
+    headerAvatarEl.style.background = session.avatarColor || '';
+    headerAvatarEl.textContent = initials;
+  }
   document.getElementById('chatDetailTitle').textContent  = session.name || 'Visitor';
   document.getElementById('chatHeaderSub').textContent    = session.email || 'Live Chat';
 
@@ -3716,7 +3827,14 @@ function deleteChatSession(sessionId) {
     }
     renderChatSessions();
     updateChatBadge();
-    showToast('Chat moved to Recycle Bin.', 'success');
+    showUndoToast('Chat moved to Recycle Bin.', {
+      onUndo: () => {
+        ChatSystem.restoreSession(sessionId);
+        renderChatSessions();
+        updateChatBadge();
+        showToast('Chat restored.', 'success');
+      }
+    });
   });
 }
 
@@ -4048,7 +4166,7 @@ function renderInquiries() {
         <td>${quoteBadgeHtml(inq)}</td>
         <td style="font-size:.76rem;color:var(--text-muted);">${d}</td>
         <td>${sBadge}</td>
-        <td><button class="btn btn-outline btn-sm" onclick="viewInquiry(${globalIdx})" style="font-size:.72rem;padding:3px 10px;">View</button></td>
+        <td><button class="btn btn-outline btn-sm" onclick="viewInquiry(${globalIdx})" style="font-size:.72rem;padding:3px 10px;margin-right:4px;">View</button><button class="btn btn-outline btn-sm" onclick="deleteInquiry(${globalIdx})" style="font-size:.72rem;padding:3px 10px;border-color:#d63030;color:#d63030;">Delete</button></td>
       </tr>`;
     }).join('');
 
@@ -4196,13 +4314,15 @@ function viewInquiry(idx) {
     `<span style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--teal-mid));color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;">${inqAvatarInitial}</span>
      <span style="min-width:0;">
        <span style="font-size:.95rem;display:block;">Inquiry from <strong style="color:var(--teal);">${escHtml(inq.name||'Guest')}</strong></span>
-       <span style="font-size:.72rem;font-weight:400;color:var(--text-muted);">${date}</span>
+       <span style="font-size:.72rem;font-weight:400;color:var(--text-muted);">${date}${inq.phone ? ' &middot; '+escHtml(inq.phone) : ''}</span>
      </span>`;
 
   // Quotation document header fields
   document.getElementById('inqQuoteNumber').textContent = ensureInqQuoteNumber(inq);
   document.getElementById('inqQuoteDate').textContent = new Date(inq.sentAt).toLocaleDateString('en-US', { month:'short', day:'2-digit', year:'numeric' });
   document.getElementById('inqQuoteCustomerName').textContent = inq.name || 'Guest';
+  document.getElementById('inqQuoteCustomerPhone').textContent = inq.phone || '—';
+  document.getElementById('inqQuoteCustomerLocation').textContent = inq.location || '—';
   document.getElementById('inqQuoteCustomerContact').textContent = inq.email || '—';
 
   document.getElementById('inqItemsList').innerHTML = (inq.items||[]).map((it, ii) => `
@@ -4696,18 +4816,27 @@ function deleteAllInquiries() {
     'Move all ' + inqs.length + ' inquiries and their linked chat histories to the Recycle Bin? You can restore them later.',
     () => {
       const ids = inqs.map(i => i.id);
+      const linkedSessionIds = [];
       ids.forEach(id => {
         // Also soft-delete the linked chat session
         const inq = InquirySystem.getInquiries().find(i => i.id === id);
         if (inq) {
           const linked = ChatSystem.getSessions().find(s => s.inquiryId === id || s.id === inq.linkedSessionId);
-          if (linked) ChatSystem.deleteSession(linked.id);
+          if (linked) { linkedSessionIds.push(linked.id); ChatSystem.deleteSession(linked.id); }
         }
         InquirySystem.deleteInquiry(id);
       });
-      showToast('All inquiries moved to Recycle Bin.', 'success');
       renderInquiries();
       updateDashboard();
+      showUndoToast(`${ids.length} inquiries moved to Recycle Bin.`, {
+        onUndo: () => {
+          ids.forEach(id => InquirySystem.restoreInquiry(id));
+          linkedSessionIds.forEach(id => ChatSystem.restoreSession(id));
+          renderInquiries();
+          updateDashboard();
+          showToast('Inquiries restored.', 'success');
+        }
+      });
     }
   );
 }
@@ -4719,11 +4848,19 @@ function deleteAllChats() {
     'Delete All Chats?',
     'Move all ' + sessions.length + ' chat session(s) to the Recycle Bin? You can restore them later.',
     () => {
-      sessions.forEach(s => ChatSystem.deleteSession(s.id));
+      const ids = sessions.map(s => s.id);
+      ids.forEach(id => ChatSystem.deleteSession(id));
       if (currentChatSessionId) closeChatDetail();
-      showToast('All chats moved to Recycle Bin.', 'success');
       renderChatSessions();
       updateChatBadge();
+      showUndoToast(`${ids.length} chat session(s) moved to Recycle Bin.`, {
+        onUndo: () => {
+          ids.forEach(id => ChatSystem.restoreSession(id));
+          renderChatSessions();
+          updateChatBadge();
+          showToast('Chats restored.', 'success');
+        }
+      });
     }
   );
 }
@@ -4733,17 +4870,27 @@ function deleteInquiry(idx) {
     const inqs = _getInqs();
     const inq = inqs[idx];
     // also soft-delete linked chat session if any
+    let linkedSessionId = null;
     if (_inqSessionId) {
+      linkedSessionId = _inqSessionId;
       ChatSystem.deleteSession(_inqSessionId);
     } else if (inq) {
       const linked = ChatSystem.getSessions().find(s => s.inquiryId === inq.id);
-      if (linked) ChatSystem.deleteSession(linked.id);
+      if (linked) { linkedSessionId = linked.id; ChatSystem.deleteSession(linked.id); }
     }
     if (inq) InquirySystem.deleteInquiry(inq.id);
     updateDashboard();
     closeInqDetail();
     renderInquiries();
-    showToast('Inquiry moved to Recycle Bin.', 'success');
+    showUndoToast('Inquiry moved to Recycle Bin.', {
+      onUndo: () => {
+        if (inq) InquirySystem.restoreInquiry(inq.id);
+        if (linkedSessionId) ChatSystem.restoreSession(linkedSessionId);
+        renderInquiries();
+        updateDashboard();
+        showToast('Inquiry restored.', 'success');
+      }
+    });
   });
 }
 
@@ -4851,8 +4998,8 @@ function _rbDateStr(iso) {
 }
 
 function renderRecycleBin() {
-  // Deleted inquiries
-  const deletedInqs = InquirySystem.getDeletedInquiries();
+  // Deleted inquiries (excluding any currently in their 5s undo window)
+  const deletedInqs = InquirySystem.getDeletedInquiries().filter(inq => !_rbPendingInqIds.has(inq.id));
   const inqListEl = document.getElementById('rbListInquiries');
   if (!deletedInqs.length) {
     inqListEl.innerHTML = '<div class="rb-empty"><i class="fa-solid fa-box-open" style="font-size:1.6rem;opacity:.3;display:block;margin-bottom:8px;"></i>Recycle Bin is empty.</div>';
@@ -4872,8 +5019,8 @@ function renderRecycleBin() {
     }).join('');
   }
 
-  // Deleted chat sessions
-  const deletedSessions = ChatSystem.getDeletedSessions();
+  // Deleted chat sessions (excluding any currently in their 5s undo window)
+  const deletedSessions = ChatSystem.getDeletedSessions().filter(s => !_rbPendingSessionIds.has(s.id));
   const chatListEl = document.getElementById('rbListChats');
   if (!deletedSessions.length) {
     chatListEl.innerHTML = '<div class="rb-empty"><i class="fa-solid fa-box-open" style="font-size:1.6rem;opacity:.3;display:block;margin-bottom:8px;"></i>Recycle Bin is empty.</div>';
@@ -4892,6 +5039,11 @@ function renderRecycleBin() {
   }
 }
 
+// Ids currently "gone" from the Recycle Bin view but not yet actually
+// erased — they're sitting inside a 5s undo window (see showUndoToast).
+const _rbPendingInqIds = new Set();
+const _rbPendingSessionIds = new Set();
+
 function restoreInquiryFromBin(id) {
   InquirySystem.restoreInquiry(id);
   renderRecycleBin();
@@ -4902,9 +5054,21 @@ function restoreInquiryFromBin(id) {
 
 function permanentlyDeleteInquiryFromBin(id) {
   showConfirm('Delete Forever?', 'This inquiry will be permanently deleted. This cannot be undone.', () => {
-    InquirySystem.permanentlyDeleteInquiry(id);
+    _rbPendingInqIds.add(id);
     renderRecycleBin();
-    showToast('Inquiry permanently deleted.', 'success');
+    showUndoToast('Inquiry will be permanently deleted.', {
+      onUndo: () => {
+        _rbPendingInqIds.delete(id);
+        renderRecycleBin();
+        showToast('Kept in Recycle Bin.', 'success');
+      },
+      onCommit: () => {
+        InquirySystem.permanentlyDeleteInquiry(id);
+        _rbPendingInqIds.delete(id);
+        renderRecycleBin();
+        showToast('Inquiry permanently deleted.', 'success');
+      }
+    });
   });
 }
 
@@ -4918,22 +5082,49 @@ function restoreSessionFromBin(id) {
 
 function permanentlyDeleteSessionFromBin(id) {
   showConfirm('Delete Forever?', 'This conversation and its messages will be permanently deleted. This cannot be undone.', () => {
-    ChatSystem.permanentlyDeleteSession(id);
+    _rbPendingSessionIds.add(id);
     renderRecycleBin();
-    showToast('Conversation permanently deleted.', 'success');
+    showUndoToast('Conversation will be permanently deleted.', {
+      onUndo: () => {
+        _rbPendingSessionIds.delete(id);
+        renderRecycleBin();
+        showToast('Kept in Recycle Bin.', 'success');
+      },
+      onCommit: () => {
+        ChatSystem.permanentlyDeleteSession(id);
+        _rbPendingSessionIds.delete(id);
+        renderRecycleBin();
+        showToast('Conversation permanently deleted.', 'success');
+      }
+    });
   });
 }
 
 function emptyRecycleBin() {
-  const deletedInqs = InquirySystem.getDeletedInquiries();
-  const deletedSessions = ChatSystem.getDeletedSessions();
+  const deletedInqs = InquirySystem.getDeletedInquiries().filter(inq => !_rbPendingInqIds.has(inq.id));
+  const deletedSessions = ChatSystem.getDeletedSessions().filter(s => !_rbPendingSessionIds.has(s.id));
   const total = deletedInqs.length + deletedSessions.length;
   if (!total) { showToast('Recycle Bin is already empty.', 'info'); return; }
   showConfirm('Empty Recycle Bin?', `This will permanently delete ${total} item(s) in the Recycle Bin. This cannot be undone.`, () => {
-    deletedInqs.forEach(inq => InquirySystem.permanentlyDeleteInquiry(inq.id));
-    deletedSessions.forEach(s => ChatSystem.permanentlyDeleteSession(s.id));
+    const inqIds = deletedInqs.map(inq => inq.id);
+    const sessionIds = deletedSessions.map(s => s.id);
+    inqIds.forEach(id => _rbPendingInqIds.add(id));
+    sessionIds.forEach(id => _rbPendingSessionIds.add(id));
     renderRecycleBin();
-    showToast('Recycle Bin emptied.', 'success');
+    showUndoToast(`${total} item(s) will be permanently deleted.`, {
+      onUndo: () => {
+        inqIds.forEach(id => _rbPendingInqIds.delete(id));
+        sessionIds.forEach(id => _rbPendingSessionIds.delete(id));
+        renderRecycleBin();
+        showToast('Kept in Recycle Bin.', 'success');
+      },
+      onCommit: () => {
+        inqIds.forEach(id => { InquirySystem.permanentlyDeleteInquiry(id); _rbPendingInqIds.delete(id); });
+        sessionIds.forEach(id => { ChatSystem.permanentlyDeleteSession(id); _rbPendingSessionIds.delete(id); });
+        renderRecycleBin();
+        showToast('Recycle Bin emptied.', 'success');
+      }
+    });
   });
 }
 

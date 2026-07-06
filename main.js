@@ -4,15 +4,18 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-  /* --- Profile icon: redirect based on login state --- */
-  const navAccount = document.querySelector('.nav-account');
-  if (navAccount) {
-    navAccount.href = 'login.html'; // default
+  /* --- Profile icon(s): redirect based on login state ---
+     There can be more than one on the page now (the top-bar icon on
+     desktop/tablet, plus the "My Account" row inside the mobile drawer),
+     so update every .nav-account element found. */
+  const navAccounts = document.querySelectorAll('.nav-account');
+  if (navAccounts.length) {
+    navAccounts.forEach((el) => { el.href = 'login.html'; }); // default
     // Update once Firebase Auth is ready
     function setNavAccount() {
       if (window.fb && window.fb.auth && window.fb.onAuthStateChanged) {
         window.fb.onAuthStateChanged(window.fb.auth, (user) => {
-          navAccount.href = user ? 'profile.html' : 'login.html';
+          navAccounts.forEach((el) => { el.href = user ? 'profile.html' : 'login.html'; });
         });
       } else {
         window.addEventListener('fb-ready', setNavAccount, { once: true });

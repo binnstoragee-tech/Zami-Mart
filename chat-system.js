@@ -124,29 +124,31 @@ const ChatSystem = (function() {
   // =============================================
   // SESSION MANAGEMENT
   // =============================================
-  function createSession(visitorName, visitorContact = '', linkedSessionId = null) {
+  function createSession(visitorName, visitorContact = '', linkedSessionId = null, profileMeta = null) {
     // If a previous session ID is explicitly linked, reuse it
     if (linkedSessionId) {
       const prev = _sessions.find(s => s.id === linkedSessionId);
-      if (prev) { if (prev.deleted) restoreSession(prev.id); return prev.id; }
+      if (prev) { if (prev.deleted) restoreSession(prev.id); updateSessionProfile(prev.id, profileMeta); return prev.id; }
     }
 
     // Deduplicate by contact (phone/email) if provided
     if (visitorContact) {
       const existing = _sessions.find(s => s.email && s.email.toLowerCase() === visitorContact.toLowerCase());
-      if (existing) { if (existing.deleted) restoreSession(existing.id); return existing.id; }
+      if (existing) { if (existing.deleted) restoreSession(existing.id); updateSessionProfile(existing.id, profileMeta); return existing.id; }
     }
 
     // Deduplicate by name if no contact (prevents duplicate guest sessions)
     if (!visitorContact && visitorName) {
       const existing = _sessions.find(s => s.name && s.name.toLowerCase() === visitorName.toLowerCase() && !s.email);
-      if (existing) { if (existing.deleted) restoreSession(existing.id); return existing.id; }
+      if (existing) { if (existing.deleted) restoreSession(existing.id); updateSessionProfile(existing.id, profileMeta); return existing.id; }
     }
 
     const sessionId = 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     const sessionData = {
       name: visitorName,
       email: visitorContact,
+      avatarPhoto: (profileMeta && profileMeta.avatarPhoto) || null,
+      avatarColor: (profileMeta && profileMeta.avatarColor) || null,
       createdAt: new Date().toISOString(),
       lastMessageAt: new Date().toISOString(),
       status: 'active'
@@ -161,6 +163,22 @@ const ChatSystem = (function() {
     });
 
     return sessionId;
+  }
+
+  // Keep a session's avatar/color synced with the customer's current profile —
+  // called whenever a chat is (re)opened, so profile edits reflect on admin's side.
+  function updateSessionProfile(sessionId, profileMeta) {
+    if (!sessionId || !profileMeta) return;
+    const s = _sessions.find(s => s.id === sessionId);
+    const patch = {};
+    if ('avatarPhoto' in profileMeta && profileMeta.avatarPhoto !== (s && s.avatarPhoto)) patch.avatarPhoto = profileMeta.avatarPhoto || null;
+    if ('avatarColor' in profileMeta && profileMeta.avatarColor !== (s && s.avatarColor)) patch.avatarColor = profileMeta.avatarColor || null;
+    if (!Object.keys(patch).length) return;
+    if (s) Object.assign(s, patch);
+    whenReady(({ db, doc, setDoc }) => {
+      setDoc(doc(db, 'chatSessions', sessionId), patch, { merge: true })
+        .catch(e => _reportErr('ChatSystem: updateSessionProfile error', e));
+    });
   }
 
   function getSession(sessionId) { return _sessions.find(s => s.id === sessionId); }
@@ -423,7 +441,7 @@ const ChatSystem = (function() {
 
   return {
     init: initStorage, on, onReady,
-    createSession, getSession, getSessions, getDeletedSessions, updateSessionLastMessage, linkInquiryToSession,
+    createSession, updateSessionProfile, getSession, getSessions, getDeletedSessions, updateSessionLastMessage, linkInquiryToSession,
     deleteSession, restoreSession, permanentlyDeleteSession,
     sendMessage, getSessionMessages, getMessages, deleteMessage, restoreMessage, permanentlyDeleteMessage,
     editMessage, reactToMessage,

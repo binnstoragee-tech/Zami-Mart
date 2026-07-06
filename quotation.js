@@ -203,6 +203,8 @@
       items: (entry && entry.items) || (inq && inq.items) || [],
       customerName: (entry && entry.customerName) || (inq && inq.name) || 'Guest Customer',
       customerContact: (entry && entry.customerContact) || (inq && inq.email) || '',
+      customerPhone: (entry && entry.customerPhone) || (inq && inq.phone) || '',
+      customerLocation: (entry && entry.customerLocation) || (inq && inq.location) || '',
       dateStr: (entry && entry.dateStr) || (inq
         ? new Date(inq.sentAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
         : new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }))
@@ -258,6 +260,8 @@
       items: (data.items || []).map(function (it) { return { name: it.name, qty: it.qty }; }),
       customerName: (data.customerName && data.customerName !== 'Guest') ? data.customerName : 'Guest Customer',
       customerContact: data.customerContact || '',
+      customerPhone: data.customerPhone || '',
+      customerLocation: data.customerLocation || '',
       dateStr: dateStr
     };
     addToHistoryIndex({
@@ -266,6 +270,8 @@
       items: state.items,
       customerName: state.customerName,
       customerContact: state.customerContact,
+      customerPhone: state.customerPhone,
+      customerLocation: state.customerLocation,
       dateStr: dateStr,
       itemCount: state.items.reduce(function (s, it) { return s + (Number(it.qty) || 0); }, 0)
     });
@@ -287,6 +293,8 @@
       items: (inq.items || []).map(function (it) { return { name: it.name, qty: it.qty, price: it.price }; }),
       customerName: (inq.name && inq.name !== 'Guest') ? inq.name : 'Guest Customer',
       customerContact: inq.email || '',
+      customerPhone: inq.phone || '',
+      customerLocation: inq.location || '',
       dateStr: new Date(inq.sentAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })
     };
     return true;
@@ -394,7 +402,9 @@
           '<div class="zmq-meta-col">' +
             '<div class="zmq-label"><i class="fa-solid fa-user"></i>Customer</div>' +
             '<div class="zmq-row"><span>Name</span><b>' + escapeHtml(state.customerName) + '</b></div>' +
-            '<div class="zmq-row"><span>Contact</span><b>' + (state.customerContact ? escapeHtml(state.customerContact) : '&mdash;') + '</b></div>' +
+            '<div class="zmq-row"><span>Phone</span><b>' + (state.customerPhone ? escapeHtml(state.customerPhone) : '&mdash;') + '</b></div>' +
+            '<div class="zmq-row"><span>Location</span><b>' + (state.customerLocation ? escapeHtml(state.customerLocation) : '&mdash;') + '</b></div>' +
+            '<div class="zmq-row"><span>Email</span><b>' + (state.customerContact ? escapeHtml(state.customerContact) : '&mdash;') + '</b></div>' +
           '</div>' +
         '</div>' +
         '<div class="zmq-table-wrap"><table class="zmq-table">' +
@@ -507,15 +517,31 @@
         '.zmq-overlay{padding:0;}',
         '.zmq-panel{max-width:100%;width:100%;height:100%;max-height:100%;border-radius:0;}',
         '.zmq-panel-head{padding:12px 14px;}',
-        '.zmq-panel-body{padding:14px;}',
-        '.zmq-panel-actions{padding:12px 14px;}',
-        '.zmq-doc{padding:22px 16px;border-radius:14px;}',
-        '.zmq-head{flex-direction:column;align-items:flex-start;gap:12px;}',
-        '.zmq-meta{flex-direction:column;}',
-        '.zmq-table{font-size:.72rem;}',
-        '.zmq-table thead th{padding:9px 10px;}',
-        '.zmq-table td{padding:9px 10px;}',
-        '.zmq-footer{flex-direction:column;align-items:flex-start;gap:6px;}',
+        '.zmq-panel-head span{font-size:.88rem;}',
+        '.zmq-panel-body{padding:12px;}',
+        '.zmq-panel-actions{padding:12px 14px;gap:8px;}',
+        '.zmq-doc{padding:20px 14px;border-radius:14px;}',
+        '.zmq-head{flex-direction:column;align-items:center;text-align:center;gap:14px;padding-bottom:18px;margin-bottom:18px;}',
+        '.zmq-kicker{font-size:.58rem;margin-bottom:4px;}',
+        '.zmq-title{font-size:1.32rem;margin-bottom:10px;}',
+        '.zmq-badge{margin:0 auto;}',
+        '.zmq-brand{align-items:center;width:100%;gap:6px;}',
+        '.zmq-logo{width:46px;height:46px;}',
+        '.zmq-brandsub{justify-content:center;font-size:.66rem;white-space:normal;text-align:center;}',
+        '.zmq-meta{flex-direction:column;gap:10px;margin-bottom:18px;}',
+        '.zmq-meta-col{padding:13px 14px;min-width:0;}',
+        '.zmq-row{font-size:.76rem;}',
+        '.zmq-row span{min-width:50px;}',
+        '.zmq-table-wrap{margin-bottom:14px;}',
+        '.zmq-table{font-size:.7rem;}',
+        '.zmq-table thead th{padding:9px 8px;font-size:.6rem;}',
+        '.zmq-table td{padding:9px 8px;}',
+        '.zmq-total-row{padding:13px 16px;margin-bottom:16px;}',
+        '.zmq-total-amt{font-size:1.05rem;}',
+        '.zmq-notice{padding:11px 12px;font-size:.72rem;}',
+        '.zmq-terms{padding:12px 13px;}',
+        '.zmq-terms li{font-size:.68rem;}',
+        '.zmq-footer{flex-direction:column;align-items:flex-start;gap:6px;margin-top:16px;padding-top:12px;}',
       '}'
     ].join('\n');
     const style = document.createElement('style');

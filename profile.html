@@ -2044,11 +2044,22 @@ function openZmEmojiPicker(e,msgId,isAdmin,anchorEl){
   });
 }
 
+let _zmProfileExtra = { avatarPhoto: null, avatarColor: null };
+async function _zmLoadProfileExtra(uid){
+  try{
+    if(!uid || !window.fb) return;
+    const snap = await window.fb.getDoc(window.fb.doc(window.fb.db,'users',uid));
+    if(snap.exists()){
+      const d = snap.data();
+      _zmProfileExtra = { avatarPhoto: d.avatarPhoto || d.photoURL || null, avatarColor: d.avatarColor || null };
+    }
+  }catch(e){}
+}
 function getLoggedUser(){
   try{
     const u = window.fb && window.fb.auth ? window.fb.auth.currentUser : null;
     if (!u) return null;
-    return { name: u.displayName || u.email || 'User', email: u.email || '' };
+    return { name: u.displayName || u.email || 'User', email: u.email || '', avatarPhoto: _zmProfileExtra.avatarPhoto, avatarColor: _zmProfileExtra.avatarColor };
   }catch(e){return null;}
 }
 
@@ -2063,7 +2074,7 @@ function avatarHtml(){
 
 function startChat(name,phone){
   visitorName=name;
-  sessionId=ChatSystem.createSession(name,phone);
+  sessionId=ChatSystem.createSession(name,phone,null,{avatarPhoto:visitorAvatar||null,avatarColor:null});
   localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name,avatar:visitorAvatar}));
   msgsEl.innerHTML='';
   inputArea.style.display='flex';
@@ -2362,7 +2373,7 @@ function restoreSession(){
       visitorName=s.name;
       visitorAvatar=s.avatar||null;
       const user=getLoggedUser();
-      if(user){visitorAvatar=user.avatarPhoto||null;}
+      if(user){visitorAvatar=user.avatarPhoto||null;ChatSystem.updateSessionProfile(sessionId,{avatarPhoto:user.avatarPhoto||null,avatarColor:user.avatarColor||null});}
       msgsEl.innerHTML='';
       inputArea.style.display='flex';
       const chips=document.getElementById('zmChatChips');
@@ -2385,7 +2396,9 @@ function restoreSession(){
         if(inq.linkedSessionId&&ChatSystem.getSession(inq.linkedSessionId)){
           sessionId=inq.linkedSessionId;
           visitorName=user.name||'Guest';
-          visitorAvatar=user.avatarPhoto||null;          localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name:visitorName,avatar:visitorAvatar}));
+          visitorAvatar=user.avatarPhoto||null;
+          ChatSystem.updateSessionProfile(sessionId,{avatarPhoto:user.avatarPhoto||null,avatarColor:user.avatarColor||null});
+          localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name:visitorName,avatar:visitorAvatar}));
           msgsEl.innerHTML='';
           inputArea.style.display='flex';
           renderMsgs();
@@ -2452,7 +2465,7 @@ function _zmResetGuestWidget(){
 function _zmAttachAccountSession(user){
   visitorAvatar=user.avatarPhoto||null;
   visitorName=user.name;
-  sessionId=ChatSystem.createSession(user.name,user.email||'');
+  sessionId=ChatSystem.createSession(user.name,user.email||'',null,{avatarPhoto:user.avatarPhoto||null,avatarColor:user.avatarColor||null});
   localStorage.setItem('zm_cv_session',JSON.stringify({id:sessionId,name:user.name,avatar:visitorAvatar}));
   msgsEl.innerHTML='';
   inputArea.style.display='flex';
@@ -2469,7 +2482,9 @@ function _zmSyncAuth(user){
   if(uid===_zmLastUid) return; // no real change in login state
   _zmLastUid=uid;
   if(user){
-    _zmAttachAccountSession({name:user.displayName||user.email||'Customer',email:user.email||''});
+    _zmLoadProfileExtra(uid).then(()=>{
+      _zmAttachAccountSession({name:user.displayName||user.email||'Customer',email:user.email||'',avatarPhoto:_zmProfileExtra.avatarPhoto,avatarColor:_zmProfileExtra.avatarColor});
+    });
   } else {
     // Logged out: this device/browser should no longer show that account's chat
     localStorage.removeItem('zm_cv_session');

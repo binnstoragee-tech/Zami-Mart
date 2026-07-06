@@ -170,6 +170,8 @@ body.is-leaving .pt-panel.pt-3{ transition-delay:0s; }
   transform: scale(1.07);
 }
 
+.nav-account-mobile{ display:none; }
+
 .nav-toggle{
   display:none;
   flex-direction:column; gap:5px;
@@ -767,12 +769,40 @@ p{ line-height:1.7; color:#3c4a49; }
   .nav-toggle{ display:flex; z-index:999; }
   .nav-toggle.open{ display:none; }
 
-  .nav-right{ gap:12px; }
-  .nav-account{
-    width:38px; height:38px; min-width:38px;
-    font-size:1.15rem;
-    position:relative; z-index:999;
+  .nav-right{ gap:10px; }
+
+  /* Profile now lives inside the hamburger drawer on mobile, not the top bar */
+  .nav-right > .nav-account{ display:none; }
+
+  .nav-toggle{
+    width:38px; height:38px;
+    align-items:center; justify-content:center; gap:4px;
+    background: rgba(6,59,63,.07);
+    border-radius:50%;
+    transition: background .3s var(--ease-soft);
   }
+  .nav-toggle span{ width:16px; }
+  .nav-toggle:hover, .nav-toggle:active{ background: rgba(6,59,63,.14); }
+
+  /* Profile row inside the drawer — pinned to the bottom, separated by a divider */
+  .nav-links .nav-account-mobile{
+    display:flex; align-items:center; gap:14px;
+    width:100%; margin-top:auto;
+    padding-top:1.6rem;
+    border-top:1px solid rgba(255,255,255,.16);
+    color:#fff; font-size:1.05rem; font-weight:600;
+  }
+  .nav-links .nav-account-mobile::after{ display:none; }
+  .nav-links .nav-account-mobile i{
+    display:flex; align-items:center; justify-content:center;
+    width:36px; height:36px; min-width:36px;
+    border-radius:50%;
+    background: rgba(255,255,255,.14);
+    font-size:1.05rem; color:#fff;
+    transition: background .3s, color .3s;
+  }
+  .nav-links .nav-account-mobile:hover{ color:var(--orange); }
+  .nav-links .nav-account-mobile:hover i{ background:var(--orange); color:#fff; }
 
 
   .cat-grid{ grid-template-columns: 1fr; }

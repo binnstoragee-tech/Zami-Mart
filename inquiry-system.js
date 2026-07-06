@@ -49,7 +49,7 @@ const InquirySystem = (function() {
   // Soft-deleted inquiries — shown in the admin Recycle Bin.
   function getDeletedInquiries() { return _inquiries.filter(i => i.deleted); }
 
-  function submitInquiry({ name, email, items, chatSessionId }) {
+  function submitInquiry({ name, email, phone, location, items, chatSessionId }) {
     const id = 'inq_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
 
     // 1) Use the provided chatSessionId or try to find it from localStorage
@@ -74,6 +74,8 @@ const InquirySystem = (function() {
     const data = {
       name: name || 'Guest',
       email: email || '',
+      phone: phone || '',
+      location: location || '',
       items: items || [],
       sentAt: new Date().toISOString(),
       status: 'new',
