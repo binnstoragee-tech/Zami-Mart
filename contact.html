@@ -533,16 +533,7 @@
   .cart-drawer:has(.cart-loading.show) .cart-items { visibility: hidden; }
   .cl-wave { display: flex; align-items: center; justify-content: center; height: 96px; margin-bottom: 1.3rem; }
   .cl-icon-wrap {
-    width: 84px; height: 84px; border-radius: 50%;
-    background: linear-gradient(135deg, #ff6a2b, var(--orange));
     display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 2rem;
-    box-shadow: 0 10px 30px -6px rgba(253,77,2,.5);
-    transform: scale(.35); opacity: 0;
-  }
-  .cart-loading.show .cl-icon-wrap {
-    animation: clIconGrow .55s cubic-bezier(.34,1.56,.64,1) forwards,
-               clIconPulse 1.7s ease-in-out .55s infinite;
   }
   @keyframes clIconGrow {
     0% { transform: scale(.35); opacity: 0; }
@@ -623,7 +614,7 @@
     .cart-item-img { width: 48px; height: 48px; }
     .cart-footer { padding: 14px 16px 18px; gap: 10px; }
     .cart-inquire-btn { padding: 13px; font-size: .88rem; }
-    .cl-icon-wrap { width: 72px; height: 72px; font-size: 1.7rem; }
+
     .cart-thankyou { padding: 2rem 1.3rem; }
     .cart-loading { padding: 2rem 1.3rem; }
     .ty-icon-wrap { width: 82px; height: 82px; margin-bottom: 1.1rem; }
@@ -799,12 +790,17 @@
   <div class="nav-right">
     <nav class="nav-links">
       <button class="nav-close" aria-label="Close menu">&times;</button>
-      <a href="index.html">Home</a>
-      <a href="categories.html">Categories</a>
-      <a href="contact.html" class="active">Contact</a>
-      <a href="login.html" class="nav-account nav-account-mobile" aria-label="Account">
-        <i class="fa-solid fa-circle-user"></i><span>My Account</span>
-      </a>
+      <div class="nav-drawer-profile" id="navDrawerProfile">
+        <div class="nav-drawer-avatar" id="navDrawerAvatar"><i class="fa-solid fa-user"></i></div>
+        <div class="nav-drawer-info">
+          <h4 id="navDrawerName">Guest</h4>
+          <p id="navDrawerSub">Tap to sign in</p>
+        </div>
+        <div class="nav-drawer-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+      </div>
+      <a href="index.html"><span class="nav-icon"><i class="fa-solid fa-house"></i></span>Home</a>
+      <a href="categories.html"><span class="nav-icon"><i class="fa-solid fa-grip"></i></span>Categories</a>
+      <a href="contact.html" class="active"><span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>Contact</a>
     </nav>
     <button class="nav-cart" id="cartNavBtn" aria-label="Inquiry cart">
       <i class="fa-solid fa-cart-shopping"></i>
@@ -1049,7 +1045,7 @@
     </div>
     <div class="cart-loading" id="cartLoading">
       <div class="cl-wave">
-        <div class="cl-icon-wrap"><i class="fa-solid fa-file-invoice"></i></div>
+        <div class="cl-icon-wrap"><div class="zm-loader lg"><span></span><span></span><span></span><span></span></div></div>
       </div>
       <div class="cl-title">Sending your inquiry<span class="cl-dots"><span>.</span><span>.</span><span>.</span></span></div>
       <div class="cl-sub">Hang tight, almost there</div>
@@ -2080,7 +2076,16 @@
 .zm-ctx-item.danger{color:#ff6b6b;}
 .zm-ctx-item.danger:hover{background:rgba(255,107,107,.15);}
 /* bubble images */
-.zm-chat-bubble img{max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:4px;}
+.zm-chat-bubble.img-only{padding:3px;background:#fff;box-shadow:0 3px 14px -3px rgba(6,59,63,.25),0 1px 3px rgba(0,0,0,.08);border:1px solid rgba(6,59,63,.06);}
+.zm-chat-msg.visitor .zm-chat-bubble.img-only{box-shadow:0 3px 14px -3px rgba(253,77,2,.28),0 1px 3px rgba(0,0,0,.08);}
+.zm-img-wrap{position:relative;display:block;overflow:hidden;border-radius:13px;line-height:0;}
+.zm-img-wrap+.zm-img-wrap{margin-top:3px;}
+.zm-chat-bubble:not(.img-only) .zm-img-wrap{margin-top:6px;border-radius:10px;}
+img.zm-chat-img{display:block;width:100%;max-width:190px;max-height:190px;object-fit:cover;border-radius:inherit;cursor:zoom-in;transition:transform .25s ease;}
+.zm-img-wrap:hover img.zm-chat-img{transform:scale(1.035);}
+.zm-img-wrap::after{content:'\f065';font-family:'Font Awesome 6 Free';font-weight:900;position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,.42);color:#fff;font-size:.62rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .18s;pointer-events:none;}
+.zm-img-wrap:hover::after{opacity:1;}
+.zm-chat-bubble.img-only .zm-chat-caption{padding:8px 9px 3px;font-size:.82rem;line-height:1.5;color:#1a2e2e;word-break:break-word;white-space:pre-wrap;overflow-wrap:anywhere;}
 /* welcome */
 .zm-chat-welcome{display:flex;flex-direction:column;align-items:center;text-align:center;padding:18px 20px 10px;font-family:'Poppins',sans-serif;flex-shrink:0;}
 .zm-chat-wave{font-size:2.2rem;animation:zmWave 1.8s ease-in-out 2;display:inline-block;transform-origin:70% 70%;margin-bottom:6px;}
@@ -2101,6 +2106,13 @@
 .zm-chat-input-area{padding:10px 12px;border-top:1px solid rgba(6,59,63,.08);display:flex;gap:8px;align-items:flex-end;background:#fff;flex-shrink:0;}
 .zm-chat-img-btn{width:36px;height:36px;border-radius:50%;background:#f0f4f4;border:1px solid rgba(6,59,63,.1);color:#8a9faa;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
 .zm-chat-img-btn:hover{background:#ddeaea;color:#063b3f;}
+.zm-chat-img-btn.busy{opacity:.55;pointer-events:none;}
+.zm-chat-attach-wrap{position:relative;flex-shrink:0;}
+.zm-chat-attach-menu{display:none;position:absolute;bottom:44px;left:0;background:#fff;border:1px solid rgba(6,59,63,.12);border-radius:12px;box-shadow:0 8px 24px -6px rgba(0,0,0,.18);overflow:hidden;min-width:130px;z-index:20;}
+.zm-chat-attach-menu.show{display:block;}
+.zm-chat-attach-menu button{width:100%;display:flex;align-items:center;gap:9px;padding:10px 13px;border:none;background:none;cursor:pointer;font-family:'Poppins',sans-serif;font-size:.8rem;color:#063b3f;text-align:left;}
+.zm-chat-attach-menu button i{color:#063b3f;width:16px;text-align:center;}
+.zm-chat-attach-menu button:hover{background:#f0f4f4;}
 .zm-chat-input{flex:1;padding:9px 13px;border:1.5px solid rgba(6,59,63,.12);border-radius:18px;font-size:.81rem;font-family:'Poppins',sans-serif;outline:none;resize:none;max-height:80px;min-height:36px;overflow-y:auto;line-height:1.4;transition:border-color .2s,box-shadow .2s;background:#f8fafa;}
 .zm-chat-input:focus{border-color:#063b3f;background:#fff;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
 .zm-chat-send{width:36px;height:36px;border-radius:12px;background:#FD4D02;border:none;color:#fff;font-size:.82rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;}
@@ -2109,6 +2121,11 @@
 .zm-chat-img-preview{display:none;padding:6px 12px 0;position:relative;width:fit-content;}
 .zm-chat-img-preview img{max-height:60px;border-radius:8px;border:1px solid rgba(6,59,63,.12);}
 .zm-chat-img-preview-close{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#d63030;color:#fff;border:none;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
+.zm-chat-file-preview{display:none;padding:6px 12px 0;position:relative;width:fit-content;}
+.zm-chat-file-preview-chip{display:flex;align-items:center;gap:8px;background:#f0f4f4;border:1px solid rgba(6,59,63,.12);border-radius:10px;padding:7px 12px;font-size:.75rem;color:#063b3f;max-width:220px;}
+.zm-chat-file-preview-chip i{color:#063b3f;font-size:.9rem;flex-shrink:0;}
+.zm-chat-file-preview-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.zm-chat-file-preview-close{position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-radius:50%;background:#d63030;color:#fff;border:none;cursor:pointer;font-size:.6rem;display:flex;align-items:center;justify-content:center;}
 /* reaction badge sitting under a bubble */
 .zm-chat-reaction-row{display:flex;gap:3px;}
 .zm-chat-msg.visitor .zm-chat-reaction-row{align-self:flex-end;}
@@ -2139,8 +2156,10 @@
 .zm-chat-reply-bar-close:hover{color:#d63030;}
 @media(max-width:480px){
   .zm-chat-btn{bottom:16px;right:16px;width:52px;height:52px;font-size:1.2rem;}
-  .zm-chat-win{position:fixed;inset:0;width:100%;max-width:100%;height:100%;border-radius:0;bottom:0;right:0;}
-  .zm-chat-head{border-radius:0;}
+  .zm-chat-win{position:fixed;top:36px;bottom:96px;left:16px;right:16px;width:auto;max-width:none;height:auto;border-radius:22px;}
+}
+@media(max-width:480px) and (max-height:700px){
+  .zm-chat-win{top:22px;bottom:82px;}
 }
 @media(max-height:500px) and (orientation:landscape){
   .zm-chat-btn{bottom:12px;right:12px;width:44px;height:44px;font-size:1rem;}
@@ -2202,9 +2221,19 @@
     <img id="zmImgPreviewImg" src="">
     <button class="zm-chat-img-preview-close"><i class="fa-solid fa-xmark"></i></button>
   </div>
+  <!-- File preview chip (staged, not yet sent) -->
+  <div class="zm-chat-file-preview" id="zmFilePreview">
+    <div class="zm-chat-file-preview-chip"><i class="fa-solid fa-file"></i><span id="zmFilePreviewName"></span></div>
+    <button class="zm-chat-file-preview-close"><i class="fa-solid fa-xmark"></i></button>
+  </div>
   <!-- Input -->
   <div class="zm-chat-input-area" id="zmChatInputArea" style="display:none">
-    <label for="zmImgUpload" class="zm-chat-img-btn" title="Attach image"><i class="fa-solid fa-image"></i></label>
+    <div class="zm-chat-attach-wrap" id="zmChatAttachWrap">
+      <button type="button" class="zm-chat-img-btn" id="zmChatAttachBtn" title="Send photo (max 15MB)"><i class="fa-solid fa-paperclip"></i></button>
+      <div class="zm-chat-attach-menu" id="zmChatAttachMenu">
+        <button type="button" data-kind="photo"><i class="fa-solid fa-image"></i> Photo</button>
+      </div>
+    </div>
     <input type="file" id="zmImgUpload" accept="image/*" style="display:none">
     <textarea class="zm-chat-input" id="zmChatInput" placeholder="Type a message…" rows="1"></textarea>
     <button class="zm-chat-send" id="zmChatSend"><i class="fa-solid fa-paper-plane"></i></button>
@@ -2236,7 +2265,7 @@ function startZmReplyTo(msgId){
   if(!msg||msg.deleted)return;
   closeZmEmojiPicker();
   unpinAllZmActions();
-  zmReplyTarget={id:msg.id,senderName:msg.senderType==='visitor'?'You':'Zami Mart',text:msg.text?msg.text.slice(0,80):(msg.imageData?'\u{1F4F7} Photo':'')};
+  zmReplyTarget={id:msg.id,senderName:msg.senderType==='visitor'?'You':'Zami Mart',text:msg.text?msg.text.slice(0,80):(msg.imageData?'\u{1F4F7} Photo':(msg.attachment?'\u{1F4CE} '+msg.attachment.name:''))};
   zmReplyBarName.textContent=zmReplyTarget.senderName;
   zmReplyBarText.textContent=zmReplyTarget.text;
   zmReplyBar.classList.add('show');
@@ -2507,13 +2536,15 @@ function renderMsgs(){
     const isAdmin=m.senderType==='admin';
     const isDeleted=!!m.deleted;
     const imgH=(!isDeleted&&m.imageData)
-      ?`<img src="${m.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${m.text?'6px':'0'};" data-src="${m.imageData}">`
+      ?`<div class="zm-img-wrap"><img src="${m.imageData}" class="zm-chat-img" alt="image" data-src="${m.imageData}"></div>`
       :'';
+    const isImgOnly=(!isDeleted&&!!m.imageData);
+    const fileH=(!isDeleted&&!m.imageData&&m.attachment)?ChatSystem.renderAttachmentHtml(m.attachment):'';
     const editedTag=(!isDeleted&&m.edited)?`<div class="zm-chat-edited-tag">edited</div>`:'';
     const txtH=isDeleted
       ?`<span><i class="fa-solid fa-circle-xmark" style="font-size:.72rem;margin-right:5px;opacity:.7;"></i>Message unsent</span>`
-      :(m.text?`<div>${escH(m.text)}</div>`:'');
-    const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}`;
+      :(m.text?`<div class="${isImgOnly?'zm-chat-caption':''}">${escH(m.text)}</div>`:'');
+    const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}${isImgOnly?' img-only':''}`;
     const cls=['zm-chat-msg',isAdmin?'admin':'visitor',!isFirst?'same-sender':'',(isLast&&!isFirst)?'last-in-group':''].filter(Boolean).join(' ');
     const reactions=(!isDeleted)?(m.reactions||(m.reaction?{legacy:m.reaction}:{})):{};
     const reactionEntries=Object.entries(reactions).filter(([,em])=>em);
@@ -2534,7 +2565,7 @@ function renderMsgs(){
         <div class="zm-chat-avatar-admin${isLast?'':' hidden'}"><i class="fa-solid fa-headset"></i></div>
         <div class="zm-chat-msg-content">
           ${isFirst?'<div class="zm-chat-sender-label">Zami Mart</div>':''}
-          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}</div>
+          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}${fileH}</div>
           ${reactionH}
           ${editedTag}
           ${isLast?`<div class="zm-chat-time">${t}</div>`:''}
@@ -2543,7 +2574,7 @@ function renderMsgs(){
     }else{
       el.innerHTML=`
         <div class="zm-chat-msg-content">
-          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}</div>
+          <div class="${bubbleCls}">${quoteH}${txtH}${imgH}${fileH}</div>
           ${reactionH}
           ${editedTag}
           ${isLast?`<div class="zm-chat-time">${t}</div>`:''}
@@ -2591,14 +2622,84 @@ document.addEventListener('change',function(e){
   if(e.target.id!=='zmImgUpload')return;
   const file=e.target.files[0];if(!file)return;
   if(file.size>3*1024*1024){alert('Image too large (max 3 MB)');return;}
+  zmClearFile();
   const r=new FileReader();
   r.onload=ev=>{zmPendingImg=ev.target.result;document.getElementById('zmImgPreviewImg').src=zmPendingImg;document.getElementById('zmImgPreview').style.display='block';};
   r.readAsDataURL(file);e.target.value='';
 });
 
+// ── Attach popup menu (Photo / File) ──
+(function initZmAttachMenu(){
+  const attachBtn=document.getElementById('zmChatAttachBtn');
+  const attachMenu=document.getElementById('zmChatAttachMenu');
+  if(!attachBtn||!attachMenu)return;
+  attachBtn.addEventListener('click',e=>{
+    e.stopPropagation();
+    attachMenu.classList.toggle('show');
+  });
+  attachMenu.addEventListener('click',e=>{
+    const item=e.target.closest('button[data-kind]');
+    if(!item)return;
+    attachMenu.classList.remove('show');
+    if(item.dataset.kind==='photo')document.getElementById('zmImgUpload').click();
+    else document.getElementById('zmFileUpload').click();
+  });
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#zmChatAttachWrap'))attachMenu.classList.remove('show');
+  });
+})();
+
+// Generic (non-image) file attachment — staged like a photo, only
+// actually uploaded + sent once the user taps the send button.
+let zmPendingFile=null;
+function zmClearFile(){zmPendingFile=null;document.getElementById('zmFilePreview').style.display='none';document.getElementById('zmFilePreviewName').textContent='';}
+document.addEventListener('change',function(e){
+  if(e.target.id!=='zmFileUpload')return;
+  const file=e.target.files[0];
+  if(!file){return;}
+  if(file.size>ChatSystem.MAX_ATTACHMENT_SIZE){alert('File too large (max 15MB)');e.target.value='';return;}
+  zmClearImg();
+  zmPendingFile=file;
+  document.getElementById('zmFilePreviewName').textContent=file.name;
+  document.getElementById('zmFilePreview').style.display='block';
+  e.target.value='';
+});
+
 function doSend(){
   const txt=input.value.trim();
-  if((!txt&&!zmPendingImg)||!sessionId)return;
+  if((!txt&&!zmPendingImg&&!zmPendingFile)||!sessionId)return;
+
+  if(zmPendingFile){
+    const fileToSend=zmPendingFile;
+    sendBtn.disabled=true;
+    sendBtn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i>';
+    ChatSystem.uploadAttachment(fileToSend,sessionId)
+      .then(att=>{
+        ChatSystem.sendMessage(sessionId,'visitor',visitorName,txt,null,zmReplyTarget,att);
+        cancelZmReplyTo();
+        const chips=document.getElementById('zmChatChips');
+        if(chips)chips.style.display='none';
+        input.value='';input.style.height='auto';
+        zmClearFile();
+        renderMsgs();
+        input.focus();
+      })
+      .catch(err=>{
+        const m=err&&err.message, code=err&&err.code;
+        let msg;
+        if(m==='TIMEOUT')msg='Matagal ang pag-upload (mabagal na koneksyon o naka-block ang Firebase Storage). Subukan ulit.';
+        else if(m==='SIZE_LIMIT')msg='Sobrang laki ng file (max 15MB).';
+        else if(code==='storage/unauthorized')msg='Hindi pinapayagan ng Firebase Storage Rules ang pag-upload ng customer (blocked: storage/unauthorized). I-update ang Storage Rules sa Firebase Console para pumayag sa chatUploads/.';
+        else msg='Hindi na-send ang file'+(code?' ('+code+')':(m?' ('+m+')':''))+'. Subukan ulit.';
+        alert(msg);
+      })
+      .finally(()=>{
+        sendBtn.disabled=false;
+        sendBtn.innerHTML='<i class="fa-solid fa-paper-plane"></i>';
+      });
+    return;
+  }
+
   ChatSystem.sendMessage(sessionId,'visitor',visitorName,txt,zmPendingImg,zmReplyTarget);
   cancelZmReplyTo();
   const chips=document.getElementById('zmChatChips');
@@ -2689,20 +2790,37 @@ const _imgPreviewClose=document.querySelector('#zmImgPreview .zm-chat-img-previe
 if(_imgPreviewClose){
   _imgPreviewClose.addEventListener('click', zmClearImg);
 }
+const _filePreviewClose=document.querySelector('#zmFilePreview .zm-chat-file-preview-close');
+if(_filePreviewClose){
+  _filePreviewClose.addEventListener('click', zmClearFile);
+}
 input.addEventListener('keypress',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();}});
 input.addEventListener('input',()=>{input.style.height='auto';input.style.height=Math.min(input.scrollHeight,80)+'px';});
 
-function _playNotifSound(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();[880,1100].forEach((freq,i)=>{const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(freq,ctx.currentTime+i*0.12);g.gain.setValueAtTime(0,ctx.currentTime+i*0.12);g.gain.linearRampToValueAtTime(0.15,ctx.currentTime+i*0.12+0.02);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.12+0.25);o.start(ctx.currentTime+i*0.12);o.stop(ctx.currentTime+i*0.12+0.25);});}catch(e){}}
-let _lastAdminMsgCount=0;
+let _zmAudioCtx=null;
+function _zmGetAudioCtx(){if(!_zmAudioCtx)_zmAudioCtx=new(window.AudioContext||window.webkitAudioContext)();if(_zmAudioCtx.state==='suspended')_zmAudioCtx.resume();return _zmAudioCtx;}
+// Unlock/resume audio on the first interaction anywhere on the page — required by
+// mobile browser autoplay policies, otherwise the notif sound can silently fail to play.
+function _zmUnlockAudio(){_zmGetAudioCtx();document.removeEventListener('click',_zmUnlockAudio);document.removeEventListener('touchstart',_zmUnlockAudio);document.removeEventListener('keydown',_zmUnlockAudio);}
+document.addEventListener('click',_zmUnlockAudio);
+document.addEventListener('touchstart',_zmUnlockAudio);
+document.addEventListener('keydown',_zmUnlockAudio);
+function _playNotifSound(){try{const ctx=_zmGetAudioCtx();[880,1100].forEach((freq,i)=>{const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.type='sine';o.frequency.setValueAtTime(freq,ctx.currentTime+i*0.12);g.gain.setValueAtTime(0,ctx.currentTime+i*0.12);g.gain.linearRampToValueAtTime(0.15,ctx.currentTime+i*0.12+0.02);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+i*0.12+0.25);o.start(ctx.currentTime+i*0.12);o.stop(ctx.currentTime+i*0.12+0.25);});}catch(e){}}
+let _lastAdminMsgCount=null; // null = baseline not set yet — avoids a false "new message" sound firing from the initial Firestore snapshot on page load
 ChatSystem.on('messages-updated',()=>{
   if(!sessionId)return;
   const msgs=ChatSystem.getSessionMessages(sessionId);
   const totalAdmin=msgs.filter(m=>m.senderType==='admin').length;
   const isOpen=win.classList.contains('open');
+  if(_lastAdminMsgCount===null){_lastAdminMsgCount=totalAdmin;updateBadge();return;}
   if(isOpen){renderMsgs();_lastAdminMsgCount=totalAdmin;}
-  else if(totalAdmin>_lastAdminMsgCount){_playNotifSound();}
+  else if(totalAdmin>_lastAdminMsgCount){_playNotifSound();_lastAdminMsgCount=totalAdmin;}
   updateBadge();
 });
+// Unread counts live in a separate Firestore doc from the messages themselves,
+// so also refresh the badge whenever that doc updates (covers the case where
+// it arrives slightly before/after the messages snapshot).
+ChatSystem.on('unread-updated',()=>{updateBadge();});
 
 // ── Keep the widget in sync with login/logout, even without a full page reload ──
 let _zmLastUid; // undefined = not checked yet

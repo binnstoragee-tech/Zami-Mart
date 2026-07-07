@@ -578,6 +578,7 @@ select {
 }
 .toast.success { background: #1a7a4a; }
 .toast.error   { background: #c0392b; }
+.toast.warning { background: #c9820a; }
 .toast i { font-size: .85rem; flex-shrink: 0; }
 @keyframes toastIn {
   from { opacity: 0; transform: translateX(30px) scale(.9); }
@@ -627,6 +628,9 @@ select {
   font-size: 1.3rem; color: #c0392b;
   margin: 0 auto 14px;
 }
+.confirm-icon.warning { background: #fff6e5; color: #c9820a; }
+.btn-warning { background: #fff6e5; color: #c9820a; border: 1px solid #ffe2a8; }
+.btn-warning:hover { background: #c9820a; color: #fff; }
 .confirm-box h3 { font-size: .95rem; font-weight: 700; color: var(--teal); margin-bottom: 7px; }
 .confirm-box p  { font-size: .8rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
 .confirm-actions { display: flex; gap: 8px; justify-content: center; }
@@ -1070,10 +1074,60 @@ select {
   background: #e2e8e8 !important; color: #7a9090 !important;
   border-radius: 10px !important; box-shadow: none !important;
 }
-.zm-chat-bubble img {
-  max-width: 180px; max-height: 140px;
-  border-radius: 10px; display: block; cursor: zoom-in; margin-top: 4px;
+
+/* ─── MODERN PHOTO BUBBLES ───────────────────── */
+/* Image-only messages get a clean neutral "photo card" instead of a flat
+   solid-color block — closer to how modern chat apps present photos.
+   Bubbles that also carry text keep their normal colored background; the
+   photo itself still gets the rounded-crop + shadow treatment either way. */
+.zm-chat-bubble.img-only {
+  padding: 3px; background: #fff;
+  box-shadow: 0 3px 14px -3px rgba(6,59,63,.25), 0 1px 3px rgba(0,0,0,.08);
+  border: 1px solid rgba(6,59,63,.06);
 }
+.zm-chat-msg.visitor .zm-chat-bubble.img-only {
+  box-shadow: 0 3px 14px -3px rgba(253,77,2,.28), 0 1px 3px rgba(0,0,0,.08);
+}
+.zm-img-wrap {
+  position: relative; display: block; overflow: hidden;
+  border-radius: 13px; line-height: 0;
+}
+.zm-img-wrap + .zm-img-wrap { margin-top: 3px; }
+.zm-chat-bubble:not(.img-only) .zm-img-wrap { margin-top: 6px; border-radius: 10px; }
+img.zm-chat-img {
+  display: block; width: 100%; max-width: 190px; max-height: 190px;
+  object-fit: cover; border-radius: inherit; cursor: zoom-in;
+  transition: transform .25s ease;
+}
+.zm-img-wrap:hover img.zm-chat-img { transform: scale(1.035); }
+.zm-img-wrap::after {
+  content: '\f065'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,.42); color: #fff; font-size: .62rem;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .18s; pointer-events: none;
+}
+.zm-img-wrap:hover::after { opacity: 1; }
+.zm-chat-bubble.img-only .zm-chat-caption {
+  padding: 8px 9px 3px; font-size: .82rem; line-height: 1.5;
+  color: var(--text); word-break: break-word; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+
+/* File attachment card (non-image files) */
+.zm-file-attach {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: 10px;
+  background: rgba(6,59,63,.06);
+  text-decoration: none; color: inherit;
+  max-width: 210px; margin-top: 4px;
+}
+.zm-file-attach i { font-size: 1.3rem; color: var(--teal); flex-shrink: 0; }
+.zm-file-attach-info { min-width: 0; display: flex; flex-direction: column; }
+.zm-file-attach-name {
+  font-size: .78rem; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.zm-file-attach-size { font-size: .65rem; opacity: .6; }
 
 /* Date divider */
 .zm-chat-divider {
@@ -1322,6 +1376,64 @@ select {
 }
 #sec-chat .chat-send-btn:hover { background: #e34602; transform: scale(1.06); }
 #sec-chat .chat-send-btn:active { transform: scale(.94); }
+#sec-chat .chat-send-btn.busy { opacity: .6; pointer-events: none; }
+#sec-chat .chat-attach-btn {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--cream); border: 1px solid var(--border); color: var(--text-muted);
+  font-size: .85rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .18s;
+}
+#sec-chat .chat-attach-btn:hover { background: #ddeaea; color: var(--teal); }
+#sec-chat .chat-attach-btn.busy { opacity: .55; pointer-events: none; }
+
+/* Attach popup menu (Photo / File) — shared by both chat panels in admin */
+.chat-attach-wrap { position: relative; flex-shrink: 0; }
+.chat-attach-menu {
+  display: none; position: absolute; bottom: 46px; left: 0;
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 8px 24px -6px rgba(0,0,0,.18); overflow: hidden;
+  min-width: 130px; z-index: 20;
+}
+.chat-attach-menu.show { display: block; }
+.chat-attach-menu button {
+  width: 100%; display: flex; align-items: center; gap: 9px;
+  padding: 10px 13px; border: none; background: none; cursor: pointer;
+  font-family: inherit; font-size: .8rem; color: var(--text); text-align: left;
+}
+.chat-attach-menu button i { color: var(--teal); width: 16px; text-align: center; }
+.chat-attach-menu button:hover { background: #f0f4f4; }
+
+/* Pending attachment preview — shown above the input row after picking a
+   file, before it's actually sent. Click the red X to remove it. */
+.chat-attach-preview {
+  display: none; align-items: center; gap: 10px;
+  padding: 10px 16px; border-top: 1px solid var(--border);
+  background: #fff; flex-shrink: 0;
+}
+.chat-attach-preview.show { display: flex; }
+.chat-attach-preview-thumb { position: relative; width: 56px; height: 56px; flex-shrink: 0; }
+.chat-attach-preview-thumb img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: block;
+  border: 1px solid var(--border);
+}
+.chat-attach-preview-file {
+  width: 100%; height: 100%; border-radius: 10px; background: var(--teal); color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; font-size: .55rem; text-align: center; padding: 4px; overflow: hidden;
+}
+.chat-attach-preview-file i { font-size: 1.05rem; }
+.chat-attach-preview-remove {
+  position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%;
+  background: #ff3b30; color: #fff; border: 2px solid #fff; cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center; font-size: .6rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,.25); transition: background .15s;
+}
+.chat-attach-preview-remove:hover { background: #d9241a; }
+.chat-attach-preview-name {
+  font-size: .75rem; color: var(--text-muted); flex: 1; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 
 @media (max-width: 768px) {
   #sec-chat .chat-layout {
@@ -1931,8 +2043,28 @@ select {
               <button class="zm-reply-bar-close" onclick="cancelChatReplyTo()" title="Cancel"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
+            <!-- Pending attachment preview (shown after picking a file, before send) -->
+            <div class="chat-attach-preview" id="chatDetailAttachPreview">
+              <div class="chat-attach-preview-thumb" id="chatDetailAttachPreviewThumb">
+                <button type="button" class="chat-attach-preview-remove" onclick="removeChatDetailAttachment()" title="Remove">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+              <div class="chat-attach-preview-name" id="chatDetailAttachPreviewName"></div>
+            </div>
+
             <!-- Input -->
             <div class="chat-input-row">
+              <div class="chat-attach-wrap" id="chatDetailAttachWrap">
+                <button type="button" class="chat-attach-btn" id="chatDetailAttachBtn" title="Send photo (max 15MB)">
+                  <i class="fa-solid fa-paperclip"></i>
+                </button>
+                <div class="chat-attach-menu" id="chatDetailAttachMenu">
+                  <button type="button" data-kind="photo"><i class="fa-solid fa-image"></i> Photo</button>
+                </div>
+              </div>
+              <input type="file" id="chatDetailPhotoInput" accept="image/*" style="display:none;" onchange="handleChatDetailFileUpload(event, true)">
+              <input type="file" id="chatDetailFileInput" style="display:none;" onchange="handleChatDetailFileUpload(event, false)">
               <textarea id="chatDetailInput" placeholder="Type your response…" rows="1"
                 onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatReply();}"
                 oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px';"></textarea>
@@ -2084,9 +2216,9 @@ select {
                 <!-- messages -->
                 <div id="inqChatMessages" style="height:420px;max-height:420px;overflow-y:auto;border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:#fafaf8;margin-bottom:12px;"></div>
 
-                <!-- image preview -->
+                <!-- attachment preview (image thumbnail or file card) -->
                 <div id="inqImgPreview" style="display:none;margin-bottom:8px;position:relative;width:fit-content;">
-                  <img id="inqImgPreviewImg" style="max-height:80px;border-radius:8px;border:1px solid var(--border);">
+                  <div id="inqAttachPreviewInner"></div>
                   <button onclick="clearInqImg()" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;background:#d63030;color:#fff;border:none;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-xmark"></i></button>
                 </div>
 
@@ -2098,11 +2230,17 @@ select {
 
                 <!-- input row -->
                 <div style="display:flex;gap:8px;align-items:flex-end;">
-                  <!-- image upload trigger -->
-                  <label for="inqImgUpload" style="width:36px;height:36px;border-radius:9px;background:var(--cream);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text-muted);font-size:.85rem;transition:all .2s;" title="Attach image">
-                    <i class="fa-solid fa-image"></i>
-                  </label>
-                  <input type="file" id="inqImgUpload" accept="image/*" style="display:none;" onchange="handleInqImgUpload(event)">
+                  <!-- attach upload trigger -->
+                  <div class="chat-attach-wrap" id="inqAttachWrap" style="position:relative;flex-shrink:0;">
+                    <button type="button" id="inqAttachBtn" style="width:36px;height:36px;border-radius:9px;background:var(--cream);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--text-muted);font-size:.85rem;transition:all .2s;" title="Attach photo (max 15MB)">
+                      <i class="fa-solid fa-paperclip"></i>
+                    </button>
+                    <div class="chat-attach-menu" id="inqAttachMenu">
+                      <button type="button" data-kind="photo"><i class="fa-solid fa-image"></i> Photo</button>
+                    </div>
+                  </div>
+                  <input type="file" id="inqPhotoUpload" accept="image/*" style="display:none;" onchange="handleInqImgUpload(event, true)">
+                  <input type="file" id="inqFileUpload" style="display:none;" onchange="handleInqImgUpload(event, false)">
 
                   <textarea id="inqChatInput" placeholder="Type your reply…" rows="1"
                     style="flex:1;padding:9px 13px;border:1px solid var(--border);border-radius:10px;font-size:.82rem;font-family:inherit;outline:none;resize:none;max-height:90px;line-height:1.5;transition:border-color .2s;"
@@ -2451,7 +2589,7 @@ select {
      ============================================= -->
 <div class="confirm-overlay" id="confirmOverlay">
   <div class="confirm-box">
-    <div class="confirm-icon"><i class="fa-solid fa-trash-can"></i></div>
+    <div class="confirm-icon" id="confirmIcon"><i class="fa-solid fa-trash-can" id="confirmIconI"></i></div>
     <h3 id="confirmTitle">Delete Item?</h3>
     <p id="confirmMsg">This action cannot be undone.</p>
     <div class="confirm-actions">
@@ -2650,7 +2788,7 @@ updateDate();
 // TOAST
 // =============================================
 function showToast(msg, type = 'success') {
-  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info' };
+  const icons = { success: 'fa-circle-check', error: 'fa-circle-xmark', info: 'fa-circle-info', warning: 'fa-triangle-exclamation' };
   const tc = document.getElementById('toastContainer');
   const t = document.createElement('div');
   t.className = 'toast ' + type;
@@ -2719,9 +2857,30 @@ function showUndoToast(msg, { onUndo, onCommit } = {}) {
 // CONFIRM DIALOG
 // =============================================
 let confirmCallback = null;
-function showConfirm(title, msg, cb) {
+// opts: { variant: 'danger' | 'warning', okText: string }
+// Defaults preserve the old delete-confirmation look for every existing call site.
+function showConfirm(title, msg, cb, opts) {
+  const { variant = 'danger', okText = 'Delete' } = opts || {};
   document.getElementById('confirmTitle').textContent = title;
   document.getElementById('confirmMsg').textContent = msg;
+
+  const iconEl = document.getElementById('confirmIcon');
+  const iconIEl = document.getElementById('confirmIconI');
+  const okBtn = document.getElementById('confirmOkBtn');
+
+  if (variant === 'warning') {
+    iconEl.classList.add('warning');
+    iconIEl.className = 'fa-solid fa-triangle-exclamation';
+    okBtn.classList.remove('btn-danger');
+    okBtn.classList.add('btn-warning');
+  } else {
+    iconEl.classList.remove('warning');
+    iconIEl.className = 'fa-solid fa-trash-can';
+    okBtn.classList.remove('btn-warning');
+    okBtn.classList.add('btn-danger');
+  }
+  okBtn.textContent = okText;
+
   confirmCallback = cb;
   document.getElementById('confirmOverlay').classList.add('open');
 }
@@ -3341,6 +3500,11 @@ function inqQuoteTotal(inq) {
 // =============================================
 let currentChatSessionId = null;
 
+// Staged (not-yet-sent) attachment for the admin chat reply box. Picking a
+// file just previews it here — the actual upload + send only happens when
+// the admin hits the send button, via sendChatReply().
+let chatDetailPendingAttachment = null; // { file, isPhoto, previewUrl }
+
 function renderChatSessions() {
   const sessions = ChatSystem.getSessions();
   const list  = document.getElementById('chatSessionList');
@@ -3385,7 +3549,7 @@ function renderChatSessions() {
     const latest = g.sessions.reduce((a, b) => new Date(a.lastMessageAt) > new Date(b.lastMessageAt) ? a : b);
     const msgs   = ChatSystem.getSessionMessages(latest.id);
     const lastMsg = msgs.length ? msgs[msgs.length - 1] : null;
-    const preview = lastMsg ? (lastMsg.imageData ? '📷 Image' : lastMsg.text) : 'No messages yet';
+    const preview = lastMsg ? (lastMsg.imageData ? '📷 Image' : (lastMsg.attachment ? '📎 ' + lastMsg.attachment.name : lastMsg.text)) : 'No messages yet';
     const timeStr = latest.lastMessageAt
       ? new Date(latest.lastMessageAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
       : '';
@@ -3428,6 +3592,7 @@ function renderChatSessions() {
 }
 
 function openChatDetail(sessionId) {
+  if (currentChatSessionId !== sessionId) removeChatDetailAttachment();
   currentChatSessionId = sessionId;
   const session = ChatSystem.getSession(sessionId);
   if (!session) return;
@@ -3465,6 +3630,7 @@ function openChatDetail(sessionId) {
 }
 
 function closeChatDetail() {
+  removeChatDetailAttachment();
   currentChatSessionId = null;
   document.getElementById('chatDetailCard').style.display = 'none';
   document.getElementById('chatPanelEmpty').style.display = 'flex';
@@ -3618,6 +3784,7 @@ function renderChatMessages() {
   const container = document.getElementById('chatDetailMessages');
   const scrolledToBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 60;
 
+  const session  = ChatSystem.getSession(currentChatSessionId);
   const messages = ChatSystem.getSessionMessages(currentChatSessionId);
   const rows = messages.map((msg, i) => {
     const prev = messages[i - 1];
@@ -3655,9 +3822,12 @@ function renderChatMessages() {
     const isAdmin   = msg.senderType === 'admin';
     const role      = isAdmin ? 'admin' : 'visitor';
     const editedTag = (!msg.deleted && msg.edited) ? `<div class="zm-chat-edited-tag">edited</div>` : '';
-    const txtH      = msg.text ? escHtml(msg.text) : '';
-    const imgH      = msg.imageData ? `<img src="${msg.imageData}" alt="image">` : '';
-    const bubbleCls = 'zm-chat-bubble' + (msg.deleted ? ' deleted' : '');
+    const hasImg    = !!msg.imageData;
+    const txtH      = msg.text ? (hasImg ? `<div class="zm-chat-caption">${escHtml(msg.text)}</div>` : escHtml(msg.text)) : '';
+    const imgH      = hasImg ? `<div class="zm-img-wrap"><img src="${msg.imageData}" class="zm-chat-img" alt="image" data-src="${msg.imageData}"></div>` : '';
+    const fileH     = (!msg.imageData && msg.attachment) ? ChatSystem.renderAttachmentHtml(msg.attachment) : '';
+    const isImgOnly = hasImg;
+    const bubbleCls = 'zm-chat-bubble' + (msg.deleted ? ' deleted' : '') + (isImgOnly ? ' img-only' : '');
     const initials  = (msg.senderName || 'C').charAt(0).toUpperCase();
     const quoteH    = msg.replyTo ? `<div class="zm-chat-reply-quote" data-refid="${msg.replyTo.id}"><b>${escHtml(msg.replyTo.senderName||'')}</b>: ${escHtml(msg.replyTo.text||'')}</div>` : '';
     const reactionH = _zmReactionBadgesHtml(msg);
@@ -3665,7 +3835,7 @@ function renderChatMessages() {
     // actions — unsending is final from the chat view (no restore here).
     const bubbleBodyH = msg.deleted
       ? `<i class="fa-solid fa-ban" style="margin-right:6px;"></i>Message deleted`
-      : `${quoteH}${txtH}${imgH}`;
+      : `${quoteH}${txtH}${imgH}${fileH}`;
     const actionsH  = msg.deleted
       ? ''
       : `
@@ -3692,7 +3862,13 @@ function renderChatMessages() {
         </div>
         ${actionsH}`;
     } else {
-      const avatarHtml = `<div class="zm-chat-avatar${isLast ? '' : ' hidden'}" title="${escHtml(msg.senderName||'Visitor')}">${initials}</div>`;
+      const avatarInner = session && session.avatarPhoto
+        ? `<img src="${escHtml(session.avatarPhoto)}" alt="${escHtml(msg.senderName||'Visitor')}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+        : initials;
+      const avatarStyle = session && session.avatarPhoto
+        ? ''
+        : (session && session.avatarColor ? ` style="background:${escHtml(session.avatarColor)};"` : '');
+      const avatarHtml = `<div class="zm-chat-avatar${isLast ? '' : ' hidden'}" title="${escHtml(msg.senderName||'Visitor')}"${avatarStyle}>${avatarInner}</div>`;
       el.innerHTML = `
         ${avatarHtml}
         <div class="zm-chat-content">
@@ -3728,7 +3904,7 @@ function startChatReplyTo(msgId) {
   zmReplyTarget = {
     id: msg.id,
     senderName: msg.senderType === 'admin' ? 'You' : (msg.senderName || 'Customer'),
-    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : '')
+    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : (msg.attachment ? '📎 ' + msg.attachment.name : ''))
   };
   document.getElementById('zmReplyBarName').textContent = zmReplyTarget.senderName;
   document.getElementById('zmReplyBarText').textContent = zmReplyTarget.text;
@@ -3806,16 +3982,118 @@ function sendChatReply() {
 
   const input = document.getElementById('chatDetailInput');
   const text = input.value.trim();
-  if (!text) return;
+  const pending = chatDetailPendingAttachment;
 
-  ChatSystem.sendMessage(currentChatSessionId, 'admin', 'Admin', text, null, zmReplyTarget);
-  cancelChatReplyTo();
-  input.value = '';
-  input.style.height = 'auto';
-  renderChatMessages();
-  renderChatSessions();
-  input.focus();
-  showToast('Message sent!', 'success');
+  if (!text && !pending) return;
+
+  const sendBtn = document.querySelector('#sec-chat .chat-send-btn');
+
+  function finishSend() {
+    cancelChatReplyTo();
+    input.value = '';
+    input.style.height = 'auto';
+    renderChatMessages();
+    renderChatSessions();
+    input.focus();
+  }
+
+  if (!pending) {
+    ChatSystem.sendMessage(currentChatSessionId, 'admin', 'Admin', text, null, zmReplyTarget);
+    finishSend();
+    showToast('Message sent!', 'success');
+    return;
+  }
+
+  // There's a staged attachment — upload it now, then send.
+  if (sendBtn) { sendBtn.classList.add('busy'); sendBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'; }
+
+  ChatSystem.uploadAttachment(pending.file, currentChatSessionId)
+    .then(att => {
+      if (pending.isPhoto) {
+        ChatSystem.sendMessage(currentChatSessionId, 'admin', 'Admin', text, att.url, zmReplyTarget);
+      } else {
+        ChatSystem.sendMessage(currentChatSessionId, 'admin', 'Admin', text, null, zmReplyTarget, att);
+      }
+      removeChatDetailAttachment();
+      finishSend();
+      showToast('Message sent!', 'success');
+    })
+    .catch((err) => {
+      const m = err && err.message, code = err && err.code;
+      let msg;
+      if (m === 'TIMEOUT') msg = 'Matagal ang pag-upload (mabagal na koneksyon).';
+      else if (m === 'SIZE_LIMIT') msg = 'Sobrang laki ng file (max 15MB).';
+      else msg = 'Failed to send file' + (code ? ' (' + code + ')' : (m ? ' (' + m + ')' : '')) + '. Try again.';
+      showToast(msg, 'error');
+    })
+    .finally(() => {
+      if (sendBtn) { sendBtn.classList.remove('busy'); sendBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>'; }
+    });
+}
+
+(function initChatDetailAttachMenu() {
+  const btn  = document.getElementById('chatDetailAttachBtn');
+  const menu = document.getElementById('chatDetailAttachMenu');
+  if (!btn || !menu) return;
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.classList.toggle('show');
+  });
+  menu.addEventListener('click', (e) => {
+    const item = e.target.closest('button[data-kind]');
+    if (!item) return;
+    menu.classList.remove('show');
+    if (item.dataset.kind === 'photo') document.getElementById('chatDetailPhotoInput').click();
+    else document.getElementById('chatDetailFileInput').click();
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#chatDetailAttachWrap')) menu.classList.remove('show');
+  });
+})();
+
+function handleChatDetailFileUpload(e, isPhoto) {
+  const file = e.target.files[0];
+  if (!file || !currentChatSessionId) { e.target.value = ''; return; }
+
+  if (file.size > ChatSystem.MAX_ATTACHMENT_SIZE) {
+    showToast('File too large (max 15MB)', 'error');
+    e.target.value = '';
+    return;
+  }
+
+  // Revoke any previous staged preview URL before replacing it.
+  if (chatDetailPendingAttachment && chatDetailPendingAttachment.previewUrl) {
+    try { URL.revokeObjectURL(chatDetailPendingAttachment.previewUrl); } catch (err) {}
+  }
+
+  const isImage = !!isPhoto;
+  const previewUrl = isImage ? URL.createObjectURL(file) : null;
+  chatDetailPendingAttachment = { file, isPhoto: isImage, previewUrl };
+
+  const thumb = document.getElementById('chatDetailAttachPreviewThumb');
+  const nameEl = document.getElementById('chatDetailAttachPreviewName');
+  const removeBtn = '<button type="button" class="chat-attach-preview-remove" onclick="removeChatDetailAttachment()" title="Remove"><i class="fa-solid fa-xmark"></i></button>';
+  if (isImage) {
+    thumb.innerHTML = `<img src="${previewUrl}">` + removeBtn;
+    nameEl.textContent = '';
+  } else {
+    thumb.innerHTML = `<div class="chat-attach-preview-file"><i class="fa-solid fa-file"></i></div>` + removeBtn;
+    nameEl.textContent = file.name || 'File';
+  }
+  document.getElementById('chatDetailAttachPreview').classList.add('show');
+
+  e.target.value = '';
+  document.getElementById('chatDetailInput').focus();
+}
+
+function removeChatDetailAttachment() {
+  if (chatDetailPendingAttachment && chatDetailPendingAttachment.previewUrl) {
+    try { URL.revokeObjectURL(chatDetailPendingAttachment.previewUrl); } catch (err) {}
+  }
+  chatDetailPendingAttachment = null;
+  document.getElementById('chatDetailAttachPreview').classList.remove('show');
+  document.getElementById('chatDetailAttachPreviewThumb').innerHTML = '';
+  document.getElementById('chatDetailAttachPreviewName').textContent = '';
 }
 
 function deleteChatSession(sessionId) {
@@ -3919,23 +4197,33 @@ const NotifSound = (function() {
   return { playChime, playBlip };
 })();
 
-// Track previous counts to only play sound on increase
-let _prevChatUnread = 0;
-let _prevInqNew = 0;
+// Track previous counts to only play sound on increase.
+// null = baseline not set yet — the first Firestore snapshot on page load/refresh
+// already contains all existing unread items, so it must NOT trigger a sound.
+let _prevChatUnread = null;
+let _prevInqNew = null;
 
 function _checkAndPlaySounds() {
   try {
     const sessions = ChatSystem.getSessions();
     let total = 0;
     sessions.forEach(s => { total += ChatSystem.getAdminUnreadBySession(s.id); });
-    if (total > _prevChatUnread) NotifSound.playBlip();
-    _prevChatUnread = total;
+    if (_prevChatUnread === null) {
+      _prevChatUnread = total; // establish baseline silently
+    } else {
+      if (total > _prevChatUnread) NotifSound.playBlip();
+      _prevChatUnread = total;
+    }
   } catch(e) {}
   try {
     const inqs = InquirySystem.getInquiries();
     const newCount = inqs.filter(i => i.status === 'new').length;
-    if (newCount > _prevInqNew) NotifSound.playChime();
-    _prevInqNew = newCount;
+    if (_prevInqNew === null) {
+      _prevInqNew = newCount; // establish baseline silently
+    } else {
+      if (newCount > _prevInqNew) NotifSound.playChime();
+      _prevInqNew = newCount;
+    }
   } catch(e) {}
 }
 
@@ -4232,7 +4520,8 @@ function toggleInqSubrows(groupIdx, e) {
 let _inqCurrentIdx   = null;   // current inquiry table index
 let _inqCurrentInqId = null;   // inquiry id (zm_inquiries)
 let _inqSessionId    = null;   // linked chat session
-let _inqPendingImg   = null;   // base64 image staged for send
+let _inqPendingImg   = null;   // image URL (Firebase Storage) staged for send
+let _inqPendingAttachment = null; // { url, name, type, size } for non-image files staged for send
 
 function _getInqs() { return InquirySystem.getInquiries(); }
 
@@ -4244,6 +4533,7 @@ function viewInquiry(idx) {
   _inqCurrentIdx   = idx;
   _inqCurrentInqId = inq.id;
   _inqPendingImg   = null;
+  _inqPendingAttachment = null;
 
   // Mark as read
   InquirySystem.markRead(inq.id);
@@ -4362,6 +4652,7 @@ function viewInquiry(idx) {
 function renderInqChat() {
   if (!_inqSessionId) return;
   const msgs = ChatSystem.getSessionMessages(_inqSessionId);
+  const inqSession = ChatSystem.getSession(_inqSessionId);
   const container = document.getElementById('inqChatMessages');
   container.innerHTML = '';
 
@@ -4397,13 +4688,16 @@ function renderInqChat() {
     const isAdmin = msg.senderType === 'admin';
     const time    = new Date(msg.timestamp).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
     const imgHtml = msg.imageData
-      ? `<img src="${msg.imageData}" class="zm-chat-img" style="max-width:160px;max-height:120px;border-radius:8px;display:block;cursor:zoom-in;margin-top:${msg.text?'6px':'0'};" data-src="${msg.imageData}">`
+      ? `<div class="zm-img-wrap"><img src="${msg.imageData}" class="zm-chat-img" alt="image" data-src="${msg.imageData}"></div>`
       : '';
+    const fileHtml = (!msg.imageData && msg.attachment) ? ChatSystem.renderAttachmentHtml(msg.attachment) : '';
+    const isImgOnlyInq = !!msg.imageData;
     const editedTagInq = (!msg.deleted && msg.edited) ? `<div class="zm-chat-edited-tag">edited</div>` : '';
     const textHtml = msg.deleted
       ? `<div style="font-style:italic;opacity:.55;"><i class="fa-solid fa-ban" style="margin-right:5px;"></i>Message deleted</div>`
-      : (msg.text ? `<div>${escHtml(msg.text)}</div>` : '');
+      : (msg.text ? `<div class="${isImgOnlyInq ? 'zm-chat-caption' : ''}">${escHtml(msg.text)}</div>` : '');
     const imgHtmlFinal = msg.deleted ? '' : imgHtml;
+    const fileHtmlFinal = msg.deleted ? '' : fileHtml;
     const role      = isAdmin ? 'admin' : 'visitor';
     const initials  = (msg.senderName||'C').charAt(0).toUpperCase();
     const classList = ['zm-chat-msg', role, !isFirst ? 'same-sender' : '', (isLast && !isFirst) ? 'last-in-group' : ''].filter(Boolean).join(' ');
@@ -4425,19 +4719,25 @@ function renderInqChat() {
       el.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:68%;">
           ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
-          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}</div>
+          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}${isImgOnlyInq ? ' img-only' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}${fileHtmlFinal}</div>
           ${reactionHInq}
           ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
         </div>
         ${actionsHInq}`;
     } else {
-      const avatarHtml = `<div class="zm-chat-avatar${isLast ? '' : ' hidden'}">${initials}</div>`;
+      const avatarInnerInq = inqSession && inqSession.avatarPhoto
+        ? `<img src="${escHtml(inqSession.avatarPhoto)}" alt="${escHtml(msg.senderName||'Customer')}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`
+        : initials;
+      const avatarStyleInq = inqSession && inqSession.avatarPhoto
+        ? ''
+        : (inqSession && inqSession.avatarColor ? ` style="background:${escHtml(inqSession.avatarColor)};"` : '');
+      const avatarHtml = `<div class="zm-chat-avatar${isLast ? '' : ' hidden'}"${avatarStyleInq}>${avatarInnerInq}</div>`;
       el.innerHTML = `
         ${avatarHtml}
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:68%;">
           ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Customer')}</div>` : ''}
-          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}</div>
+          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}${isImgOnlyInq ? ' img-only' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}${fileHtmlFinal}</div>
           ${reactionHInq}
           ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}
@@ -4548,7 +4848,7 @@ function startInqReplyTo(msgId) {
   inqReplyTarget = {
     id: msg.id,
     senderName: msg.senderType === 'admin' ? 'You' : (msg.senderName || 'Customer'),
-    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : '')
+    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : (msg.attachment ? '📎 ' + msg.attachment.name : ''))
   };
   document.getElementById('inqReplyBarName').textContent = inqReplyTarget.senderName;
   document.getElementById('inqReplyBarText').textContent = inqReplyTarget.text;
@@ -4607,9 +4907,9 @@ function sendInqReply() {
   if (!_inqSessionId) return;
   const input = document.getElementById('inqChatInput');
   const text  = input.value.trim();
-  if (!text && !_inqPendingImg) return;
+  if (!text && !_inqPendingImg && !_inqPendingAttachment) return;
 
-  ChatSystem.sendMessage(_inqSessionId, 'admin', 'Admin', text, _inqPendingImg, inqReplyTarget);
+  ChatSystem.sendMessage(_inqSessionId, 'admin', 'Admin', text, _inqPendingImg, inqReplyTarget, _inqPendingAttachment);
   cancelInqReplyTo();
   input.value = '';
   input.style.height = 'auto';
@@ -4619,24 +4919,72 @@ function sendInqReply() {
   showToast('Reply sent to customer!', 'success');
 }
 
-function handleInqImgUpload(e) {
+(function initInqAttachMenu() {
+  const btn  = document.getElementById('inqAttachBtn');
+  const menu = document.getElementById('inqAttachMenu');
+  if (!btn || !menu) return;
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menu.classList.toggle('show');
+  });
+  menu.addEventListener('click', (e) => {
+    const item = e.target.closest('button[data-kind]');
+    if (!item) return;
+    menu.classList.remove('show');
+    if (item.dataset.kind === 'photo') document.getElementById('inqPhotoUpload').click();
+    else document.getElementById('inqFileUpload').click();
+  });
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#inqAttachWrap')) menu.classList.remove('show');
+  });
+})();
+
+function handleInqImgUpload(e, isPhoto) {
   const file = e.target.files[0];
-  if (!file) return;
-  if (file.size > 3 * 1024 * 1024) { showToast('Image too large (max 3 MB)', 'error'); return; }
-  const reader = new FileReader();
-  reader.onload = (ev) => {
-    _inqPendingImg = ev.target.result;
-    document.getElementById('inqImgPreviewImg').src = _inqPendingImg;
-    document.getElementById('inqImgPreview').style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-  e.target.value = '';
+  if (!file || !_inqSessionId) { e.target.value = ''; return; }
+  if (file.size > ChatSystem.MAX_ATTACHMENT_SIZE) { showToast('File too large (max 15MB)', 'error'); e.target.value = ''; return; }
+
+  const isImage = !!isPhoto;
+  const btn = document.getElementById('inqAttachBtn');
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  btn.style.pointerEvents = 'none';
+
+  ChatSystem.uploadAttachment(file, _inqSessionId)
+    .then(att => {
+      const preview = document.getElementById('inqImgPreview');
+      const inner   = document.getElementById('inqAttachPreviewInner');
+      if (isImage) {
+        _inqPendingImg = att.url;
+        _inqPendingAttachment = null;
+        inner.innerHTML = `<img style="max-height:80px;border-radius:8px;border:1px solid var(--border);" src="${att.url}">`;
+      } else {
+        _inqPendingImg = null;
+        _inqPendingAttachment = att;
+        inner.innerHTML = ChatSystem.renderAttachmentHtml(att);
+      }
+      preview.style.display = 'block';
+    })
+    .catch((err) => {
+      const m=err&&err.message, code=err&&err.code;
+      let msg;
+      if(m==='TIMEOUT')msg='Matagal ang pag-upload (mabagal na koneksyon o naka-block ang Firebase Storage).';
+      else if(m==='SIZE_LIMIT')msg='Sobrang laki ng file (max 15MB).';
+      else if(code==='storage/unauthorized')msg='Blocked ng Firebase Storage Rules (storage/unauthorized). I-check ang Rules sa Firebase Console.';
+      else msg='Upload failed'+(code?' ('+code+')':(m?' ('+m+')':''))+'. Try again.';
+      showToast(msg, 'error');
+    })
+    .finally(() => {
+      btn.innerHTML = '<i class="fa-solid fa-paperclip"></i>';
+      btn.style.pointerEvents = '';
+      e.target.value = '';
+    });
 }
 
 function clearInqImg() {
   _inqPendingImg = null;
+  _inqPendingAttachment = null;
   document.getElementById('inqImgPreview').style.display = 'none';
-  document.getElementById('inqImgPreviewImg').src = '';
+  document.getElementById('inqAttachPreviewInner').innerHTML = '';
 }
 
 function zoomInqImg(src) {
@@ -4790,22 +5138,29 @@ function saveInqQuotation(quoteStatus) {
   if (quoteStatus === 'approved' && missingPrice) {
     showConfirm(
       'Some items have no price',
-      'One or more items don\'t have a price set yet. Approve this quotation anyway?',
-      () => _doSaveInqQuotation(inq, items, quoteStatus)
+      'One or more items don\'t have a price set yet. Send this quotation to the customer without a price for those items?',
+      () => _doSaveInqQuotation(inq, items, quoteStatus, true),
+      { variant: 'warning', okText: 'Send Without Price' }
     );
     return;
   }
-  _doSaveInqQuotation(inq, items, quoteStatus);
+  _doSaveInqQuotation(inq, items, quoteStatus, false);
 }
 
-function _doSaveInqQuotation(inq, items, quoteStatus) {
+function _doSaveInqQuotation(inq, items, quoteStatus, sentWithoutPrice) {
   InquirySystem.saveQuotation(inq.id, items, quoteStatus);
   inq.items = items;
   inq.quoteStatus = quoteStatus;
   renderInqQuoteStatusBadge(inq);
   renderInqCompletedControls(inq); // "Mark as Completed" only unlocks once approved
   renderInquiries();
-  showToast(quoteStatus === 'approved' ? 'Quotation approved.' : 'Quotation saved as pending.', 'success');
+  if (quoteStatus === 'approved') {
+    // Confirming notification so the admin knows the without-price send actually went through
+    if (sentWithoutPrice) showToast('Sent to customer without a price for some items.', 'warning');
+    else showToast('Quotation approved.', 'success');
+  } else {
+    showToast('Quotation saved as pending.', 'success');
+  }
 }
 
 function deleteAllInquiries() {

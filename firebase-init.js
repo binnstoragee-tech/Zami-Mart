@@ -33,6 +33,14 @@ import {
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  uploadBytesResumable,
+  getDownloadURL,
+  deleteObject
+} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDFayXb4VTQPgHVreyeXBnDLqdbt_BS_RE",
@@ -70,11 +78,12 @@ window.zmShowFbError = function(message) {
   document.getElementById('zmFbErrorText').textContent = '⚠️ Firebase error: ' + message;
 };
 
-let app, db, auth;
+let app, db, auth, storage;
 try {
   app = initializeApp(firebaseConfig);
   db = getFirestore(app);
   auth = getAuth(app);
+  storage = getStorage(app);
 } catch (e) {
   window.zmShowFbError('Hindi na-initialize ang Firebase — ' + (e && e.message ? e.message : e));
 }
@@ -87,7 +96,8 @@ window.fb = {
   app, db,
   collection, doc, addDoc, setDoc, updateDoc, deleteDoc, getDoc, getDocs,
   onSnapshot, query, orderBy, where, increment, serverTimestamp,
-  auth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged
+  auth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged,
+  storage, storageRef, uploadBytes, uploadBytesResumable, getDownloadURL
 };
 
 // =============================================
@@ -156,6 +166,35 @@ if (db) {
         hint = ' (Wala pang Firestore database na ginawa para sa project — gawin muna sa Firebase Console > Firestore Database > Create database.)';
       }
       window.zmShowFbError((e && e.message ? e.message : String(e)) + hint);
+    }
+  })();
+}
+
+// =============================================
+// STORAGE CONNECTIVITY SELF-TEST
+// Tries a tiny real upload the moment the page loads, so if Storage isn't
+// provisioned or its Rules block writes — a very common gotcha, since chat
+// visitors are NOT signed in to Firebase Auth — the user sees the real
+// error immediately instead of only discovering it when a customer tries
+// to send a photo/file and it just spins forever.
+// =============================================
+if (storage) {
+  (async () => {
+    try {
+      const testRef = storageRef(storage, '_connectionTest/storage_ping.txt');
+      await uploadBytes(testRef, new Blob(['ping'], { type: 'text/plain' }));
+      await deleteObject(testRef).catch(() => {});
+    } catch (e) {
+      const code = e && e.code ? e.code : '';
+      let hint = '';
+      if (code === 'storage/unauthorized') {
+        hint = ' (Storage Rules ang nag-block ng pag-upload — dahil hindi naka-login ang mga customer sa chat widget, kailangang payagan ng Rules ang writes papunta sa chatUploads/ kahit walang request.auth.)';
+      } else if (code === 'storage/unknown' || code === 'storage/retry-limit-exceeded') {
+        hint = ' (Baka wala pang Firebase Storage na na-provision para sa project na ito — puntahan ang Firebase Console > Storage > Get Started.)';
+      } else if (code === 'storage/bucket-not-found' || code === 'storage/project-not-found') {
+        hint = ' (Mali o wala pang Storage bucket na naka-setup para sa project.)';
+      }
+      window.zmShowFbError('Firebase Storage: ' + (e && e.message ? e.message : String(e)) + hint);
     }
   })();
 }

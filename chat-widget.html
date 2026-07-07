@@ -92,9 +92,17 @@ body { background: transparent; color: var(--text); font-size: 14px; }
   display: flex;
   animation: chatSlideUp .3s var(--ease);
 }
+.chat-widget-window.closing {
+  display: flex;
+  animation: chatSlideDown .22s cubic-bezier(.4,0,1,1) forwards;
+}
 @keyframes chatSlideUp {
   from { transform: translateY(16px) scale(.97); opacity: 0; }
   to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+@keyframes chatSlideDown {
+  from { transform: translateY(0) scale(1); opacity: 1; }
+  to   { transform: translateY(16px) scale(.96); opacity: 0; }
 }
 
 /* ── Header ── */
@@ -228,10 +236,33 @@ body { background: transparent; color: var(--text); font-size: 14px; }
   position: relative;
 }
 
-.chat-message-bubble img {
-  max-width: 190px; max-height: 180px;
-  border-radius: 10px; display: block;
+.chat-message-bubble.img-only {
+  padding: 3px; background: #fff;
+  box-shadow: 0 3px 14px -3px rgba(6,59,63,.22), 0 1px 3px rgba(0,0,0,.08);
+  border: 1px solid rgba(6,59,63,.06);
 }
+.chat-message.visitor .chat-message-bubble.img-only {
+  box-shadow: 0 3px 14px -3px rgba(253,77,2,.28), 0 1px 3px rgba(0,0,0,.08);
+}
+.chat-img-wrap {
+  position: relative; display: block; overflow: hidden;
+  border-radius: 13px; line-height: 0;
+}
+.chat-img-wrap + .chat-img-wrap { margin-top: 3px; }
+img.chat-img {
+  display: block; width: 100%; max-width: 190px; max-height: 190px;
+  object-fit: cover; border-radius: inherit; cursor: zoom-in;
+  transition: transform .25s ease;
+}
+.chat-img-wrap:hover img.chat-img { transform: scale(1.035); }
+.chat-img-wrap::after {
+  content: '\f065'; font-family: 'Font Awesome 6 Free'; font-weight: 900;
+  position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border-radius: 50%;
+  background: rgba(0,0,0,.42); color: #fff; font-size: .62rem;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .18s; pointer-events: none;
+}
+.chat-img-wrap:hover::after { opacity: 1; }
 
 /* ── VISITOR (right, orange) ── */
 .chat-message.visitor {
@@ -527,6 +558,23 @@ body { background: transparent; color: var(--text); font-size: 14px; }
   transition: all .2s; flex-shrink: 0;
 }
 .chat-img-btn:hover { background: #ddeaea; color: var(--teal); }
+.chat-img-btn:disabled { opacity: .55; cursor: not-allowed; }
+
+/* ── File attachment card (non-image files) ── */
+.zm-file-attach {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; border-radius: 10px;
+  background: rgba(6,59,63,.06);
+  text-decoration: none; color: inherit;
+  max-width: 200px;
+}
+.zm-file-attach i { font-size: 1.3rem; color: var(--teal); flex-shrink: 0; }
+.zm-file-attach-info { min-width: 0; display: flex; flex-direction: column; }
+.zm-file-attach-name {
+  font-size: .78rem; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.zm-file-attach-size { font-size: .65rem; opacity: .6; }
 
 .chat-input {
   flex: 1; padding: 9px 13px;
@@ -583,14 +631,24 @@ body { background: transparent; color: var(--text); font-size: 14px; }
 
 
 
-/* Mobile */
-@media (max-width: 480px) {
+/* Mobile — floating bubble card, NOT full-screen. Leaves margin on
+   all four sides so the page behind (catalog, etc.) stays visible. */
+@media (max-width: 600px) {
   .chat-widget-window {
-    bottom: 0; right: 0; left: 0;
-    width: 100%; max-width: 100%;
-    height: 100dvh; border-radius: 0;
+    top: 36px;
+    bottom: 96px;
+    left: 18px; right: 18px;
+    width: auto; max-width: none;
+    height: auto;
+    max-height: none;
+    border-radius: 24px;
   }
-  .chat-widget-btn { bottom: 20px; right: 16px; }
+  .chat-widget-btn { bottom: 18px; right: 18px; }
+}
+
+/* Extra-short phones: trim margins a touch so the card doesn't feel cramped. */
+@media (max-width: 600px) and (max-height: 700px) {
+  .chat-widget-window { top: 24px; bottom: 84px; }
 }
 </style>
 </head>
@@ -656,16 +714,39 @@ body { background: transparent; color: var(--text); font-size: 14px; }
 
   <!-- Input -->
   <div class="chat-input-area" id="chatInputArea">
-    <button class="chat-img-btn" id="chatImgBtn" style="display:none;" title="Send image">
-      <i class="fa-solid fa-image"></i>
-    </button>
-    <input type="file" id="chatImgInput" accept="image/*" style="display:none;">
+    <div class="chat-attach-wrap" id="chatAttachWrap" style="display:none;">
+      <button class="chat-img-btn" id="chatImgBtn" title="Send photo (max 15MB)">
+        <i class="fa-solid fa-paperclip"></i>
+      </button>
+      <div class="chat-attach-menu" id="chatAttachMenu">
+        <button type="button" data-kind="photo"><i class="fa-solid fa-image"></i> Photo</button>
+      </div>
+    </div>
+    <input type="file" id="chatPhotoInput" accept="image/*" style="display:none;">
     <textarea class="chat-input" id="chatInput" placeholder="Type a message…" rows="1" style="display:none;"></textarea>
     <button class="chat-send-btn" id="chatSendBtn" style="display:none;">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
 </div>
+
+<style>
+.chat-attach-wrap { position: relative; flex-shrink: 0; }
+.chat-attach-menu {
+  display: none; position: absolute; bottom: 44px; left: 0;
+  background: #fff; border: 1px solid var(--border); border-radius: 12px;
+  box-shadow: 0 8px 24px -6px rgba(0,0,0,.18); overflow: hidden;
+  min-width: 130px; z-index: 20;
+}
+.chat-attach-menu.show { display: block; }
+.chat-attach-menu button {
+  width: 100%; display: flex; align-items: center; gap: 9px;
+  padding: 10px 13px; border: none; background: none; cursor: pointer;
+  font-family: inherit; font-size: .8rem; color: var(--text); text-align: left;
+}
+.chat-attach-menu button i { color: var(--teal); width: 16px; text-align: center; }
+.chat-attach-menu button:hover { background: #f0f4f4; }
+</style>
 
 <script>
 const chatBtn        = document.getElementById('chatWidgetBtn');
@@ -675,7 +756,10 @@ const chatMessages   = document.getElementById('chatMessages');
 const chatInput      = document.getElementById('chatInput');
 const chatSendBtn    = document.getElementById('chatSendBtn');
 const chatImgBtn     = document.getElementById('chatImgBtn');
-const chatImgInput   = document.getElementById('chatImgInput');
+const chatAttachWrap = document.getElementById('chatAttachWrap');
+const chatAttachMenu = document.getElementById('chatAttachMenu');
+const chatPhotoInput = document.getElementById('chatPhotoInput');
+const chatFileInput  = document.getElementById('chatFileInput');
 const chatWelcomeForm  = document.getElementById('chatWelcomeForm');
 const chatWelcomeBlock = document.getElementById('chatWelcomeBlock');
 const chatSuggestions  = document.getElementById('chatSuggestions');
@@ -699,7 +783,7 @@ function startWidgetReplyTo(msgId) {
   widgetReplyTarget = {
     id: msg.id,
     senderName: msg.senderType === 'visitor' ? 'You' : 'Zami Mart',
-    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : '')
+    text: msg.text ? msg.text.slice(0, 80) : (msg.imageData ? '📷 Photo' : (msg.attachment ? '📎 ' + msg.attachment.name : ''))
   };
   chatReplyBarName.textContent = widgetReplyTarget.senderName;
   chatReplyBarText.textContent = widgetReplyTarget.text;
@@ -763,22 +847,31 @@ function _playReceiveSound() {
   } catch(e) {}
 }
 
-// ── TOGGLE ──
-chatBtn.addEventListener('click', () => {
-  chatWindow.classList.toggle('open');
-  chatBtn.classList.toggle('open');
-  if (chatWindow.classList.contains('open') && currentSessionId) {
+// ── OPEN / CLOSE ──
+function openChatWindow() {
+  chatWindow.classList.remove('closing');
+  chatWindow.classList.add('open');
+  chatBtn.classList.add('open');
+  if (currentSessionId) {
     chatInput.focus();
     ChatSystem.markSessionAsRead(currentSessionId);
     unreadBadge.style.display = 'none';
     const msgs = ChatSystem.getSessionMessages(currentSessionId);
     _lastSeenAdminMsgCount = msgs.filter(m => m.senderType === 'admin').length;
   }
-});
-chatCloseBtn.addEventListener('click', () => {
+}
+function closeChatWindow() {
+  if (!chatWindow.classList.contains('open')) return;
   chatWindow.classList.remove('open');
   chatBtn.classList.remove('open');
+  chatWindow.classList.add('closing');
+  setTimeout(() => { chatWindow.classList.remove('closing'); }, 220);
+}
+chatBtn.addEventListener('click', () => {
+  if (chatWindow.classList.contains('open')) closeChatWindow();
+  else openChatWindow();
 });
+chatCloseBtn.addEventListener('click', closeChatWindow);
 
 // ── WELCOME FORM ──
 chatWelcomeForm.addEventListener('submit', e => {
@@ -800,7 +893,7 @@ function _activateChat() {
   // Show input controls
   chatInput.style.display       = 'block';
   chatSendBtn.style.display     = 'flex';
-  chatImgBtn.style.display      = 'flex';
+  chatAttachWrap.style.display  = 'block';
   // Show suggestion chips
   chatSuggestions.style.display = 'flex';
   renderMessages();
@@ -826,19 +919,60 @@ chatInput.addEventListener('input', function() {
   this.style.height = this.scrollHeight + 'px';
 });
 
-chatImgBtn.addEventListener('click', () => chatImgInput.click());
-chatImgInput.addEventListener('change', () => {
-  const file = chatImgInput.files[0];
+chatImgBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  chatAttachMenu.classList.toggle('show');
+});
+chatAttachMenu.addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-kind]');
+  if (!btn) return;
+  chatAttachMenu.classList.remove('show');
+  if (btn.dataset.kind === 'photo') chatPhotoInput.click();
+  else chatFileInput.click();
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.chat-attach-wrap')) chatAttachMenu.classList.remove('show');
+});
+
+function _handleChatAttachFile(file) {
   if (!file || !currentSessionId) return;
-  const reader = new FileReader();
-  reader.onload = e => {
-    ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, '', e.target.result);
-    _playSendSound();
-    chatSuggestions.style.display = 'none';
-    renderMessages();
-  };
-  reader.readAsDataURL(file);
-  chatImgInput.value = '';
+
+  if (file.size > ChatSystem.MAX_ATTACHMENT_SIZE) {
+    alert('Masyadong malaki ang file (max 15MB). Pumili ng mas maliit na file.');
+    return;
+  }
+
+  const isImage = file.type && file.type.startsWith('image/');
+  chatImgBtn.disabled = true;
+  chatImgBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+  ChatSystem.uploadAttachment(file, currentSessionId)
+    .then(att => {
+      if (isImage) {
+        ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, '', att.url);
+      } else {
+        ChatSystem.sendMessage(currentSessionId, 'visitor', visitorName, '', null, null, att);
+      }
+      _playSendSound();
+      chatSuggestions.style.display = 'none';
+      renderMessages();
+    })
+    .catch(() => {
+      alert('Hindi na-send ang file. Subukan ulit.');
+    })
+    .finally(() => {
+      chatImgBtn.disabled = false;
+      chatImgBtn.innerHTML = '<i class="fa-solid fa-paperclip"></i>';
+    });
+}
+
+chatPhotoInput.addEventListener('change', () => {
+  _handleChatAttachFile(chatPhotoInput.files[0]);
+  chatPhotoInput.value = '';
+});
+chatFileInput.addEventListener('change', () => {
+  _handleChatAttachFile(chatFileInput.files[0]);
+  chatFileInput.value = '';
 });
 
 function sendMessage() {
@@ -889,8 +1023,11 @@ function renderMessages() {
     const isAdmin  = msg.senderType === 'admin';
     const time     = msgDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const bubbleContent = msg.imageData
-      ? `<img src="${msg.imageData}" alt="image" style="max-width:190px;max-height:180px;border-radius:10px;display:block;">`
+      ? `<div class="chat-img-wrap"><img src="${msg.imageData}" alt="image" class="chat-img" data-src="${msg.imageData}"></div>`
+      : msg.attachment
+      ? ChatSystem.renderAttachmentHtml(msg.attachment)
       : escapeHtml(msg.text);
+    const bubbleCls = 'chat-message-bubble' + (msg.imageData ? ' img-only' : '');
 
     const el = document.createElement('div');
     el.className = [
@@ -920,7 +1057,7 @@ function renderMessages() {
         <div class="chat-avatar admin-av ${isLast ? '' : 'hidden'}" title="Zami Mart">ZM</div>
         <div class="chat-message-content">
           ${isFirst ? '<div class="chat-sender-label">Zami Mart</div>' : ''}
-          <div class="chat-message-bubble">${quoteH}${bubbleContent}</div>
+          <div class="${bubbleCls}">${quoteH}${bubbleContent}</div>
           ${reactionH}
           ${editedH}
           ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
@@ -929,7 +1066,7 @@ function renderMessages() {
     } else {
       el.innerHTML = `
         <div class="chat-message-content">
-          <div class="chat-message-bubble">${quoteH}${bubbleContent}</div>
+          <div class="${bubbleCls}">${quoteH}${bubbleContent}</div>
           ${reactionH}
           ${editedH}
           ${isLast ? `<div class="chat-message-time">${time}</div>` : ''}
@@ -1118,7 +1255,7 @@ function _resetToGuestWidget() {
   chatWelcomeBlock.style.display = 'block';
   chatInput.style.display   = 'none';
   chatSendBtn.style.display = 'none';
-  chatImgBtn.style.display  = 'none';
+  chatAttachWrap.style.display  = 'none';
   chatSuggestions.style.display = 'none';
   chatMessages.innerHTML = '';
   unreadBadge.style.display = 'none';
@@ -1173,6 +1310,24 @@ ChatSystem.onReady(() => {
       _playReceiveSound();
     }
   });
+});
+</script>
+
+<script>
+/* chat-img lightbox — tap a photo to view it full-size */
+document.addEventListener('click', function(e) {
+  var img = e.target.closest('.chat-img');
+  if (!img) return;
+  var src = img.dataset.src || img.src;
+  var o = document.getElementById('chatImgLightbox');
+  if (!o) {
+    o = document.createElement('div');
+    o.id = 'chatImgLightbox';
+    o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:99999;display:flex;align-items:center;justify-content:center;cursor:zoom-out;';
+    o.onclick = function(){ o.remove(); };
+    document.body.appendChild(o);
+  }
+  o.innerHTML = '<img src="' + src + '" style="max-width:90vw;max-height:90vh;border-radius:10px;">';
 });
 </script>
 </body>

@@ -24,6 +24,53 @@ document.addEventListener('DOMContentLoaded', () => {
     setNavAccount();
   }
 
+  /* --- Drawer profile card: avatar + name, reflects login state --- */
+  const drawerAvatar = document.getElementById('navDrawerAvatar');
+  const drawerName = document.getElementById('navDrawerName');
+  const drawerSub = document.getElementById('navDrawerSub');
+  const drawerProfile = document.getElementById('navDrawerProfile');
+
+  function getInitials(str) {
+    if (!str) return '';
+    const parts = str.trim().split(/\s+/);
+    return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
+  }
+
+  function renderDrawerProfile(user) {
+    if (!drawerAvatar) return;
+    if (user) {
+      const name = user.displayName || (user.email ? user.email.split('@')[0] : 'Customer');
+      drawerAvatar.innerHTML = '';
+      if (user.photoURL) {
+        const img = document.createElement('img');
+        img.src = user.photoURL;
+        img.alt = name;
+        drawerAvatar.appendChild(img);
+      } else {
+        drawerAvatar.textContent = getInitials(name) || 'U';
+      }
+      if (drawerName) drawerName.textContent = name;
+      if (drawerSub) drawerSub.textContent = user.email || 'Welcome back';
+      if (drawerProfile) drawerProfile.onclick = () => { window.location.href = 'profile.html'; };
+    } else {
+      drawerAvatar.innerHTML = '<i class="fa-solid fa-user"></i>';
+      if (drawerName) drawerName.textContent = 'Guest';
+      if (drawerSub) drawerSub.textContent = 'Tap to sign in';
+      if (drawerProfile) drawerProfile.onclick = () => { window.location.href = 'login.html'; };
+    }
+  }
+
+  if (drawerAvatar) {
+    function setDrawerProfile() {
+      if (window.fb && window.fb.auth && window.fb.onAuthStateChanged) {
+        window.fb.onAuthStateChanged(window.fb.auth, renderDrawerProfile);
+      } else {
+        window.addEventListener('fb-ready', setDrawerProfile, { once: true });
+      }
+    }
+    setDrawerProfile();
+  }
+
   /* --- Navbar scroll state --- */
   const navbar = document.querySelector('.navbar');
   if (navbar) {

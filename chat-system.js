@@ -20,6 +20,11 @@
 const ChatSystem = (function() {
   'use strict';
 
+  // Max size for any chat image/file upload (Firebase Storage, not Firestore —
+  // Firestore documents cap out at ~1MB so anything beyond a tiny thumbnail
+  // has to live in Storage with just the download URL saved on the message).
+  const MAX_ATTACHMENT_SIZE = 15 * 1024 * 1024; // 15MB
+
   // In-memory mirrors kept in sync by Firestore onSnapshot listeners.
   // All synchronous "get" functions read from these — callers don't need to await anything.
   let _messages = [];
@@ -206,10 +211,11 @@ const ChatSystem = (function() {
   // =============================================
   // MESSAGE MANAGEMENT (supports imageData)
   // =============================================
-  function sendMessage(sessionId, senderType, senderName, text, imageData, replyTo) {
-    const hasText  = text && text.trim();
-    const hasImage = imageData && typeof imageData === 'string';
-    if (!hasText && !hasImage) return null;
+  function sendMessage(sessionId, senderType, senderName, text, imageData, replyTo, attachment) {
+    const hasText       = text && text.trim();
+    const hasImage      = imageData && typeof imageData === 'string';
+    const hasAttachment = attachment && attachment.url;
+    if (!hasText && !hasImage && !hasAttachment) return null;
 
     const id = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     const message = {
@@ -218,7 +224,14 @@ const ChatSystem = (function() {
       senderType,             // 'visitor' | 'admin'
       senderName,
       text:       hasText ? text.trim() : '',
-      imageData:  hasImage ? imageData : null,   // base64 data-URL
+      imageData:  hasImage ? imageData : null,   // base64 data-URL (legacy) OR a Storage image URL
+      // attachment: non-image file uploaded to Firebase Storage — { url, name, type, size }
+      attachment: hasAttachment ? {
+        url:  attachment.url,
+        name: attachment.name || 'file',
+        type: attachment.type || 'application/octet-stream',
+        size: attachment.size || 0
+      } : null,
       timestamp:  new Date().toISOString(),
       read:       false,
       // replyTo: { id, senderName, text } — short snapshot of the quoted message, or null
@@ -235,18 +248,36 @@ const ChatSystem = (function() {
     _messages.push(message);
     notifyListeners('messages-updated', _messages);
 
+    // Optimistic local unread bump — same idea as the message push above, so the
+    // relevant badge (admin sidebar or the customer's chat button) lights up
+    // immediately instead of waiting on the Firestore round-trip.
+    if (senderType === 'visitor') {
+      _unread['admin'] = (_unread['admin'] || 0) + 1;
+      notifyListeners('unread-updated', _unread);
+    } else if (senderType === 'admin') {
+      _unread[sessionId] = (_unread[sessionId] || 0) + 1;
+      notifyListeners('unread-updated', _unread);
+    }
+
     whenReady(({ db, doc, setDoc, updateDoc, increment }) => {
       const { id: _id, ...data } = message;
       setDoc(doc(db, 'chatMessages', id), data)
         .catch(e => _reportErr('ChatSystem: sendMessage error', e));
 
       // Only increment unread count for visitor messages (so admin gets notified).
-      // When admin sends, do NOT increment the session unread — that's the customer's count
-      // and incrementing it causes the admin sidebar to show a false notification on their own messages.
+      // When admin sends, do NOT increment the *admin* unread counter — that's the
+      // admin sidebar's own count and incrementing it there causes a false notification
+      // on their own messages. Instead, bump the *per-session* counter so the customer's
+      // chat button badge lights up for the admin's reply.
       if (senderType === 'visitor') {
         updateDoc(doc(db, 'chatMeta', 'unreadCounts'), { admin: increment(1) })
           .catch(() => {
             setDoc(doc(db, 'chatMeta', 'unreadCounts'), { admin: 1 }, { merge: true }).catch(() => {});
+          });
+      } else if (senderType === 'admin') {
+        updateDoc(doc(db, 'chatMeta', 'unreadCounts'), { [sessionId]: increment(1) })
+          .catch(() => {
+            setDoc(doc(db, 'chatMeta', 'unreadCounts'), { [sessionId]: 1 }, { merge: true }).catch(() => {});
           });
       }
     });
@@ -257,6 +288,133 @@ const ChatSystem = (function() {
   }
 
   function getSessionMessages(sessionId) { return _messages.filter(m => m.sessionId === sessionId); }
+
+  // =============================================
+  // FILE / IMAGE UPLOAD (Cloudinary)
+  // =============================================
+  // Uploads any file (image or otherwise) to Cloudinary under
+  // chatUploads/{sessionId}/... and resolves with { url, name, type, size }
+  // ready to pass into sendMessage() as imageData (images) or attachment (files).
+  // Rejects with Error('SIZE_LIMIT') if the file is over MAX_ATTACHMENT_SIZE,
+  // or Error('TIMEOUT') if the upload genuinely stalls.
+  //
+  // Uploads via Cloudinary's unsigned upload endpoint (no Firebase Storage /
+  // Blaze plan dependency). Uses XMLHttpRequest (not fetch) so we still get
+  // real upload-progress events, and keeps the same STALL watchdog behavior
+  // as before: the timeout resets every time real progress is reported, and
+  // only fires if NO bytes have moved for STALL_MS.
+  const CLOUDINARY_CLOUD_NAME = 'vx6n3jdc';
+  const CLOUDINARY_UPLOAD_PRESET = 'zamimart_chat';
+
+  function uploadAttachment(file, sessionId, onProgress) {
+    return new Promise((resolve, reject) => {
+      if (!file) { reject(new Error('NO_FILE')); return; }
+      if (file.size > MAX_ATTACHMENT_SIZE) { reject(new Error('SIZE_LIMIT')); return; }
+
+      const STALL_MS = 20000;
+      let settled = false;
+      let stallTimer = null;
+
+      const safeName = (file.name || 'file').replace(/[^a-zA-Z0-9._-]/g, '_');
+      const xhr = new XMLHttpRequest();
+
+      function armStallTimer() {
+        clearTimeout(stallTimer);
+        stallTimer = setTimeout(() => {
+          if (settled) return;
+          settled = true;
+          try { xhr.abort(); } catch (e) {}
+          _reportErr('ChatSystem: uploadAttachment timeout', new Error('Upload stalled (no progress for 20s)'));
+          reject(new Error('TIMEOUT'));
+        }, STALL_MS);
+      }
+
+      const url = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/auto/upload`;
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('folder', `chatUploads/${sessionId}`);
+
+      xhr.open('POST', url, true);
+      armStallTimer();
+
+      xhr.upload.onprogress = (e) => {
+        if (settled) return;
+        armStallTimer(); // bytes are still moving — push the stall deadline out
+        if (typeof onProgress === 'function' && e.lengthComputable) {
+          const pct = Math.round((e.loaded / e.total) * 100);
+          try { onProgress(pct); } catch (err) {}
+        }
+      };
+
+      xhr.onload = () => {
+        if (settled) return;
+        clearTimeout(stallTimer);
+        settled = true;
+        let data;
+        try { data = JSON.parse(xhr.responseText); } catch (e) { data = null; }
+        if (xhr.status >= 200 && xhr.status < 300 && data && data.secure_url) {
+          resolve({ url: data.secure_url, name: file.name || safeName, type: file.type || 'application/octet-stream', size: file.size });
+        } else {
+          const e = new Error((data && data.error && data.error.message) || ('Cloudinary upload failed (' + xhr.status + ')'));
+          _reportErr('ChatSystem: uploadAttachment error', e);
+          reject(e);
+        }
+      };
+
+      xhr.onerror = () => {
+        if (settled) return;
+        settled = true; clearTimeout(stallTimer);
+        const e = new Error('NETWORK_ERROR');
+        _reportErr('ChatSystem: uploadAttachment error', e);
+        reject(e);
+      };
+
+      xhr.onabort = () => {
+        // Handled by the stall-timeout path (rejects with TIMEOUT already).
+      };
+
+      xhr.send(formData);
+    });
+  }
+
+  // =============================================
+  // SHARED RENDERING HELPERS (used by chat-widget.html + admin.html)
+  // =============================================
+  function formatFileSize(bytes) {
+    if (!bytes) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  function _fileIconClass(type, name) {
+    const ext = ((name || '').split('.').pop() || '').toLowerCase();
+    type = type || '';
+    if (type.indexOf('pdf') > -1 || ext === 'pdf') return 'fa-file-pdf';
+    if (/word/.test(type) || ['doc', 'docx'].includes(ext)) return 'fa-file-word';
+    if (/sheet|excel/.test(type) || ['xls', 'xlsx', 'csv'].includes(ext)) return 'fa-file-excel';
+    if (/presentation|powerpoint/.test(type) || ['ppt', 'pptx'].includes(ext)) return 'fa-file-powerpoint';
+    if (/zip|compressed|rar|7z/.test(type) || ['zip', 'rar', '7z'].includes(ext)) return 'fa-file-zipper';
+    if (/^video\//.test(type)) return 'fa-file-video';
+    if (/^audio\//.test(type)) return 'fa-file-audio';
+    if (/^text\//.test(type) || ext === 'txt') return 'fa-file-lines';
+    return 'fa-file';
+  }
+
+  // Renders a small clickable file card for a non-image attachment.
+  function renderAttachmentHtml(att) {
+    if (!att || !att.url) return '';
+    const name = att.name || 'file';
+    const safeName = String(name).replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const icon = _fileIconClass(att.type, name);
+    const size = formatFileSize(att.size);
+    return `<a href="${att.url}" target="_blank" rel="noopener noreferrer" class="zm-file-attach" title="${safeName}">` +
+      `<i class="fa-solid ${icon}"></i>` +
+      `<span class="zm-file-attach-info"><span class="zm-file-attach-name">${safeName}</span>` +
+      `<span class="zm-file-attach-size">${size}${size ? ' · ' : ''}Download</span></span>` +
+      `</a>`;
+  }
 
   function markSessionAsRead(sessionId) {
     _messages.forEach(m => { if (m.sessionId === sessionId) m.read = true; });
@@ -447,7 +605,9 @@ const ChatSystem = (function() {
     editMessage, reactToMessage,
     markSessionAsRead, markAdminRead,
     getUnreadCount, getAdminUnreadCount, getAdminUnreadBySession,
-    clearAllChats
+    clearAllChats,
+    uploadAttachment, formatFileSize, renderAttachmentHtml,
+    MAX_ATTACHMENT_SIZE
   };
 })();
 

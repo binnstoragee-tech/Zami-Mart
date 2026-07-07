@@ -83,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const pvQtyDec      = document.getElementById('pvQtyDec');
   const pvQtyInc      = document.getElementById('pvQtyInc');
   const pvQtyVal      = document.getElementById('pvQtyVal');
+  const pvCartLoading = document.getElementById('pvCartLoading');
+  const pvClBarFill   = document.getElementById('pvClBarFill');
 
   const ZOOM_MIN = 1;
   const ZOOM_MAX = 4;
@@ -170,9 +172,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Step 1: Loading
+      // Step 1: Loading — full panel, same style as the "Sending your inquiry" loader
       pvAddCartBtn.classList.add('pv-loading');
-      pvAddCartBtn.innerHTML = '<div class="pv-btn-spinner zm-loader xs"><span></span><span></span><span></span><span></span></div> Adding...';
+      if (pvCartLoading) {
+        pvCartLoading.classList.add('show');
+        if (pvClBarFill) {
+          pvClBarFill.style.transition = 'none';
+          pvClBarFill.style.width = '0%';
+          requestAnimationFrame(() => {
+            pvClBarFill.style.transition = 'width .8s linear';
+            pvClBarFill.style.width = '100%';
+          });
+        }
+      }
 
       // Step 2: Success after 900ms
       setTimeout(() => {
@@ -181,6 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
         pvAddCartBtn.classList.remove('pv-loading');
         pvAddCartBtn.classList.add('pv-added');
         pvAddCartBtn.innerHTML = '<span class="pv-check-icon"><i class="fa-solid fa-check"></i></span> Added to Cart!';
+        if (pvCartLoading) pvCartLoading.classList.remove('show');
         syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
         // Show centered success modal
         if (window.zmShowCartSuccess) window.zmShowCartSuccess(pvCurrentProduct.name);

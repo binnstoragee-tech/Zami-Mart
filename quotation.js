@@ -378,18 +378,15 @@
       '<div class="zmq-doc">' +
         '<div class="zmq-topbar"></div>' +
         '<div class="zmq-head">' +
-          '<div>' +
-            '<div class="zmq-kicker">Zami Mart &middot; Order Quotation</div>' +
+          '<div class="zmq-brand">' +
+            '<div class="zmq-logo"><img src="img/logo.png" alt="Zami Mart" /></div>' +
             '<div class="zmq-title">Quotation</div>' +
             '<span class="zmq-badge ' + badgeClass + '"><i class="zmq-badge-dot"></i>' + badgeText + '</span>' +
           '</div>' +
-          '<div class="zmq-brand">' +
-            '<div class="zmq-logo"><img src="img/logo.png" alt="Zami Mart" /></div>' +
-            '<div>' +
-              '<div class="zmq-brandsub"><i class="fa-solid fa-location-dot"></i>Male&#39;, Maldives</div>' +
-              '<div class="zmq-brandsub"><i class="fa-solid fa-envelope"></i>Zamimart.g3@gmail.com</div>' +
-              '<div class="zmq-brandsub"><i class="fa-solid fa-phone"></i>+960 9906025</div>' +
-            '</div>' +
+          '<div class="zmq-head-info">' +
+            '<div class="zmq-brandsub"><i class="fa-solid fa-location-dot"></i>Male&#39;, Maldives</div>' +
+            '<div class="zmq-brandsub"><i class="fa-solid fa-envelope"></i>Zamimart.g3@gmail.com</div>' +
+            '<div class="zmq-brandsub"><i class="fa-solid fa-phone"></i>+960 9906025</div>' +
           '</div>' +
         '</div>' +
         '<div class="zmq-meta">' +
@@ -459,20 +456,21 @@
       '.zmq-panel-actions .zmq-download-btn:hover{opacity:.92;transform:translateY(-1px);}',
       '.zmq-doc{position:relative;background:#fff;border-radius:18px;padding:34px 32px 28px;font-family:var(--font-body,-apple-system,sans-serif);color:#1e2b2b;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden;}',
       '.zmq-topbar{position:absolute;top:0;left:0;right:0;height:6px;background:linear-gradient(90deg,#063b3f,#0a5a62 55%,#fd4d02);}',
-      '.zmq-head{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:22px;margin-bottom:24px;gap:16px;flex-wrap:wrap;position:relative;}',
+      '.zmq-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:22px;margin-bottom:24px;gap:16px;flex-wrap:wrap;position:relative;}',
       '.zmq-head::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,rgba(6,59,63,.14),rgba(6,59,63,.02));}',
       '.zmq-kicker{font-size:.62rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#fd4d02;margin-bottom:6px;}',
-      '.zmq-title{font-size:1.65rem;font-weight:800;color:var(--teal,#063B3F);letter-spacing:-.02em;margin-bottom:12px;line-height:1;}',
+      '.zmq-title{font-size:1.5rem;font-weight:800;color:var(--teal,#063B3F);letter-spacing:-.02em;margin:10px 0 10px;line-height:1;}',
       '.zmq-badge{display:inline-flex;align-items:center;gap:6px;font-size:.65rem;font-weight:800;letter-spacing:.06em;padding:6px 13px 6px 11px;border-radius:100px;}',
       '.zmq-badge-dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0;}',
       '.zmq-badge-none{background:#eef2f2;color:#6d8080;}',
       '.zmq-badge-pending{background:#fff2e8;color:#c9530a;}',
       '.zmq-badge-approved{background:#e3f8ee;color:#0a9a60;}',
       '.zmq-badge-completed{background:#e6efee;color:#063b3f;}',
-      '.zmq-brand{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}',
-      '.zmq-logo{width:56px;height:56px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;}',
+      '.zmq-head-info{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:8px;}',
+      '.zmq-brand{display:flex;flex-direction:column;align-items:flex-start;}',
+      '.zmq-logo{width:76px;height:76px;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;}',
       '.zmq-logo img{width:100%;height:100%;object-fit:contain;}',
-      '.zmq-brandsub{display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:.68rem;color:#7a8f8f;line-height:1.6;white-space:nowrap;}',
+      '.zmq-brandsub{display:flex;align-items:center;justify-content:flex-start;gap:6px;font-size:.68rem;color:#7a8f8f;line-height:1.6;white-space:nowrap;}',
       '.zmq-brandsub i{color:#fd4d02;font-size:.62rem;width:11px;text-align:center;flex-shrink:0;}',
       '.zmq-meta{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;}',
       '.zmq-meta-col{flex:1;min-width:180px;padding:16px 18px;background:linear-gradient(155deg,rgba(6,59,63,.035),rgba(6,59,63,.015));border:1px solid rgba(6,59,63,.06);border-radius:14px;border-left:3px solid rgba(6,59,63,.35);}',
@@ -513,7 +511,7 @@
       '.zmq-terms li{font-size:.72rem;color:#6a8080;margin-bottom:4px;line-height:1.5;}',
       '.zmq-footer{display:flex;justify-content:space-between;align-items:center;font-size:.66rem;color:#a0b0b0;border-top:1px solid rgba(6,59,63,.08);margin-top:20px;padding-top:14px;}',
       '.zmq-footer-thanks{font-weight:700;color:var(--teal,#063B3F);font-size:.72rem;}',
-      '@media (max-width: 480px) {',
+      '@media screen and (max-width: 480px) {',
         '.zmq-overlay{padding:0;}',
         '.zmq-panel{max-width:100%;width:100%;height:100%;max-height:100%;border-radius:0;}',
         '.zmq-panel-head{padding:12px 14px;}',
@@ -521,13 +519,13 @@
         '.zmq-panel-body{padding:12px;}',
         '.zmq-panel-actions{padding:12px 14px;gap:8px;}',
         '.zmq-doc{padding:20px 14px;border-radius:14px;}',
-        '.zmq-head{flex-direction:column;align-items:center;text-align:center;gap:14px;padding-bottom:18px;margin-bottom:18px;}',
-        '.zmq-kicker{font-size:.58rem;margin-bottom:4px;}',
-        '.zmq-title{font-size:1.32rem;margin-bottom:10px;}',
-        '.zmq-badge{margin:0 auto;}',
-        '.zmq-brand{align-items:center;width:100%;gap:6px;}',
-        '.zmq-logo{width:46px;height:46px;}',
-        '.zmq-brandsub{justify-content:center;font-size:.66rem;white-space:normal;text-align:center;}',
+        '.zmq-head{flex-direction:row;align-items:flex-start;justify-content:space-between;text-align:left;gap:10px;padding-bottom:16px;margin-bottom:16px;}',
+        '.zmq-title{font-size:1.2rem;margin:8px 0 8px;}',
+        '.zmq-badge{font-size:.58rem;padding:5px 10px 5px 9px;}',
+        '.zmq-head-info{align-items:flex-start;text-align:left;gap:6px;}',
+        '.zmq-brand{align-items:flex-start;}',
+        '.zmq-logo{width:56px;height:56px;}',
+        '.zmq-brandsub{justify-content:flex-start;font-size:.62rem;white-space:normal;text-align:left;line-height:1.5;}',
         '.zmq-meta{flex-direction:column;gap:10px;margin-bottom:18px;}',
         '.zmq-meta-col{padding:13px 14px;min-width:0;}',
         '.zmq-row{font-size:.76rem;}',
@@ -676,60 +674,82 @@
     const inq = getLiveInquiry(state.inquiryId);
     const quoteNumber = (inq && inq.quoteNumber) || shortRef(state.inquiryId);
 
-    const holder = document.createElement('div');
-    holder.style.position = 'fixed';
-    holder.style.left = '-9999px';
-    holder.style.top = '0';
-    holder.style.width = '720px';
-    holder.innerHTML = buildDocHTML();
-    document.body.appendChild(holder);
+    // Render inside a fixed-width iframe (like Print) so the desktop
+    // letterhead layout is always used for the PDF, regardless of the
+    // actual device/screen width the user is downloading from.
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.left = '-9999px';
+    iframe.style.top = '0';
+    iframe.style.width = '760px';
+    iframe.style.height = '600px';
+    iframe.style.border = '0';
+    document.body.appendChild(iframe);
 
-    loadLibs().then(function () {
-      return global.html2canvas(holder.firstChild, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
-    }).then(function (canvas) {
-      const jsPDFCtor = (global.jspdf && global.jspdf.jsPDF) || global.jsPDF;
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write(
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Quotation</title>' +
+      '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">' +
+      '<style>' +
+        'html,body{margin:0;padding:0;background:#fff;}' +
+        'body{padding:24px;}' +
+        '.zmq-doc{max-width:720px;margin:0 auto;box-shadow:none;}' +
+      '</style>' +
+      '<style>' + injectedStyleText + '</style>' +
+      '</head><body>' + buildDocHTML() + '</body></html>'
+    );
+    doc.close();
 
-      // Real, correctly-sized A4 page (mm), with margins — the image is
-      // scaled to fit the page width, and sliced across multiple pages
-      // automatically if the document is taller than one A4 page.
-      const pageWidthMM = 210, pageHeightMM = 297, marginMM = 10;
-      const usableWidthMM = pageWidthMM - marginMM * 2;
-      const usableHeightMM = pageHeightMM - marginMM * 2;
-      const pxToMM = usableWidthMM / canvas.width;
-      const imgHeightMM = canvas.height * pxToMM;
+    function cleanup() { if (iframe.parentNode) iframe.parentNode.removeChild(iframe); }
 
-      const pdf = new jsPDFCtor({ unit: 'mm', format: 'a4' });
+    setTimeout(function () {
+      loadLibs().then(function () {
+        const target = doc.querySelector('.zmq-doc');
+        return global.html2canvas(target, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+      }).then(function (canvas) {
+        const jsPDFCtor = (global.jspdf && global.jspdf.jsPDF) || global.jsPDF;
 
-      if (imgHeightMM <= usableHeightMM) {
-        const imgData = canvas.toDataURL('image/png');
-        pdf.addImage(imgData, 'PNG', marginMM, marginMM, usableWidthMM, imgHeightMM);
-      } else {
-        const pageCanvasHeightPx = Math.floor(usableHeightMM / pxToMM);
-        let renderedPx = 0;
-        let first = true;
-        while (renderedPx < canvas.height) {
-          const sliceHeightPx = Math.min(pageCanvasHeightPx, canvas.height - renderedPx);
-          const pageCanvas = document.createElement('canvas');
-          pageCanvas.width = canvas.width;
-          pageCanvas.height = sliceHeightPx;
-          pageCanvas.getContext('2d').drawImage(
-            canvas, 0, renderedPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx
-          );
-          const sliceData = pageCanvas.toDataURL('image/png');
-          const sliceHeightMM = sliceHeightPx * pxToMM;
-          if (!first) pdf.addPage();
-          pdf.addImage(sliceData, 'PNG', marginMM, marginMM, usableWidthMM, sliceHeightMM);
-          renderedPx += sliceHeightPx;
-          first = false;
+        // Real, correctly-sized A4 page (mm), with margins — the image is
+        // scaled to fit the page width, and sliced across multiple pages
+        // automatically if the document is taller than one A4 page.
+        const pageWidthMM = 210, pageHeightMM = 297, marginMM = 10;
+        const usableWidthMM = pageWidthMM - marginMM * 2;
+        const usableHeightMM = pageHeightMM - marginMM * 2;
+        const pxToMM = usableWidthMM / canvas.width;
+        const imgHeightMM = canvas.height * pxToMM;
+
+        const pdf = new jsPDFCtor({ unit: 'mm', format: 'a4' });
+
+        if (imgHeightMM <= usableHeightMM) {
+          const imgData = canvas.toDataURL('image/png');
+          pdf.addImage(imgData, 'PNG', marginMM, marginMM, usableWidthMM, imgHeightMM);
+        } else {
+          const pageCanvasHeightPx = Math.floor(usableHeightMM / pxToMM);
+          let renderedPx = 0;
+          let first = true;
+          while (renderedPx < canvas.height) {
+            const sliceHeightPx = Math.min(pageCanvasHeightPx, canvas.height - renderedPx);
+            const pageCanvas = document.createElement('canvas');
+            pageCanvas.width = canvas.width;
+            pageCanvas.height = sliceHeightPx;
+            pageCanvas.getContext('2d').drawImage(
+              canvas, 0, renderedPx, canvas.width, sliceHeightPx, 0, 0, canvas.width, sliceHeightPx
+            );
+            const sliceData = pageCanvas.toDataURL('image/png');
+            const sliceHeightMM = sliceHeightPx * pxToMM;
+            if (!first) pdf.addPage();
+            pdf.addImage(sliceData, 'PNG', marginMM, marginMM, usableWidthMM, sliceHeightMM);
+            renderedPx += sliceHeightPx;
+            first = false;
+          }
         }
-      }
 
-      pdf.save(String(quoteNumber).replace(/\//g, '-') + '.pdf');
-    }).catch(function (e) {
-      console.warn('Quotation download failed:', e);
-    }).finally(function () {
-      if (holder.parentNode) holder.parentNode.removeChild(holder);
-    });
+        pdf.save(String(quoteNumber).replace(/\//g, '-') + '.pdf');
+      }).catch(function (e) {
+        console.warn('Quotation download failed:', e);
+      }).finally(cleanup);
+    }, 200);
   }
 
   // ---------------------------------------------------------------
