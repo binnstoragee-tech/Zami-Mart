@@ -2701,6 +2701,20 @@ img.zm-chat-img{display:block;width:100%;max-width:190px;max-height:190px;object
 .zm-chat-form input:focus{border-color:#063b3f;background:#fff;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
 .zm-chat-form button{padding:10px 16px;background:#FD4D02;color:#fff;border:none;border-radius:10px;font-size:.82rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .2s;}
 .zm-chat-form button:hover{background:#e34602;transform:translateY(-1px);}
+.zm-viber-divider{display:flex;align-items:center;gap:10px;width:100%;margin:12px 0 10px;}
+.zm-viber-divider::before,.zm-viber-divider::after{content:'';flex:1;height:1px;background:rgba(6,59,63,.1);}
+.zm-viber-divider span{font-size:.64rem;font-weight:600;color:#8a9faa;letter-spacing:.04em;text-transform:uppercase;font-family:'Poppins',sans-serif;}
+.zm-viber-cta{position:relative;width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;text-decoration:none;background:linear-gradient(135deg,#7360f2 0%,#59267c 100%);box-shadow:0 6px 18px -4px rgba(115,96,242,.45);overflow:hidden;isolation:isolate;transition:transform .25s cubic-bezier(.4,0,.2,1),box-shadow .25s cubic-bezier(.4,0,.2,1);animation:zmViberPulse 2.4s ease-in-out infinite;font-family:'Poppins',sans-serif;}
+.zm-viber-cta:hover{transform:translateY(-2px);box-shadow:0 10px 26px -4px rgba(115,96,242,.55);}
+.zm-viber-cta:active{transform:translateY(0);}
+.zm-viber-cta::after{content:'';position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.35) 48%,transparent 66%);background-size:220% 100%;background-position:150% 0;animation:zmViberShimmer 2.8s ease-in-out infinite;z-index:1;pointer-events:none;}
+@keyframes zmViberShimmer{0%{background-position:150% 0}55%{background-position:-50% 0}100%{background-position:-50% 0}}
+@keyframes zmViberPulse{0%,100%{box-shadow:0 6px 18px -4px rgba(115,96,242,.45)}50%{box-shadow:0 6px 22px -2px rgba(115,96,242,.7)}}
+.zm-viber-cta-icon{position:relative;z-index:2;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.95rem;flex-shrink:0;animation:zmViberIconBounce 2.4s ease-in-out infinite;}
+@keyframes zmViberIconBounce{0%,100%{transform:scale(1) rotate(0)}10%{transform:scale(1.12) rotate(-8deg)}20%{transform:scale(1) rotate(4deg)}30%{transform:scale(1) rotate(0)}}
+.zm-viber-cta-text{position:relative;z-index:2;flex:1;color:#fff;font-size:.88rem;font-weight:600;text-align:center;}
+.zm-viber-cta-arrow{position:relative;z-index:2;color:#fff;font-size:.72rem;display:flex;align-items:center;justify-content:center;transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.zm-viber-cta:hover .zm-viber-cta-arrow{transform:translateX(3px);}
 /* suggestion chips */
 .zm-chat-chips{padding:8px 12px 10px;display:flex;flex-wrap:wrap;gap:6px;flex-shrink:0;border-top:1px solid rgba(6,59,63,.07);background:#f8fafa;}
 .zm-chat-chips-label{width:100%;font-size:.62rem;color:#8a9faa;font-weight:600;margin-bottom:2px;letter-spacing:.03em;}
@@ -2850,6 +2864,8 @@ img.zm-chat-img{display:block;width:100%;max-width:190px;max-height:190px;object
 const btn=document.getElementById('zmChatBtn');
 const win=document.getElementById('zmChatWin');
 const closeBtn=document.getElementById('zmChatClose');
+// TODO: palitan ng tunay na Viber number ni Zami Mart (country code + number, walang + o 0 sa harap)
+const VIBER_NUMBER='9609906025';
 const msgsEl=document.getElementById('zmChatMsgs');
 const inputArea=document.getElementById('zmChatInputArea');
 const input=document.getElementById('zmChatInput');
@@ -2991,7 +3007,15 @@ function showWelcome(){
         <input type="tel" id="zmVisitorPhone" placeholder="Phone number (optional)">
         <button id="zmStartChat">Start Chatting &#x2192;</button>
       </div>
+      <div class="zm-viber-divider"><span>or</span></div>
+      <a href="#" id="zmWelcomeViberBtn" class="zm-viber-cta" target="_blank" rel="noopener">
+        <span class="zm-viber-cta-icon"><i class="fa-brands fa-viber"></i></span>
+        <span class="zm-viber-cta-text">Chat with us on Viber</span>
+        <span class="zm-viber-cta-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+      </a>
     </div>`;
+  const zmWelcomeViberBtn=document.getElementById('zmWelcomeViberBtn');
+  if(zmWelcomeViberBtn){zmWelcomeViberBtn.href=`viber://chat?number=%2B${VIBER_NUMBER}`;}
   document.getElementById('zmStartChat').addEventListener('click',()=>{
     const name=document.getElementById('zmVisitorName').value.trim();
     if(!name){document.getElementById('zmVisitorName').focus();return;}

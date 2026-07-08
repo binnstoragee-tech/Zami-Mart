@@ -510,6 +510,100 @@ img.chat-img {
   background: #e34602; transform: translateY(-1px);
 }
 
+/* ── "or" divider ── */
+.chat-welcome-divider {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; margin: 12px 0 10px;
+}
+.chat-welcome-divider::before,
+.chat-welcome-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: rgba(6,59,63,.1);
+}
+.chat-welcome-divider span {
+  font-size: .64rem; font-weight: 600;
+  color: var(--text-muted); letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+/* ── Viber CTA button ── */
+.chat-viber-cta {
+  position: relative;
+  width: 100%;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  background: linear-gradient(135deg, #7360f2 0%, #59267c 100%);
+  box-shadow: 0 6px 18px -4px rgba(115,96,242,.45);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
+  animation: viberPulse 2.4s ease-in-out infinite;
+}
+.chat-viber-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px -4px rgba(115,96,242,.55);
+}
+.chat-viber-cta:active { transform: translateY(0); }
+
+/* shimmer sweep */
+.chat-viber-cta::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.35) 48%, transparent 66%);
+  background-size: 220% 100%;
+  background-position: 150% 0;
+  animation: viberShimmer 2.8s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+@keyframes viberShimmer {
+  0%   { background-position: 150% 0; }
+  55%  { background-position: -50% 0; }
+  100% { background-position: -50% 0; }
+}
+@keyframes viberPulse {
+  0%, 100% { box-shadow: 0 6px 18px -4px rgba(115,96,242,.45); }
+  50%      { box-shadow: 0 6px 22px -2px rgba(115,96,242,.7); }
+}
+
+.chat-viber-cta-icon {
+  position: relative; z-index: 2;
+  width: 30px; height: 30px; border-radius: 50%;
+  background: rgba(255,255,255,.18);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: .95rem;
+  flex-shrink: 0;
+  animation: viberIconBounce 2.4s ease-in-out infinite;
+}
+@keyframes viberIconBounce {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  10%      { transform: scale(1.12) rotate(-8deg); }
+  20%      { transform: scale(1) rotate(4deg); }
+  30%      { transform: scale(1) rotate(0deg); }
+}
+
+.chat-viber-cta-text {
+  position: relative; z-index: 2;
+  flex: 1;
+  color: #fff; font-size: .82rem; font-weight: 600;
+  text-align: left;
+}
+.chat-viber-cta-sub {
+  display: block;
+  font-size: .62rem; font-weight: 400;
+  color: rgba(255,255,255,.75);
+  margin-top: 1px;
+}
+.chat-viber-cta-arrow {
+  position: relative; z-index: 2;
+  color: #fff; font-size: .72rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .25s var(--ease);
+}
+.chat-viber-cta:hover .chat-viber-cta-arrow { transform: translateX(3px); }
+
 /* ── Suggestion Chips ── */
 .chat-suggestions {
   padding: 8px 14px 10px;
@@ -695,8 +789,19 @@ img.chat-img {
         <input type="tel" id="visitorPhone" placeholder="Phone number (optional)">
         <button type="submit">Start Chatting <i class="fa-solid fa-arrow-right" style="margin-left:4px;font-size:.75rem;"></i></button>
       </form>
+
+      <div class="chat-welcome-divider"><span>or</span></div>
+
+      <a href="#" id="chatWelcomeViberBtn" class="chat-viber-cta" target="_blank" rel="noopener">
+        <span class="chat-viber-cta-icon"><i class="fa-brands fa-viber"></i></span>
+        <span class="chat-viber-cta-text">Chat with us on Viber
+          <span class="chat-viber-cta-sub">Click to direct chatting in viber</span>
+        </span>
+        <span class="chat-viber-cta-arrow"><i class="fa-solid fa-arrow-right"></i></span>
+      </a>
     </div>
   </div>
+
 
   <!-- Quick Suggestions (shown after session starts) -->
   <div class="chat-suggestions" id="chatSuggestions" style="display:none;">
@@ -749,6 +854,14 @@ img.chat-img {
 </style>
 
 <script>
+// TODO: palitan ng tunay na Viber number ni Zami Mart (country code + number, walang + o 0 sa harap)
+// halimbawa: '9171234567'
+const VIBER_NUMBER = '9609906025';
+const chatWelcomeViberBtn = document.getElementById('chatWelcomeViberBtn');
+if (chatWelcomeViberBtn) {
+  chatWelcomeViberBtn.href = `viber://chat?number=%2B${VIBER_NUMBER}`;
+}
+
 const chatBtn        = document.getElementById('chatWidgetBtn');
 const chatWindow     = document.getElementById('chatWindow');
 const chatCloseBtn   = document.getElementById('chatCloseBtn');

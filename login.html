@@ -434,6 +434,24 @@ body::before {
 .fb-switch a { color: #FD4D02; font-weight: 600; cursor: pointer; }
 .fb-switch a:hover { text-decoration: underline; }
 
+/* ── VIBER HELP LINK ── */
+.fb-viber-help {
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  margin: 1rem auto 0; width: fit-content;
+  background: #7360f2; color: #fff;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; font-size: .82rem;
+  padding: 10px 22px; border-radius: 100px;
+  text-decoration: none;
+  box-shadow: 0 8px 22px -6px rgba(115,96,242,.5);
+  transition: transform .2s, box-shadow .2s;
+}
+.fb-viber-help:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -6px rgba(115,96,242,.65);
+}
+.fb-viber-help i { font-size: 1rem; }
+
 /* hidden form */
 .fb-card form { display: block; }
 .fb-card form.hidden { display: none; }
@@ -900,6 +918,11 @@ body.is-leaving .pt-panel { transform: scaleX(1); transform-origin: left; }
         </form>
 
       </div>
+
+      <a class="fb-viber-help" id="loginViberBtn" href="#" target="_blank" rel="noopener">
+        <i class="fa-brands fa-viber"></i> Need help? Chat with us on Viber
+      </a>
+
     </div>
   </div>
 </section>
@@ -907,6 +930,14 @@ body.is-leaving .pt-panel { transform: scaleX(1); transform-origin: left; }
 <script src="main.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+
+    // TODO: palitan ng tunay na Viber number ni Zami Mart (country code + number, walang + o 0 sa harap)
+    // halimbawa: '9171234567'
+    const VIBER_NUMBER = '9609906025';
+    const loginViberBtn = document.getElementById('loginViberBtn');
+    if (loginViberBtn) {
+      loginViberBtn.href = `viber://chat?number=%2B${VIBER_NUMBER}`;
+    }
 
     const loginForm    = document.getElementById('loginForm');
     const signupForm   = document.getElementById('signupForm');
