@@ -13,7 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const s = document.createElement('style');
     s.id = 'zmCartCtrlStyle';
     s.textContent = `
-      .product-cart-ctrl{ display:flex; align-items:center; margin-left:auto; }
+      .product-cart-ctrl{ display:flex; align-items:center; gap:8px; margin-left:auto; }
+      .product-add-btn:disabled{ opacity:.5; cursor:not-allowed; }
+      .product-add-btn:disabled:hover{ transform:none; }
       .item-tag[data-price] .product-cart-ctrl{ margin-left:0; }
 
       @keyframes zmCtrlPopIn{
@@ -92,6 +94,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================
+  // Admin-linked stock lookup. Reads the same localStorage
+  // key the admin dashboard (admin.html) saves products to
+  // ('zm_products'), matches by product name, and applies
+  // the exact same thresholds admin uses:
+  //   qty > 10  -> in stock
+  //   qty 1-10  -> low stock
+  //   qty === 0 -> out of stock
+  //   qty blank/unset -> no badge shown
+  // Falls back to a manual data-stock="in|low|out" attribute
+  // on the .item-tag (if present) when no admin match is found,
+  // so the badge still works for hand-authored product tags.
+  // ============================================
+  function getAdminStockStatus(productName) {
+    try {
+      const raw = localStorage.getItem('zm_products');
+      if (!raw) return null;
+      const list = JSON.parse(raw);
+      if (!Array.isArray(list)) return null;
+      const norm = s => (s || '').toString().trim().toLowerCase();
+      const match = list.find(p => norm(p.name) === norm(productName));
+      if (!match) return null;
+      if (match.stock === '' || match.stock === undefined || match.stock === null) return null;
+      const qty = parseInt(match.stock);
+      if (isNaN(qty)) return null;
+      if (qty <= 0) return 'out';
+      if (qty <= 10) return 'low';
+      return 'in';
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ============================================
   // Enhance product cards: category label + structured
   // body (SKU / price / stock badge render only once that
   // data exists — set via data-sku / data-price / data-unit /
@@ -107,13 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const imgWrap = tag.querySelector('.product-img-wrap');
       const nameEl = tag.querySelector('.product-name');
       if (!nameEl) return;
-
-      if (imgWrap) {
-        const stockBadge = document.createElement('span');
-        stockBadge.className = 'stock-badge';
-        stockBadge.textContent = tag.dataset.stock === 'low' ? 'Low Stock' : 'In Stock';
-        imgWrap.appendChild(stockBadge);
-      }
 
       const body = document.createElement('div');
       body.className = 'product-body';
@@ -133,15 +161,46 @@ document.addEventListener('DOMContentLoaded', () => {
       const footer = document.createElement('div');
       footer.className = 'product-footer';
 
+      // ---- Add button <-> quantity stepper control ----
+      const productName = nameEl.textContent.trim();
+
+      // Stock status — driven by the admin-set stock quantity
+      // (falls back to a manual data-stock attribute if no admin record found).
+      const stockStatus = getAdminStockStatus(productName) || tag.dataset.stock || null;
+
+      if (stockStatus === 'out') {
+        // Out of stock: just one centered "Unavailable" pill, no badge,
+        // no Add/quantity controls (there's nothing to add to cart).
+        footer.classList.add('is-unavailable');
+        const unavailableEl = document.createElement('div');
+        unavailableEl.className = 'product-unavailable';
+        unavailableEl.innerHTML = '<i class="fa-solid fa-ban"></i><span>Unavailable</span>';
+        footer.appendChild(unavailableEl);
+        body.appendChild(footer);
+        tag.appendChild(body);
+        return;
+      }
+
+      const footerLeft = document.createElement('div');
+      footerLeft.className = 'product-footer-left';
+
       const priceEl = document.createElement('div');
       priceEl.className = 'product-price';
       if (tag.dataset.price) {
         priceEl.innerHTML = `MVR ${tag.dataset.price}` + (tag.dataset.unit ? `<span> / ${tag.dataset.unit}</span>` : '');
       }
-      footer.appendChild(priceEl);
+      footerLeft.appendChild(priceEl);
 
-      // ---- Add button <-> quantity stepper control ----
-      const productName = nameEl.textContent.trim();
+      // Stock badge — sits on the left of the footer, directly across
+      // from the Add button.
+      if (stockStatus === 'in' || stockStatus === 'low') {
+        const stockBadge = document.createElement('span');
+        stockBadge.className = 'stock-badge stock-' + stockStatus;
+        stockBadge.textContent = stockStatus === 'low' ? 'Low Stock' : 'In Stock';
+        footerLeft.appendChild(stockBadge);
+      }
+
+      footer.appendChild(footerLeft);
 
       const ctrl = document.createElement('div');
       ctrl.className = 'product-cart-ctrl';
@@ -472,6 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pvAddCartBtn  = document.getElementById('pvAddCartBtn');
   const pvRemoveBtn   = document.getElementById('pvRemoveBtn');
   const pvQtyCtrl     = document.getElementById('pvQtyCtrl');
+  const pvUnavailable = document.getElementById('pvUnavailable');
   const pvQtyDec      = document.getElementById('pvQtyDec');
   const pvQtyInc      = document.getElementById('pvQtyInc');
   const pvQtyVal      = document.getElementById('pvQtyVal');
@@ -535,9 +595,21 @@ document.addEventListener('DOMContentLoaded', () => {
     pvQtyVal.textContent = qty;
   }
 
-  function syncPvCartBtn(productName, productImg) {
+  function syncPvCartBtn(productName, productImg, stockStatus) {
     pvCurrentProduct = { name: productName, img: productImg };
     if (!pvAddCartBtn) return;
+
+    // Out of stock: hide Add/Remove/Qty controls entirely and show
+    // the "Unavailable" pill instead, same as the product card.
+    if (stockStatus === 'out') {
+      pvAddCartBtn.style.display = 'none';
+      pvRemoveBtn.style.display = 'none';
+      if (pvQtyCtrl) pvQtyCtrl.style.display = 'none';
+      if (pvUnavailable) pvUnavailable.style.display = '';
+      return;
+    }
+    if (pvUnavailable) pvUnavailable.style.display = 'none';
+
     const qty = getPvQty();
     if (qty > 0) {
       pvAddCartBtn.style.display = 'none';
@@ -761,6 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const productName = name ? name.textContent.trim() : '';
     const productImg  = (img && !wrap.classList.contains('no-img')) ? img.src : null;
+    const stockStatus = getAdminStockStatus(productName) || tag.dataset.stock || null;
 
     pvName.textContent = productName;
     resetView();
@@ -775,7 +848,8 @@ document.addEventListener('DOMContentLoaded', () => {
       pvStage.classList.add('no-img');
     }
 
-    syncPvCartBtn(productName, productImg);
+    if (pvQtyCtrl) pvQtyCtrl.style.display = '';
+    syncPvCartBtn(productName, productImg, stockStatus);
     renderSimilarProducts(tag);
 
     if (pvBox) pvBox.scrollTop = 0;

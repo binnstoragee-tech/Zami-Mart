@@ -352,20 +352,26 @@
     opacity:.55;
   }
 
-  /* Stock badge — top-left of image, populated via data-stock on .item-tag */
+  /* Stock badge — small pill on the left side of the card footer,
+     directly across from the Add-to-cart button on the right.
+     Status comes from the admin dashboard's saved stock quantity
+     (see getAdminStockStatus in catalog.js); falls back to a manual
+     data-stock="in|low|out" attribute on .item-tag if set by hand. */
   .stock-badge{
-    position:absolute; top:10px; left:10px; z-index:2;
-    font-size:.62rem; font-weight:800;
-    letter-spacing:.08em; text-transform:uppercase;
+    display:inline-flex; align-items:center;
+    font-family: var(--font-display);
+    font-size:.62rem; font-weight:700; line-height:1;
+    letter-spacing:.03em; text-transform:uppercase;
     color:#fff;
-    background: var(--teal);
-    padding:5px 10px;
-    border-radius:6px;
-    display:none;
+    padding:7px 11px;
+    border-radius:100px;
+    white-space:nowrap;
+    flex-shrink:0;
+    box-shadow: 0 4px 10px -4px rgba(6,59,63,.35);
   }
-  .item-tag[data-stock] .stock-badge{ display:inline-block; }
-  .item-tag[data-stock="low"] .stock-badge{ background:#b3401f; }
-  .item-tag[data-stock="in"] .stock-badge{ background: var(--ink); }
+  .stock-badge.stock-in{ background: var(--teal-soft); }
+  .stock-badge.stock-low{ background:#b3401f; }
+  .stock-badge.stock-out{ background:#9aa5a4; box-shadow:none; }
 
   .product-body{
     display:flex; flex-direction:column;
@@ -394,8 +400,14 @@
 
   .product-footer{
     display:flex; align-items:center; justify-content:space-between;
+    gap:8px;
     margin-top:auto;
-    padding-top:10px;
+    padding-top:12px;
+  }
+  .product-footer-left{
+    display:flex; align-items:center; gap:8px;
+    min-width:0;
+    flex-wrap:wrap;
   }
   .product-price{
     font-size:.9rem; font-weight:800; color:var(--ink);
@@ -407,15 +419,50 @@
   .item-tag[data-price] .product-price{ display:block; }
   .product-add-btn{
     display:flex; align-items:center; gap:6px;
-    background:none; border:none;
+    background: var(--teal); border:none;
     font-family: var(--font-display);
-    font-weight:700; font-size:.82rem;
-    color: var(--teal-soft);
-    padding:4px 2px;
-    transition: color .25s, transform .25s;
+    font-weight:700; font-size:.74rem;
+    color:#fff;
+    padding:7px 13px;
+    border-radius:100px;
+    line-height:1;
+    box-shadow: 0 6px 14px -6px rgba(6,59,63,.45);
+    transition: background .25s, transform .25s, box-shadow .25s;
   }
-  .product-add-btn:hover{ color: var(--orange); transform: translateY(-1px); }
-  .product-add-btn i{ font-size:.85rem; }
+  .product-add-btn:hover{ background: var(--orange); transform: translateY(-1px); box-shadow: 0 8px 16px -6px rgba(253,77,2,.4); }
+  .product-add-btn i{ font-size:.78rem; }
+
+  /* Out of stock — footer collapses to a single centered pill instead
+     of a badge + disabled button. */
+  .product-footer.is-unavailable{ justify-content:center; }
+  .product-unavailable{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family: var(--font-display);
+    font-weight:700; font-size:.72rem;
+    letter-spacing:.02em; text-transform:uppercase;
+    color:#9aa5a4;
+    background:#eef1ef;
+    border:1px solid #dde2e0;
+    padding:7px 16px;
+    border-radius:100px;
+  }
+  .product-unavailable i{ font-size:.72rem; }
+
+  /* Unavailable pill inside the product viewer (quick view) modal —
+     shown instead of Add to Cart / qty controls when out of stock. */
+  .pv-unavailable{
+    display:inline-flex; align-items:center; gap:6px;
+    font-family: var(--font-display);
+    font-weight:700; font-size:.78rem;
+    letter-spacing:.02em; text-transform:uppercase;
+    color:#9aa5a4;
+    background:#eef1ef;
+    border:1px solid #dde2e0;
+    padding:9px 18px;
+    border-radius:100px;
+  }
+  .pv-unavailable i{ font-size:.78rem; }
+
 
 
 
@@ -943,6 +990,9 @@
     .item-tags{ grid-template-columns: repeat(2, 1fr); gap:.8rem; }
     .product-body{ padding:10px 12px 12px; }
     .product-name{ font-size:.78rem; }
+    .product-footer{ gap:6px; }
+    .stock-badge{ font-size:.54rem; padding:5px 8px; letter-spacing:.02em; }
+    .product-add-btn{ font-size:.68rem; padding:6px 10px; gap:4px; }
   }
   @media (max-width: 400px){
     .item-tags{ grid-template-columns: repeat(2, 1fr); gap:.6rem; }
@@ -3407,7 +3457,7 @@ function goBackToAdmin() {
       </div>
     </div>
     <div class="item-tags">
-      <div class="item-tag">
+      <div class="item-tag" data-stock="low">
         <div class="product-img-wrap"><img src="img/products/product-524.jpg" alt="" loading="lazy" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>
         <div class="product-name">Ocean Fruit Drink Apple 500ML</div>
       </div>
@@ -3600,6 +3650,9 @@ function goBackToAdmin() {
         <button class="pv-add-cart-btn" id="pvAddCartBtn">
           <i class="fa-solid fa-cart-plus"></i> Add to Cart
         </button>
+        <div class="pv-unavailable" id="pvUnavailable" style="display:none;">
+          <i class="fa-solid fa-ban"></i><span>Unavailable</span>
+        </div>
       </div>
     </div>
     <div class="pv-similar" id="pvSimilar">
