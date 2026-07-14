@@ -394,57 +394,63 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // On mobile, move the Categories toggle so it sits just below the
-  // first category's item count (instead of above it). On desktop it
-  // stays in its normal sidebar position.
-  (function repositionCatFilterPanel() {
-    const sidebar = document.querySelector('.catalog-layout > .catalog-sidebar');
-    const catalogLayout = document.querySelector('.catalog-layout');
-    const catalogMain = document.querySelector('.catalog-layout > .catalog-main');
-    // NOTE: anchor to the first cat-block SECTION itself (not something inside
-    // it) so we can insert the toolbar as a SIBLING before it. Previously the
-    // toolbar was inserted *inside* #personal-care's .cat-block-inner — when
-    // a different category filter was tapped, #personal-care got the
-    // .cat-hidden (display:none) class and took the toggle button down with it.
-    const firstBlock = document.querySelector('#personal-care');
-    const searchWrap = document.querySelector('.cat-search');
-    const heroContainer = document.querySelector('.page-hero .container');
+  // On mobile, the search box + Categories toggle sit together in a
+  // toolbar placed right after the currently-visible category's header
+  // (icon/title/description), just above that category's products.
+  const mobileToolbarSidebar = document.querySelector('.catalog-layout > .catalog-sidebar');
+  const mobileToolbarLayout = document.querySelector('.catalog-layout');
+  const mobileToolbarMain = document.querySelector('.catalog-layout > .catalog-main');
+  const mobileToolbarFirstBlock = document.querySelector('#personal-care');
+  const mobileToolbarSearch = document.querySelector('.cat-search');
+  const mobileToolbarHeroContainer = document.querySelector('.page-hero .container');
 
-    if (!sidebar || !catalogLayout || !catalogMain || !firstBlock) return;
+  let catMobileToolbar = document.getElementById('catMobileToolbar');
+  if (!catMobileToolbar) {
+    catMobileToolbar = document.createElement('div');
+    catMobileToolbar.id = 'catMobileToolbar';
+    catMobileToolbar.className = 'cat-mobile-toolbar';
+  }
 
-    // Wrapper that holds the search box + Categories toggle side by side on mobile
-    let toolbar = document.getElementById('catMobileToolbar');
-    if (!toolbar) {
-      toolbar = document.createElement('div');
-      toolbar.id = 'catMobileToolbar';
-      toolbar.className = 'cat-mobile-toolbar';
+  const mobileToolbarMq = window.matchMedia('(max-width: 980px)');
+  let isCurrentlyMobileToolbar = null;
+
+  // Finds whichever category block is currently on screen (not filtered
+  // out) and drops the toolbar right after its header, before its
+  // product grid — so it always follows that block's title, wherever
+  // it happens to be in the filtered list.
+  function repositionMobileToolbarInline() {
+    if (!isCurrentlyMobileToolbar) return;
+    const activeBlock = document.querySelector('.cat-block:not(.cat-hidden)') || mobileToolbarFirstBlock;
+    if (!activeBlock) return;
+    const head = activeBlock.querySelector('.cat-block-head');
+    const inner = activeBlock.querySelector('.cat-block-inner') || activeBlock;
+    if (head && head.parentNode) {
+      head.insertAdjacentElement('afterend', catMobileToolbar);
+    } else {
+      inner.insertBefore(catMobileToolbar, inner.firstChild);
     }
+  }
 
-    const mq = window.matchMedia('(max-width: 980px)');
-    let isCurrentlyMobile = null;
+  function placeMobileToolbar(isMobile) {
+    if (isCurrentlyMobileToolbar === isMobile) return;
+    isCurrentlyMobileToolbar = isMobile;
 
-    function place(isMobile) {
-      if (isCurrentlyMobile === isMobile) return;
-      isCurrentlyMobile = isMobile;
-
-      if (isMobile) {
-        if (searchWrap) toolbar.appendChild(searchWrap);
-        toolbar.appendChild(sidebar);
-        // Insert as a sibling BEFORE the first cat-block, not inside it —
-        // this way toggling .cat-hidden on any category block (including
-        // personal-care) never affects the toolbar/toggle's visibility.
-        catalogMain.insertBefore(toolbar, firstBlock);
-        sidebar.classList.add('cat-filter-inline');
-      } else {
-        catalogLayout.insertBefore(sidebar, catalogMain);
-        sidebar.classList.remove('cat-filter-inline');
-        if (searchWrap && heroContainer) heroContainer.appendChild(searchWrap);
-      }
+    if (isMobile) {
+      catMobileToolbar.appendChild(mobileToolbarSidebar);
+      if (mobileToolbarSearch) catMobileToolbar.appendChild(mobileToolbarSearch);
+      repositionMobileToolbarInline();
+      mobileToolbarSidebar.classList.add('cat-filter-inline');
+    } else {
+      mobileToolbarLayout.insertBefore(mobileToolbarSidebar, mobileToolbarMain);
+      mobileToolbarSidebar.classList.remove('cat-filter-inline');
+      if (mobileToolbarSearch && mobileToolbarHeroContainer) mobileToolbarHeroContainer.appendChild(mobileToolbarSearch);
     }
+  }
 
-    place(mq.matches);
-    mq.addEventListener('change', e => place(e.matches));
-  })();
+  if (mobileToolbarSidebar && mobileToolbarLayout && mobileToolbarMain && mobileToolbarFirstBlock) {
+    placeMobileToolbar(mobileToolbarMq.matches);
+    mobileToolbarMq.addEventListener('change', e => placeMobileToolbar(e.matches));
+  }
   const searchInput = document.getElementById('productSearch');
   const noResults = document.getElementById('noResults');
 
@@ -479,6 +485,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     noResults.classList.toggle('show', !anyVisible);
+    repositionMobileToolbarInline();
   }
 
   filterBtns.forEach(btn => {
