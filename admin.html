@@ -1084,6 +1084,22 @@ select {
   border-radius: 10px !important; box-shadow: none !important;
 }
 
+/* Order-inquiry card — replaces the plain "Hi! I'd like to inquire
+   about..." text block with a distinct, scannable receipt-style card
+   so orders stand out at a glance in the inquiry panel. */
+.zm-chat-bubble.has-order-card { padding: 11px 13px; }
+.zm-order-card { min-width: 190px; }
+.zm-oc-head { display:flex; align-items:center; gap:7px; font-weight:700; font-size:.8rem; letter-spacing:.01em; padding-bottom:8px; margin-bottom:8px; border-bottom:1px dashed rgba(255,255,255,.4); }
+.zm-oc-head i { font-size:.82rem; }
+.zm-oc-items { display:flex; flex-direction:column; gap:7px; }
+.zm-oc-item { display:flex; align-items:baseline; gap:6px; font-size:.81rem; line-height:1.4; }
+.zm-oc-num { font-weight:700; opacity:.8; flex-shrink:0; }
+.zm-oc-name { flex:1; }
+.zm-oc-qty { flex-shrink:0; background: rgba(255,255,255,.28); padding:1px 8px; border-radius:20px; font-size:.7rem; font-weight:700; }
+.zm-oc-foot { display:flex; align-items:center; gap:6px; font-size:.71rem; opacity:.85; padding-top:8px; margin-top:8px; border-top:1px dashed rgba(255,255,255,.4); }
+.zm-chat-msg.admin .zm-oc-head, .zm-chat-msg.admin .zm-oc-foot { border-color: rgba(6,59,63,.15); }
+.zm-chat-msg.admin .zm-oc-qty { background: rgba(6,59,63,.08); }
+
 /* ─── MODERN PHOTO BUBBLES ───────────────────── */
 /* Image-only messages get a clean neutral "photo card" instead of a flat
    solid-color block — closer to how modern chat apps present photos.
@@ -3454,6 +3470,38 @@ function escHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+// ============================================
+// Detects the auto-generated "order inquiry" chat
+// message and renders it as a distinct card instead of
+// plain text, so orders stand out at a glance in the panel.
+// ============================================
+function buildOrderInquiryCard(text) {
+  const re = /^(👋 Hi! I'd like to inquire about:|📦 New Order Inquiry)\n━+\n([\s\S]*?)\n━+\n🕐 (.+)$/;
+  const match = text.match(re);
+  if (!match) return null;
+
+  const isNewOrder = match[1].indexOf('New Order') !== -1;
+  const items = match[2].split('\n').map(l => l.trim()).filter(Boolean).map(line => {
+    const im = line.match(/^(\d+)\.\s*(.+?)(?:\s*×\s*(\d+))?$/);
+    return im ? { num: im[1], name: im[2], qty: im[3] || '' } : { num: '', name: line, qty: '' };
+  });
+  const dateStr = match[3].trim();
+
+  const itemsHtml = items.map(it => `
+    <div class="zm-oc-item">
+      <span class="zm-oc-num">${escHtml(it.num)}.</span>
+      <span class="zm-oc-name">${escHtml(it.name)}</span>
+      ${it.qty ? `<span class="zm-oc-qty">×${escHtml(it.qty)}</span>` : ''}
+    </div>`).join('');
+
+  return `
+    <div class="zm-order-card">
+      <div class="zm-oc-head"><i class="fa-solid fa-bag-shopping"></i><span>${isNewOrder ? 'New Order Inquiry' : "I'd like to inquire about"}</span></div>
+      <div class="zm-oc-items">${itemsHtml}</div>
+      <div class="zm-oc-foot"><i class="fa-regular fa-clock"></i><span>${escHtml(dateStr)}</span></div>
+    </div>`;
+}
+
 function fmtMoney(n) {
   return 'MVR ' + (Number(n) || 0).toFixed(2);
 }
@@ -4702,9 +4750,10 @@ function renderInqChat() {
     const fileHtml = (!msg.imageData && msg.attachment) ? ChatSystem.renderAttachmentHtml(msg.attachment) : '';
     const isImgOnlyInq = !!msg.imageData;
     const editedTagInq = (!msg.deleted && msg.edited) ? `<div class="zm-chat-edited-tag">edited</div>` : '';
+    const orderCardHtmlInq = (!msg.deleted && msg.text) ? buildOrderInquiryCard(msg.text) : null;
     const textHtml = msg.deleted
       ? `<div style="font-style:italic;opacity:.55;"><i class="fa-solid fa-ban" style="margin-right:5px;"></i>Message deleted</div>`
-      : (msg.text ? `<div class="${isImgOnlyInq ? 'zm-chat-caption' : ''}">${escHtml(msg.text)}</div>` : '');
+      : (orderCardHtmlInq ? orderCardHtmlInq : (msg.text ? `<div class="${isImgOnlyInq ? 'zm-chat-caption' : ''}">${escHtml(msg.text)}</div>` : ''));
     const imgHtmlFinal = msg.deleted ? '' : imgHtml;
     const fileHtmlFinal = msg.deleted ? '' : fileHtml;
     const role      = isAdmin ? 'admin' : 'visitor';
@@ -4728,7 +4777,7 @@ function renderInqChat() {
       el.innerHTML = `
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:68%;">
           ${isFirst ? '<div class="zm-chat-sender-label" style="text-align:right;">You</div>' : ''}
-          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}${isImgOnlyInq ? ' img-only' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}${fileHtmlFinal}</div>
+          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}${isImgOnlyInq ? ' img-only' : ''}${orderCardHtmlInq ? ' has-order-card' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}${fileHtmlFinal}</div>
           ${reactionHInq}
           ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time" style="text-align:right;">${time}</div>` : ''}
@@ -4746,7 +4795,7 @@ function renderInqChat() {
         ${avatarHtml}
         <div style="display:flex;flex-direction:column;align-items:flex-start;gap:2px;max-width:68%;">
           ${isFirst ? `<div class="zm-chat-sender-label">${escHtml(msg.senderName||'Customer')}</div>` : ''}
-          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}${isImgOnlyInq ? ' img-only' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}${fileHtmlFinal}</div>
+          <div class="zm-chat-bubble${msg.deleted ? ' deleted' : ''}${isImgOnlyInq ? ' img-only' : ''}${orderCardHtmlInq ? ' has-order-card' : ''}">${quoteHInq}${textHtml}${imgHtmlFinal}${fileHtmlFinal}</div>
           ${reactionHInq}
           ${editedTagInq}
           ${isLast ? `<div class="zm-chat-time">${time}</div>` : ''}

@@ -286,10 +286,14 @@
     vertical-align: middle;
   }
 
-  /* Product cards */
+  /* Product cards — fluid grid: the browser fits as many
+     columns as will comfortably hold a 210px-wide card, so the
+     row always fills the available width (2 columns on a phone,
+     4-5 on a laptop, 6+ on an ultra-wide monitor) instead of
+     jumping between a few fixed breakpoints and leaving gaps. */
   .item-tags{
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
     gap: 1.2rem;
   }
   .item-tag{
@@ -360,10 +364,10 @@
   .stock-badge{
     display:inline-flex; align-items:center;
     font-family: var(--font-display);
-    font-size:.62rem; font-weight:700; line-height:1;
-    letter-spacing:.03em; text-transform:uppercase;
+    font-size:.58rem; font-weight:700; line-height:1;
+    letter-spacing:.02em; text-transform:uppercase;
     color:#fff;
-    padding:7px 11px;
+    padding:6px 10px;
     border-radius:100px;
     white-space:nowrap;
     flex-shrink:0;
@@ -400,14 +404,15 @@
 
   .product-footer{
     display:flex; align-items:center; justify-content:space-between;
-    gap:8px;
+    gap:8px; row-gap:10px;
     margin-top:auto;
     padding-top:12px;
+    flex-wrap:wrap;
   }
   .product-footer-left{
     display:flex; align-items:center; gap:8px;
     min-width:0;
-    flex-wrap:wrap;
+    flex:1 1 auto;
   }
   .product-price{
     font-size:.9rem; font-weight:800; color:var(--ink);
@@ -418,35 +423,39 @@
   }
   .item-tag[data-price] .product-price{ display:block; }
   .product-add-btn{
-    display:flex; align-items:center; gap:6px;
+    display:flex; align-items:center; justify-content:center; gap:6px;
     background: var(--teal); border:none;
     font-family: var(--font-display);
     font-weight:700; font-size:.74rem;
     color:#fff;
-    padding:7px 13px;
-    border-radius:100px;
+    width:34px; height:34px;
+    padding:0;
+    border-radius:50%;
     line-height:1;
     box-shadow: 0 6px 14px -6px rgba(6,59,63,.45);
     transition: background .25s, transform .25s, box-shadow .25s;
+    flex-shrink:0;
+    margin-left:auto;
   }
+  .product-add-btn span{ display:none; }
   .product-add-btn:hover{ background: var(--orange); transform: translateY(-1px); box-shadow: 0 8px 16px -6px rgba(253,77,2,.4); }
-  .product-add-btn i{ font-size:.78rem; }
+  .product-add-btn i{ font-size:.85rem; }
 
   /* Out of stock — footer collapses to a single centered pill instead
      of a badge + disabled button. */
   .product-footer.is-unavailable{ justify-content:center; }
   .product-unavailable{
-    display:inline-flex; align-items:center; gap:6px;
+    display:inline-flex; align-items:center; gap:5px;
     font-family: var(--font-display);
-    font-weight:700; font-size:.72rem;
+    font-weight:700; font-size:.6rem;
     letter-spacing:.02em; text-transform:uppercase;
     color:#9aa5a4;
     background:#eef1ef;
     border:1px solid #dde2e0;
-    padding:7px 16px;
+    padding:6px 13px;
     border-radius:100px;
   }
-  .product-unavailable i{ font-size:.72rem; }
+  .product-unavailable i{ font-size:.6rem; }
 
   /* Unavailable pill inside the product viewer (quick view) modal —
      shown instead of Add to Cart / qty controls when out of stock. */
@@ -983,16 +992,15 @@
   .ccf-error.show { display: block; }
   .ccf-actions { display: flex; gap: 10px; width: 100%; margin-top: .3rem; }
 
-  @media (max-width: 1100px){
-    .item-tags{ grid-template-columns: repeat(3, 1fr); }
-  }
   @media (max-width: 700px){
     .item-tags{ grid-template-columns: repeat(2, 1fr); gap:.8rem; }
     .product-body{ padding:10px 12px 12px; }
     .product-name{ font-size:.78rem; }
     .product-footer{ gap:6px; }
-    .stock-badge{ font-size:.54rem; padding:5px 8px; letter-spacing:.02em; }
-    .product-add-btn{ font-size:.68rem; padding:6px 10px; gap:4px; }
+    .product-footer-left{ min-width:0; }
+    .stock-badge{ font-size:.52rem; padding:5px 7px; letter-spacing:.01em; }
+    .product-add-btn{ width:30px; height:30px; }
+    .product-add-btn i{ font-size:.78rem; }
   }
   @media (max-width: 400px){
     .item-tags{ grid-template-columns: repeat(2, 1fr); gap:.6rem; }
@@ -4697,6 +4705,22 @@ body:has(.cart-overlay.open) .zm-chat-btn{opacity:0;pointer-events:none;transfor
 .zm-chat-msg.admin.last-in-group .zm-chat-bubble{border-radius:4px 18px 18px 18px;}
 /* deleted */
 .zm-chat-bubble.deleted{font-style:italic;font-size:.74rem;background:rgba(0,0,0,0)!important;color:#aaa!important;border:1.5px dashed #ccc!important;padding:7px 11px;display:flex;align-items:center;gap:5px;border-radius:10px!important;}
+
+/* Order-inquiry card — replaces the plain "Hi! I'd like to inquire
+   about..." text block with a distinct, scannable receipt-style card
+   so orders stand out at a glance instead of reading as a normal message. */
+.zm-chat-bubble.has-order-card{padding:11px 13px;}
+.zm-order-card{min-width:190px;}
+.zm-oc-head{display:flex;align-items:center;gap:7px;font-weight:700;font-size:.8rem;letter-spacing:.01em;padding-bottom:8px;margin-bottom:8px;border-bottom:1px dashed rgba(255,255,255,.4);}
+.zm-oc-head i{font-size:.82rem;}
+.zm-oc-items{display:flex;flex-direction:column;gap:7px;}
+.zm-oc-item{display:flex;align-items:baseline;gap:6px;font-size:.81rem;line-height:1.4;}
+.zm-oc-num{font-weight:700;opacity:.8;flex-shrink:0;}
+.zm-oc-name{flex:1;}
+.zm-oc-qty{flex-shrink:0;background:rgba(255,255,255,.28);padding:1px 8px;border-radius:20px;font-size:.7rem;font-weight:700;}
+.zm-oc-foot{display:flex;align-items:center;gap:6px;font-size:.71rem;opacity:.85;padding-top:8px;margin-top:8px;border-top:1px dashed rgba(255,255,255,.4);}
+.zm-chat-msg.admin .zm-oc-head,.zm-chat-msg.admin .zm-oc-foot{border-color:rgba(6,59,63,.15);}
+.zm-chat-msg.admin .zm-oc-qty{background:rgba(6,59,63,.08);}
 /* time + sender label */
 .zm-chat-time{font-size:.6rem;color:#8a9faa;padding:0 3px;margin-top:1px;}
 .zm-chat-edited-tag{font-size:.6rem;color:#8a9faa;opacity:.85;font-style:italic;padding:0 3px;margin-top:1px;}
@@ -4924,6 +4948,39 @@ const unreadBadge=document.getElementById('zmChatUnread');
 let sessionId=null,visitorName=null,visitorAvatar=null;
 let zmReplyTarget=null;
 function escH(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
+
+// ============================================
+// Detects the auto-generated "order inquiry" chat
+// message (sent when a customer taps Inquire/Checkout)
+// and renders it as a distinct card instead of plain
+// text, so it stands out at a glance in the chat.
+// ============================================
+function buildOrderInquiryCard(text){
+  const re = /^(👋 Hi! I'd like to inquire about:|📦 New Order Inquiry)\n━+\n([\s\S]*?)\n━+\n🕐 (.+)$/;
+  const match = text.match(re);
+  if(!match) return null;
+
+  const isNewOrder = match[1].indexOf('New Order') !== -1;
+  const items = match[2].split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
+    const im = line.match(/^(\d+)\.\s*(.+?)(?:\s*×\s*(\d+))?$/);
+    return im ? {num:im[1], name:im[2], qty:im[3]||''} : {num:'', name:line, qty:''};
+  });
+  const dateStr = match[3].trim();
+
+  const itemsHtml = items.map(it => `
+    <div class="zm-oc-item">
+      <span class="zm-oc-num">${escH(it.num)}.</span>
+      <span class="zm-oc-name">${escH(it.name)}</span>
+      ${it.qty ? `<span class="zm-oc-qty">×${escH(it.qty)}</span>` : ''}
+    </div>`).join('');
+
+  return `
+    <div class="zm-order-card">
+      <div class="zm-oc-head"><i class="fa-solid fa-bag-shopping"></i><span>${isNewOrder ? 'New Order Inquiry' : "I'd like to inquire about"}</span></div>
+      <div class="zm-oc-items">${itemsHtml}</div>
+      <div class="zm-oc-foot"><i class="fa-regular fa-clock"></i><span>${escH(dateStr)}</span></div>
+    </div>`;
+}
 
 // ── Reply-to state / bar ──
 const zmReplyBar=document.getElementById('zmReplyBar');
@@ -5233,10 +5290,11 @@ function renderMsgs(){
     const isImgOnly=(!isDeleted&&!!m.imageData);
     const fileH=(!isDeleted&&!m.imageData&&m.attachment)?ChatSystem.renderAttachmentHtml(m.attachment):'';
     const editedTag=(!isDeleted&&m.edited)?`<div class="zm-chat-edited-tag">edited</div>`:'';
+    const orderCardHtml = (!isDeleted && m.text) ? buildOrderInquiryCard(m.text) : null;
     const txtH=isDeleted
       ?`<span><i class="fa-solid fa-circle-xmark" style="font-size:.72rem;margin-right:5px;opacity:.7;"></i>Message unsent</span>`
-      :(m.text?`<div class="${isImgOnly?'zm-chat-caption':''}">${escH(m.text)}</div>`:'');
-    const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}${isImgOnly?' img-only':''}`;
+      :(orderCardHtml ? orderCardHtml : (m.text?`<div class="${isImgOnly?'zm-chat-caption':''}">${escH(m.text)}</div>`:''));
+    const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}${isImgOnly?' img-only':''}${orderCardHtml?' has-order-card':''}`;
     const cls=['zm-chat-msg',isAdmin?'admin':'visitor',!isFirst?'same-sender':'',(isLast&&!isFirst)?'last-in-group':''].filter(Boolean).join(' ');
     const reactions=(!isDeleted)?(m.reactions||(m.reaction?{legacy:m.reaction}:{})):{};
     const reactionEntries=Object.entries(reactions).filter(([,em])=>em);

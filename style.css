@@ -233,9 +233,9 @@ body.is-leaving .pt-panel.pt-3{ transition-delay:0s; }
    Layout helpers
    ============================================ */
 .container{
-  max-width:1240px;
-  margin: 0 auto;
-  padding: 0 6%;
+  max-width:100%;
+  margin: 0;
+  padding: 0 2.5%;
 }
 section{ position:relative; }
 .eyebrow{
