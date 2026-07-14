@@ -452,6 +452,21 @@ body::before {
 }
 .fb-viber-help i { font-size: 1rem; }
 
+/* ── PRIVACY POLICY LINK (below Viber help) ── */
+.fb-privacy-link {
+  display: block;
+  text-align: center;
+  margin: 1.4rem auto 0;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; font-size: .74rem;
+  letter-spacing: .03em;
+  color: rgba(255,255,255,.55);
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: color .2s;
+}
+.fb-privacy-link:hover { color: #fff; text-decoration: underline; }
+
 /* hidden form */
 .fb-card form { display: block; }
 .fb-card form.hidden { display: none; }
@@ -922,6 +937,8 @@ body.is-leaving .pt-panel { transform: scaleX(1); transform-origin: left; }
       <a class="fb-viber-help" id="loginViberBtn" href="#" target="_blank" rel="noopener">
         <i class="fa-brands fa-viber"></i> Need help? Chat with us on Viber
       </a>
+
+      <a class="fb-privacy-link" href="privacy-policy.html">Our Privacy Policy</a>
 
     </div>
   </div>

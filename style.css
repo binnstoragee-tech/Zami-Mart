@@ -117,10 +117,9 @@ body.is-leaving .pt-panel.pt-3{ transition-delay:0s; }
 }
 .nav-logo img{
   height:95px; width:auto;
-  transition: height .3s var(--ease-soft), transform .4s var(--ease-soft);
+  transition: height .3s var(--ease-soft);
 }
 .navbar.scrolled .nav-logo img{ height:75px; }
-.nav-logo:hover img{ transform: rotate(-8deg) scale(1.06); }
 .nav-logo-text{ display:none; }
 .nav-logo-text span{ color:var(--orange); }
 
@@ -701,6 +700,8 @@ p{ line-height:1.7; color:#3c4a49; }
   padding-top: 2rem;
   font-size:.85rem; color:#7a8684;
 }
+.footer-bottom a{ color:#7a8684; text-decoration:none; transition: color .2s; }
+.footer-bottom a:hover{ color: var(--orange); }
 .footer-social{ display:flex; gap:.8rem; }
 .footer-social a{
   width:38px; height:38px; border-radius:50%;

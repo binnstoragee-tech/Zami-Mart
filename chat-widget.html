@@ -499,6 +499,20 @@ img.chat-img {
   background: #fff;
   box-shadow: 0 0 0 3px rgba(6,59,63,.07);
 }
+.chat-welcome-form input.chat-input-error {
+  border-color: #e0342c;
+  background: #fff5f4;
+}
+.chat-welcome-form input.chat-input-error:focus {
+  box-shadow: 0 0 0 3px rgba(224,52,44,.12);
+}
+.chat-welcome-form-error {
+  color: #e0342c;
+  font-size: .72rem;
+  margin: -4px 0 0 2px;
+  display: none;
+}
+.chat-welcome-form-error.show { display: block; }
 .chat-welcome-form button {
   padding: 10px 16px;
   background: var(--orange); color: #fff;
@@ -786,7 +800,8 @@ img.chat-img {
       <p>We usually reply within minutes. Fill in your details below to get started.</p>
       <form class="chat-welcome-form" id="chatWelcomeForm">
         <input type="text" id="visitorName" placeholder="Your name" required autocomplete="name">
-        <input type="tel" id="visitorPhone" placeholder="Phone number (optional)">
+        <input type="tel" id="visitorPhone" placeholder="Phone number" required autocomplete="tel">
+        <div class="chat-welcome-form-error" id="visitorPhoneError">Please enter a valid Maldives phone number.</div>
         <button type="submit">Start Chatting <i class="fa-solid fa-arrow-right" style="margin-left:4px;font-size:.75rem;"></i></button>
       </form>
 
@@ -990,8 +1005,22 @@ chatCloseBtn.addEventListener('click', closeChatWindow);
 chatWelcomeForm.addEventListener('submit', e => {
   e.preventDefault();
   const name  = document.getElementById('visitorName').value.trim();
-  const phone = document.getElementById('visitorPhone').value.trim();
+  const phoneInput = document.getElementById('visitorPhone');
+  const phoneErrorEl = document.getElementById('visitorPhoneError');
+  const phone = phoneInput.value.trim();
   if (!name) { document.getElementById('visitorName').focus(); return; }
+
+  const digits = phone.replace(/\D/g, '');
+  const local = (digits.startsWith('960') && digits.length > 7) ? digits.slice(3) : digits;
+  const isValidMaldivesPhone = /^[3679]\d{6}$/.test(local);
+  if (!isValidMaldivesPhone) {
+    phoneInput.classList.add('chat-input-error');
+    if (phoneErrorEl) phoneErrorEl.classList.add('show');
+    phoneInput.focus();
+    return;
+  }
+  phoneInput.classList.remove('chat-input-error');
+  if (phoneErrorEl) phoneErrorEl.classList.remove('show');
 
   visitorName      = name;
   currentSessionId = ChatSystem.createSession(name, phone);

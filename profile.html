@@ -1891,6 +1891,10 @@ document.addEventListener('DOMContentLoaded', () => {
 .zm-chat-form{width:100%;display:flex;flex-direction:column;gap:8px;}
 .zm-chat-form input{padding:10px 13px;border:1.5px solid rgba(6,59,63,.12);border-radius:10px;font-size:.82rem;font-family:'Poppins',sans-serif;outline:none;transition:all .2s;background:#f8fafa;}
 .zm-chat-form input:focus{border-color:#063b3f;background:#fff;box-shadow:0 0 0 3px rgba(6,59,63,.07);}
+.zm-chat-form input.zm-input-error{border-color:#e0342c;background:#fff5f4;}
+.zm-chat-form input.zm-input-error:focus{box-shadow:0 0 0 3px rgba(224,52,44,.12);}
+.zm-chat-form-error{color:#e0342c;font-size:.72rem;font-family:'Poppins',sans-serif;margin:-4px 0 0 2px;display:none;}
+.zm-chat-form-error.show{display:block;}
 .zm-chat-form button{padding:10px 16px;background:#FD4D02;color:#fff;border:none;border-radius:10px;font-size:.82rem;font-weight:600;font-family:'Poppins',sans-serif;cursor:pointer;transition:all .2s;}
 .zm-chat-form button:hover{background:#e34602;transform:translateY(-1px);}
 /* suggestion chips */
@@ -2180,14 +2184,28 @@ function showWelcome(){
       <p>We usually reply within minutes. Fill in your details below.</p>
       <div class="zm-chat-form" id="zmChatForm">
         <input type="text" id="zmVisitorName" placeholder="Your name" required autocomplete="name">
-        <input type="tel" id="zmVisitorPhone" placeholder="Phone number (optional)">
+        <input type="tel" id="zmVisitorPhone" placeholder="Phone number" required autocomplete="tel">
+        <div class="zm-chat-form-error" id="zmPhoneError">Please enter a valid Maldives phone number.</div>
         <button id="zmStartChat">Start Chatting &#x2192;</button>
       </div>
     </div>`;
   document.getElementById('zmStartChat').addEventListener('click',()=>{
     const name=document.getElementById('zmVisitorName').value.trim();
+    const phoneInput=document.getElementById('zmVisitorPhone');
+    const phoneErrorEl=document.getElementById('zmPhoneError');
     if(!name){document.getElementById('zmVisitorName').focus();return;}
-    const phone=document.getElementById('zmVisitorPhone').value.trim();
+    const phone=phoneInput.value.trim();
+    const digits=phone.replace(/\D/g,'');
+    const local=digits.startsWith('960')&&digits.length>7?digits.slice(3):digits;
+    const isValidMaldivesPhone=/^[3679]\d{6}$/.test(local);
+    if(!isValidMaldivesPhone){
+      phoneInput.classList.add('zm-input-error');
+      if(phoneErrorEl)phoneErrorEl.classList.add('show');
+      phoneInput.focus();
+      return;
+    }
+    phoneInput.classList.remove('zm-input-error');
+    if(phoneErrorEl)phoneErrorEl.classList.remove('show');
     visitorAvatar=null;
     startChat(name,phone);
   });

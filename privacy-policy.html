@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact — Zami Mart</title>
+<title>Privacy Policy — Zami Mart</title>
 <link rel="icon" type="image/png" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -771,7 +771,192 @@
   }
   .fso-close-btn:hover { background: #e34602; transform: translateY(-1px); }
 </style>
+<style>
+  .policy-hero{
+    padding-top: 140px;
+    padding-bottom: 2.6rem;
+    background: var(--cream);
+    border-bottom: 1px solid rgba(6,59,63,.1);
+    position: relative;
+  }
+  .policy-hero .container{ position: relative; z-index: 1; }
+  .policy-hero .eyebrow{ margin-bottom: 1.1rem; opacity: .85; }
+  .policy-back{
+    display: flex; width: fit-content;
+    align-items: center; gap: 7px;
+    font-family: var(--font-body);
+    font-size: .8rem; font-weight: 600;
+    color: var(--teal);
+    background: #fff;
+    border: 1px solid rgba(6,59,63,.14);
+    padding: 7px 14px 7px 10px;
+    border-radius: 100px;
+    text-decoration: none;
+    margin-bottom: 1.6rem;
+    cursor: pointer;
+    transition: background .2s, border-color .2s, transform .2s;
+  }
+  .policy-back i{ font-size: .7rem; }
+  .policy-back:hover{ background: var(--orange); border-color: var(--orange); color: #fff; transform: translateX(-2px); }
+  .policy-hero h1{
+    font-size: clamp(2rem, 4.4vw, 2.7rem);
+    font-weight: 800;
+    margin-bottom: 1rem; max-width: 720px;
+    letter-spacing: -.01em;
+  }
+  .policy-hero p{ max-width: 600px; font-size: .98rem; color: var(--ink); opacity: .72; line-height: 1.7; }
+  .policy-meta{
+    display: flex; flex-wrap: wrap; gap: 1.6rem;
+    margin-top: 1.6rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid rgba(6,59,63,.1);
+    max-width: 600px;
+  }
+  .policy-meta-item{ display: flex; flex-direction: column; gap: 3px; }
+  .policy-meta-item .label{
+    font-size: .64rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    color: #9aa5a4;
+  }
+  .policy-meta-item .value{ font-size: .86rem; font-weight: 700; color: var(--teal); }
+
+  .policy-section{ padding-top: 3.6rem; padding-bottom: 6rem; }
+  .policy-layout{
+    display: grid;
+    grid-template-columns: 250px 1fr;
+    gap: 3.2rem;
+    align-items: start;
+  }
+
+  /* Table of contents — plain, document-style list. Uses <details> so it
+     collapses out of the way on mobile by default; JS force-opens it on
+     wider viewports where the sticky sidebar has room. */
+  .policy-toc{
+    position: sticky; top: 110px;
+    background: #fff;
+    border: 1px solid rgba(6,59,63,.12);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .policy-toc summary{
+    list-style: none;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 1.2rem;
+    font-size: .74rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--teal);
+  }
+  .policy-toc summary::-webkit-details-marker{ display: none; }
+  .policy-toc summary .chev{ font-size: .7rem; color: #9aa5a4; transition: transform .2s; }
+  .policy-toc[open] summary .chev{ transform: rotate(180deg); }
+  .policy-toc summary:hover{ background: rgba(6,59,63,.03); }
+
+  .policy-toc ol{
+    list-style: none; counter-reset: toc;
+    padding: .2rem 1.2rem 1.1rem;
+  }
+  .policy-toc li{ counter-increment: toc; border-top: 1px solid rgba(6,59,63,.06); }
+  .policy-toc li:first-child{ border-top: none; }
+  .policy-toc a{
+    display: flex; gap: 10px; align-items: baseline;
+    padding: .55rem 0;
+    font-size: .84rem; font-weight: 600; color: var(--ink);
+    text-decoration: none; line-height: 1.4;
+    transition: color .15s;
+  }
+  .policy-toc a::before{
+    content: counter(toc, decimal-leading-zero) '.';
+    flex-shrink: 0;
+    font-weight: 700; color: #9aa5a4; font-size: .78rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .policy-toc a:hover{ color: var(--orange); }
+
+  .policy-body{ max-width: 720px; }
+  .policy-intro{
+    font-size: .95rem; color: var(--ink); opacity: .8; line-height: 1.75;
+    padding-bottom: 2rem; margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(6,59,63,.1);
+  }
+  .policy-block{
+    padding: 2rem 0;
+    border-bottom: 1px solid rgba(6,59,63,.08);
+  }
+  .policy-block:last-child{ border-bottom: none; padding-bottom: 0; }
+  .policy-block h2{
+    font-size: 1.12rem; font-weight: 800; color: var(--teal);
+    margin-bottom: 1rem; letter-spacing: -.005em;
+    scroll-margin-top: 100px;
+  }
+  .policy-block h2 .idx{
+    color: #9aa5a4; font-weight: 700; margin-right: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .policy-block p{
+    color: var(--ink); opacity: .78; line-height: 1.75; margin-bottom: .9rem; font-size: .93rem;
+  }
+  .policy-block ul{
+    display: flex; flex-direction: column; gap: .55rem;
+    margin: .5rem 0 1rem 0;
+  }
+  .policy-block ul li{
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: .91rem; color: var(--ink); opacity: .82; line-height: 1.65;
+  }
+  .policy-block ul li::before{
+    content: '';
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #9aa5a4;
+    margin-top: 8px; flex-shrink: 0;
+  }
+  .policy-block strong{ color: var(--teal); font-weight: 700; }
+
+  .policy-contact-card{
+    background: #fff;
+    border: 1px solid rgba(6,59,63,.14);
+    border-radius: 12px;
+    padding: 1.8rem 2rem;
+    margin-top: 1rem;
+  }
+  .policy-contact-card h3{ color: var(--teal); font-size: 1rem; margin-bottom: .35rem; font-weight: 800; }
+  .policy-contact-card p{ opacity: .7; margin-bottom: 1.1rem; font-size: .88rem; }
+  .policy-contact-row{ display: flex; flex-wrap: wrap; gap: 1.6rem; }
+  .policy-contact-item{ display: flex; align-items: center; gap: 9px; font-size: .87rem; color: var(--ink); }
+  .policy-contact-item i{ color: var(--orange); width: 14px; text-align: center; }
+  .policy-contact-item a{ color: var(--ink); text-decoration: none; font-weight: 600; }
+  .policy-contact-item a:hover{ color: var(--orange); text-decoration: underline; }
+
+  @media (max-width: 860px){
+    .policy-layout{ grid-template-columns: 1fr; }
+    .policy-toc{ position: static; }
+  }
+</style>
+
+<script>
+  // Keep the table of contents expanded on desktop (where it sits in a
+  // sticky sidebar), but collapsed by default on mobile to save space.
+  document.addEventListener('DOMContentLoaded', function(){
+    var toc = document.querySelector('.policy-toc');
+    if (!toc) return;
+    function syncToc(){
+      if (window.innerWidth > 860) toc.setAttribute('open', '');
+    }
+    syncToc();
+    window.addEventListener('resize', syncToc);
+
+    // Prefer going back to wherever the person came from; index.html
+    // (the href already on the link) is just the fallback for a direct visit.
+    var backBtn = document.getElementById('policyBackBtn');
+    if (backBtn && document.referrer && document.referrer.indexOf(window.location.host) !== -1) {
+      backBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        history.back();
+      });
+    }
+  });
+</script>
+
 </head>
+
 <body>
 
 <!-- Page transition overlay -->
@@ -800,7 +985,7 @@
       </div>
       <a href="index.html"><span class="nav-icon"><i class="fa-solid fa-house"></i></span>Home</a>
       <a href="categories.html"><span class="nav-icon"><i class="fa-solid fa-grip"></i></span>Categories</a>
-      <a href="contact.html" class="active"><span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>Contact</a>
+      <a href="contact.html"><span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>Contact</a>
     </nav>
     <button class="nav-cart" id="cartNavBtn" aria-label="Inquiry cart">
       <i class="fa-solid fa-cart-shopping"></i>
@@ -812,129 +997,155 @@
     </button>
   </div>
 </header>
-
-<!-- Page hero -->
-<section class="page-hero">
+<!-- Policy hero -->
+<section class="policy-hero">
   <div class="container">
-    <div class="eyebrow">Get In Touch</div>
-    <h1>Let's talk stock, pricing &amp; delivery.</h1>
-    <p>Whether it's a single order or a standing wholesale account, our team is ready to help. Reach out below or visit us in Male'.</p>
-  </div>
-</section>
-
-<!-- Contact -->
-<section class="contact-section container">
-  <div class="contact-grid">
-
-    <div class="info-card reveal">
-      <h2>Contact details</h2>
-      <p>We typically respond within a few hours during business days.</p>
-      <div class="info-list">
-        <div class="info-item">
-          <div class="icon"><i class="fa-solid fa-location-dot"></i></div>
-          <div>
-            <h4>Visit our store</h4>
-            <p>Zami Mart, Male  Ma. Motherland, Maldives</p>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="icon"><i class="fa-solid fa-phone"></i></div>
-          <div>
-            <h4>Call us</h4>
-            <p><a href="tel:+960 9906025">+960 9906025</a></p>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="icon"><i class="fa-brands fa-whatsapp"></i></div>
-          <div>
-            <h4>WhatsApp / Viber</h4>
-            <p><a href="https://wa.me/+960 9906025">+960 9906025</a></p>
-          </div>
-        </div>
-        <div class="info-item">
-          <div class="icon"><i class="fa-solid fa-envelope"></i></div>
-          <div>
-            <h4>Email</h4>
-            <p><a href="mailto:zamimart@gmail.com">Zamimart.g3@gmail.com</a></p>
-          </div>
-        </div>
+    <a href="index.html" class="policy-back" id="policyBackBtn"><i class="fa-solid fa-arrow-left"></i> Back</a>
+    <div class="eyebrow">Legal</div>
+    <h1>Privacy Policy</h1>
+    <p>This document explains what information Zami Mart collects when you browse, chat, or place an inquiry with us, and how that information is used and protected.</p>
+    <div class="policy-meta">
+      <div class="policy-meta-item">
+        <span class="label">Effective date</span>
+        <span class="value">July 14, 2026</span>
       </div>
-
-      <div class="info-hours">
-        <h4>Store hours</h4>
-        <div class="hours-row"><span>09:00 – 12:00</span></div>
-        <div class="hours-row"><span>13:30 – 18:00</span></div>
-        <div class="hours-row"><span>20:00 – 22:00</span></div>
+      <div class="policy-meta-item">
+        <span class="label">Applies to</span>
+        <span class="value">zamimart.com and related services</span>
       </div>
-    </div>
-
-    <div class="form-card reveal">
-      <h2>Send an inquiry</h2>
-      <p>Tell us what you're looking for — retail order, wholesale account, or a general question.</p>
-      <form>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="name">Full name</label>
-            <input type="text" id="name" name="name" placeholder="Your name" required>
-          </div>
-          <div class="form-group">
-            <label for="phone">Phone number</label>
-            <input type="tel" id="phone" name="phone" placeholder="+960 ___ ____" required>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="email">Email address</label>
-            <input type="email" id="email" name="email" placeholder="you@email.com">
-          </div>
-          <div class="form-group">
-            <label for="type">Inquiry type</label>
-            <select id="type" name="type">
-              <option>Retail order</option>
-              <option>Wholesale account</option>
-              <option>Bulk pricing request</option>
-              <option>General question</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group full">
-            <label for="message">Message</label>
-            <textarea id="message" name="message" placeholder="Tell us what you need — items, quantities, or your question."></textarea>
-          </div>
-        </div>
-        <button type="submit" class="btn btn-primary form-submit"><span>Send Message</span></button>
-      </form>
-    </div>
-  </div>
-
-  <div class="map-section reveal">
-    <div class="map-section-head">
-      <h3><i class="fa-solid fa-location-dot"></i> Find Us</h3>
-      <p>Zami Mart · Ma. Motherland, Male', Maldives</p>
-    </div>
-    <div class="map-wrap">
-      <iframe
-        src="https://maps.google.com/maps?q=4.1757293,73.5097629&z=17&output=embed"
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-        title="Zami Mart location map"
-        allowfullscreen></iframe>
-      <div class="map-pin-card">
-        <div class="map-pin-icon"><i class="fa-solid fa-store"></i></div>
-        <div>
-          <h4>Zami Mart</h4>
-          <p>Ma. Motherland, Male'<br>Republic of Maldives</p>
-        </div>
+      <div class="policy-meta-item">
+        <span class="label">Document owner</span>
+        <span class="value">Zami Mart</span>
       </div>
-      <a href="https://maps.google.com/?q=4.1757293,73.5097629" target="_blank" rel="noopener" class="map-directions-btn">
-        <i class="fa-solid fa-diamond-turn-right"></i> Get Directions
-      </a>
     </div>
   </div>
 </section>
 
-<!-- Footer -->
+<!-- Policy content -->
+<section class="policy-section container">
+  <div class="policy-layout">
+
+    <details class="policy-toc">
+      <summary>Contents <i class="fa-solid fa-chevron-down chev"></i></summary>
+      <ol>
+        <li><a href="#info-we-collect">Information we collect</a></li>
+        <li><a href="#how-we-use">How we use your information</a></li>
+        <li><a href="#account-login">Account &amp; Google login</a></li>
+        <li><a href="#chat-inquiries">Chat &amp; inquiries</a></li>
+        <li><a href="#cookies-storage">Cookies &amp; local storage</a></li>
+        <li><a href="#sharing">Sharing of information</a></li>
+        <li><a href="#data-retention">Data retention</a></li>
+        <li><a href="#your-rights">Your rights &amp; choices</a></li>
+        <li><a href="#children">Children's privacy</a></li>
+        <li><a href="#changes">Changes to this policy</a></li>
+        <li><a href="#contact-us">Contact us</a></li>
+      </ol>
+    </details>
+
+    <div class="policy-body">
+
+      <p class="policy-intro">Zami Mart ("we", "us", "our") operates this website to help customers in Male', Maldives browse our catalogue, chat with our team, and send retail or wholesale inquiries. This Privacy Policy applies whenever you visit the site, create an account, or communicate with us through chat, WhatsApp, or Viber. By using the site, you agree to the practices described below. If anything here doesn't sit right with you, please contact us before continuing to use the site.</p>
+
+      <div class="policy-block" id="info-we-collect">
+        <h2><span class="idx">1.</span>Information we collect</h2>
+        <p>We only collect what we need to process your orders and respond to you properly:</p>
+        <ul>
+          <li><span><strong>Contact details</strong> — name, phone number, and general location, collected when you start an inquiry or chat with us.</span></li>
+          <li><span><strong>Account information</strong> — email address and, if you sign in with Google, your name and profile photo.</span></li>
+          <li><span><strong>Order &amp; inquiry details</strong> — the products, quantities, and messages you send us through the cart or chat.</span></li>
+          <li><span><strong>Chat messages and attachments</strong> — including any photos or files you send our support team.</span></li>
+          <li><span><strong>Basic usage data</strong> — pages viewed and general device/browser info, used only to keep the site working smoothly.</span></li>
+        </ul>
+      </div>
+
+      <div class="policy-block" id="how-we-use">
+        <h2><span class="idx">2.</span>How we use your information</h2>
+        <p>Your information is used strictly to run the store and support you as a customer:</p>
+        <ul>
+          <li><span>Processing and following up on your retail or wholesale inquiries and quotations.</span></li>
+          <li><span>Replying to your messages in our chat, WhatsApp, or Viber.</span></li>
+          <li><span>Sending order status updates, such as when a quotation is approved.</span></li>
+          <li><span>Improving our catalogue, stock, and website based on what customers ask for most.</span></li>
+        </ul>
+        <p>We do not use your information for advertising, and we do not sell it to anyone.</p>
+      </div>
+
+      <div class="policy-block" id="account-login">
+        <h2><span class="idx">3.</span>Account &amp; Google login</h2>
+        <p>You can create an account with an email and password, or sign in faster with Google. When you use Google sign-in, Google shares your name, email, and profile photo with us — we don't receive your Google password. Your account information is stored securely with our backend provider, Firebase (by Google), and is used only to identify you across chat, inquiries, and order history.</p>
+      </div>
+
+      <div class="policy-block" id="chat-inquiries">
+        <h2><span class="idx">4.</span>Chat &amp; inquiries</h2>
+        <p>Our live chat and inquiry/quotation system are built on Firebase, so messages, attachments, and inquiry details are saved in real time so our team can respond and so you can see your quotation history later. Please avoid sending sensitive information (like full card numbers) through chat — our team will never ask for that.</p>
+      </div>
+
+      <div class="policy-block" id="cookies-storage">
+        <h2><span class="idx">5.</span>Cookies &amp; local storage</h2>
+        <p>We use your browser's local storage — not tracking cookies — to remember practical things like:</p>
+        <ul>
+          <li><span>Items in your inquiry cart, so they're not lost if you close the tab.</span></li>
+          <li><span>Your name, phone, and location, so you don't have to retype them next time.</span></li>
+          <li><span>Your chat session, so your conversation history stays with you on that device.</span></li>
+        </ul>
+        <p>This information stays in your browser and is not used to track you across other websites.</p>
+      </div>
+
+      <div class="policy-block" id="sharing">
+        <h2><span class="idx">6.</span>Sharing of information</h2>
+        <p>We don't sell or rent your information. We only share it with:</p>
+        <ul>
+          <li><span><strong>Firebase / Google Cloud</strong> — our hosting and database provider, used to store account, chat, and order data securely.</span></li>
+          <li><span><strong>Delivery or courier partners</strong> — only the details needed (name, phone, location) to fulfill your order.</span></li>
+          <li><span>Authorities, only if required by Maldivian law.</span></li>
+        </ul>
+      </div>
+
+      <div class="policy-block" id="data-retention">
+        <h2><span class="idx">7.</span>Data retention</h2>
+        <p>We keep account, chat, and order information for as long as your account is active or as needed to fulfill orders and resolve any disputes. You can ask us to delete your account and associated data at any time, subject to any records we're required to keep for legal or accounting reasons.</p>
+      </div>
+
+      <div class="policy-block" id="your-rights">
+        <h2><span class="idx">8.</span>Your rights &amp; choices</h2>
+        <p>You can, at any time:</p>
+        <ul>
+          <li><span>Ask us what information we hold about you.</span></li>
+          <li><span>Ask us to correct inaccurate details.</span></li>
+          <li><span>Ask us to delete your account and personal data.</span></li>
+          <li><span>Opt out of non-essential communications from us.</span></li>
+        </ul>
+        <p>Just message us through chat, WhatsApp, Viber, or email and we'll take care of it.</p>
+      </div>
+
+      <div class="policy-block" id="children">
+        <h2><span class="idx">9.</span>Children's privacy</h2>
+        <p>Zami Mart is intended for adults placing retail or wholesale orders. We don't knowingly collect information from children. If you believe a child has provided us with personal information, please contact us and we'll remove it.</p>
+      </div>
+
+      <div class="policy-block" id="changes">
+        <h2><span class="idx">10.</span>Changes to this policy</h2>
+        <p>We may update this policy as our site and services grow. Significant changes will be reflected by updating the "Last updated" date at the top of this page.</p>
+      </div>
+
+      <div class="policy-block" id="contact-us">
+        <h2><span class="idx">11.</span>Contact us</h2>
+        <p>Questions about this policy or your data? Reach out any time:</p>
+        <div class="policy-contact-card">
+          <h3>Zami Mart</h3>
+          <p>Ma. Motherland, Male', Republic of Maldives</p>
+          <div class="policy-contact-row">
+            <div class="policy-contact-item"><i class="fa-solid fa-phone"></i><a href="tel:+960 9906025">+960 9906025</a></div>
+            <div class="policy-contact-item"><i class="fa-solid fa-envelope"></i><a href="mailto:zamimart@gmail.com">Zamimart.g3@gmail.com</a></div>
+            <div class="policy-contact-item"><i class="fa-brands fa-whatsapp"></i><a href="https://wa.me/+960 9906025">WhatsApp us</a></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 <footer class="footer">
   <div class="container footer-grid">
     <div>
