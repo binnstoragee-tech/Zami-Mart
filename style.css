@@ -148,6 +148,22 @@ body.is-leaving .pt-panel.pt-3{ transition-delay:0s; }
 .nav-links a:hover::after{ width:100%; }
 .nav-links a.active{ color:var(--orange); }
 .nav-links a.active::after{ width:100%; }
+.nav-cart-drawer-link{ display:none; }
+.nav-drawer-cart-badge {
+  margin-left: auto;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 100px;
+  background: var(--orange);
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 800;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.nav-drawer-cart-badge.show{ display: flex; }
 
 .nav-right{
   display:flex; align-items:center; gap:18px;
@@ -174,10 +190,42 @@ body.is-leaving .pt-panel.pt-3{ transition-delay:0s; }
 
 .nav-toggle{
   display:none;
+  position:relative;
   flex-direction:column; gap:5px;
   width:32px; z-index:1001;
 }
-.nav-toggle span{
+@keyframes navToggleRingPulse{
+  0%   { box-shadow: 0 0 0 0 rgba(253,77,2,.5); }
+  70%  { box-shadow: 0 0 0 9px rgba(253,77,2,0); }
+  100% { box-shadow: 0 0 0 0 rgba(253,77,2,0); }
+}
+.nav-toggle.has-cart{
+  border-radius:50%;
+  animation: navToggleRingPulse 1.8s ease-out infinite;
+}
+@keyframes navToggleBadgePop{
+  0%   { transform: scale(0); }
+  55%  { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+.nav-toggle-badge{
+  position:absolute; top:-8px; right:-8px;
+  min-width:18px; height:18px;
+  padding:0 5px;
+  border-radius:100px;
+  background:var(--orange);
+  color:#fff;
+  font-size:.64rem;
+  font-weight:800;
+  display:none;
+  align-items:center; justify-content:center;
+  box-shadow:0 0 0 2px #fff;
+}
+.nav-toggle-badge.show{
+  display:flex;
+  animation: navToggleBadgePop .45s cubic-bezier(.34,1.56,.64,1);
+}
+.nav-toggle span:not(.nav-toggle-badge){
   display:block; height:3px; width:100%;
   background:var(--teal); border-radius:3px;
   transition: transform .35s var(--ease-soft), opacity .25s;
@@ -233,9 +281,9 @@ body.is-leaving .pt-panel.pt-3{ transition-delay:0s; }
    Layout helpers
    ============================================ */
 .container{
-  max-width:100%;
-  margin: 0;
-  padding: 0 2.5%;
+  max-width:1240px;
+  margin: 0 auto;
+  padding: 0 6%;
 }
 section{ position:relative; }
 .eyebrow{
@@ -398,36 +446,6 @@ p{ line-height:1.7; color:#3c4a49; }
   to{ opacity:1; transform:translateX(-50%) translateY(0); }
 }
 
-/* ============================================
-   Marquee strip
-   ============================================ */
-.marquee{
-  background: var(--teal);
-  overflow:hidden;
-  padding: 16px 0;
-}
-.marquee-track{
-  display:flex;
-  white-space:nowrap;
-  animation: scrollLeft 28s linear infinite;
-}
-.marquee-track span{
-  font-family:var(--font-display);
-  font-weight:700;
-  font-size:1.1rem;
-  color: var(--mint);
-  padding:0 2.2rem;
-  display:flex; align-items:center; gap:1.2rem;
-}
-.marquee-track span::after{
-  content:'◆';
-  color:var(--orange);
-  font-size:.6rem;
-}
-@keyframes scrollLeft{
-  from{ transform:translateX(0); }
-  to{ transform:translateX(-50%); }
-}
 
 /* ============================================
    Section: split intro
@@ -735,6 +753,8 @@ p{ line-height:1.7; color:#3c4a49; }
 }
 
 @media (max-width: 720px){
+  .navbar{ border-bottom:none; }
+  .navbar.scrolled{ box-shadow:none; }
   .nav-links{
     position:fixed; top:0; right:0;
     height:100vh; width:78%; max-width:340px;
@@ -774,6 +794,9 @@ p{ line-height:1.7; color:#3c4a49; }
   /* Profile now lives inside the hamburger drawer on mobile, not the top bar */
   .nav-right > .nav-account{ display:none; }
 
+  /* Cart now lives inside the hamburger drawer on mobile, not the top bar */
+  .nav-right > .nav-cart{ display:none; }
+
   .nav-toggle{
     width:38px; height:38px;
     align-items:center; justify-content:center; gap:4px;
@@ -781,7 +804,7 @@ p{ line-height:1.7; color:#3c4a49; }
     border-radius:50%;
     transition: background .3s var(--ease-soft);
   }
-  .nav-toggle span{ width:16px; }
+  .nav-toggle span:not(.nav-toggle-badge){ width:16px; }
   .nav-toggle:hover, .nav-toggle:active{ background: rgba(6,59,63,.14); }
 
   /* ---- Identity card at the top of the drawer ---- */

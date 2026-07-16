@@ -12,16 +12,127 @@
 <link rel="stylesheet" href="style.css">
 <style>
   .page-hero{
-    padding: 150px 0 3rem;
+    padding: 150px 0 2.4rem;
     background: var(--cream);
     position:relative;
     overflow:hidden;
   }
+  @media (max-width:760px){
+    .page-hero{ padding-top:110px; }
+  }
+  @media (min-width:981px){
+    .page-hero{ display:none; }
+  }
   .page-hero .container{ position:relative; z-index:1; }
-  .page-hero h1{ font-size: clamp(2.4rem, 5.5vw, 4rem); margin-bottom:1rem; max-width:760px; }
+  .page-hero h1{ font-size: clamp(1.6rem, 3vw, 2.2rem); line-height:1.22; margin:0; max-width:none; }
   .page-hero p{ max-width:560px; font-size:1.05rem; }
 
+  /* Simple Catalogue header row */
+  .cat-hero-row{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:2rem;
+    flex-wrap:wrap;
+  }
+  .cat-hero-title-simple{
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin:0;
+  }
+
+  /* Nav search (desktop) — mirrors the Home page nav search */
+  .nav-search{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    padding:0 2rem;
+  }
+  .nav-search-form{
+    position:relative;
+    width:100%;
+    max-width:420px;
+  }
+  .nav-search-form input{
+    width:100%;
+    padding:11px 44px 11px 18px;
+    border-radius:100px;
+    border:1px solid rgba(6,59,63,.14);
+    background:rgba(255,255,255,.7);
+    font-family:var(--font-body);
+    font-size:.88rem;
+    color:var(--teal);
+    transition:border-color .25s, background .25s, box-shadow .25s;
+  }
+  .nav-search-form input::placeholder{ color:#9ab0b0; }
+  .nav-search-form input:focus{
+    outline:none;
+    border-color:var(--orange);
+    background:#fff;
+    box-shadow:0 6px 20px -10px rgba(253,77,2,.35);
+  }
+  .nav-search-form button{
+    position:absolute; right:5px; top:50%; transform:translateY(-50%);
+    width:34px; height:34px; border-radius:50%;
+    border:none; background:transparent;
+    color:var(--teal);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; font-size:.92rem;
+    transition:background .2s, color .2s;
+  }
+  .nav-search-form button:hover{ background:var(--orange); color:#fff; }
+  @media (max-width:980px){
+    .nav-search{ display:none; }
+  }
+
+  .nav-suggest{
+    position:absolute;
+    left:0; right:0; top:calc(100% + 8px);
+    background:#fff;
+    border:1px solid rgba(6,59,63,.1);
+    border-radius:14px;
+    box-shadow:0 18px 40px -14px rgba(6,59,63,.35);
+    max-height:360px;
+    overflow-y:auto;
+    z-index:1100;
+    display:none;
+    padding:6px;
+  }
+  .nav-suggest.show{ display:block; }
+  .nav-suggest-item{
+    display:flex; align-items:center; gap:12px;
+    padding:9px 10px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:background .15s;
+  }
+  .nav-suggest-item:hover, .nav-suggest-item.active{ background:rgba(6,59,63,.06); }
+  .nav-suggest-img{
+    width:38px; height:38px; border-radius:8px;
+    object-fit:contain;
+    background:#f3f0e8;
+    flex-shrink:0;
+  }
+  .nav-suggest-text{ min-width:0; flex:1; }
+  .nav-suggest-name{
+    font-size:.85rem; font-weight:600; color:var(--teal);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .nav-suggest-cat{
+    font-size:.72rem; color:#8a9f9f;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .nav-suggest-empty{
+    padding:14px 12px;
+    font-size:.82rem; color:#8a9f9f; text-align:center;
+  }
+  .nav-suggest-viewall{
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    padding:10px; margin-top:2px;
+    border-top:1px solid rgba(6,59,63,.08);
+    font-size:.8rem; font-weight:700; color:var(--orange);
+    cursor:pointer;
+  }
+
   /* Search */
+  .cat-hero-row .cat-search{ margin-top:0; flex:1 1 360px; }
   .cat-search{
     margin-top: 1.6rem;
     max-width: 460px;
@@ -50,7 +161,7 @@
   }
 
   /* Catalogue hero heading */
-  .cat-hero-title{ font-size: clamp(2.4rem, 5.5vw, 4rem); margin-bottom:1rem; max-width:760px; }
+  .cat-hero-title{ font-size: clamp(2.4rem, 5.5vw, 4rem); line-height:1.22; margin-bottom:1.2rem; max-width:760px; }
   .cat-hero-title .accent{ color: var(--orange); }
 
   /* Sidebar + product grid layout */
@@ -62,6 +173,9 @@
     padding-top: 2.4rem;
     padding-bottom: 1rem;
   }
+  @media (min-width:981px){
+    .catalog-layout{ padding-top: calc(150px + 2.4rem); }
+  }
   .catalog-sidebar{
     position: relative;
   }
@@ -71,6 +185,12 @@
   @media (max-width: 980px){
     .catalog-layout{ grid-template-columns:1fr; }
     .catalog-sidebar{ position:static; }
+  }
+  @media (min-width:1500px){
+    .container.catalog-layout{ max-width:1560px; }
+  }
+  @media (min-width:1850px){
+    .container.catalog-layout{ max-width:1880px; }
   }
 
   /* Category filter panel — vertical list-card style */
@@ -99,7 +219,7 @@
     margin-top:14px;
   }
   .cat-filter-list .filter-btn{
-    display:flex; align-items:center; gap:12px;
+    display:flex; align-items:flex-start; gap:12px;
     width:100%;
     background:transparent;
     border:none;
@@ -110,12 +230,14 @@
     letter-spacing:.02em;
     text-transform:uppercase;
     font-size:.9rem;
+    line-height:1.35;
     color: var(--teal);
     text-align:left;
     transition: background .25s, color .25s;
   }
   .cat-filter-list .filter-btn .dot{
     width:7px; height:7px; border-radius:50%;
+    margin-top:6px;
     background:#c7cfce;
     flex-shrink:0;
     transition: background .25s, box-shadow .25s;
@@ -286,14 +408,10 @@
     vertical-align: middle;
   }
 
-  /* Product cards — fluid grid: the browser fits as many
-     columns as will comfortably hold a 210px-wide card, so the
-     row always fills the available width (2 columns on a phone,
-     4-5 on a laptop, 6+ on an ultra-wide monitor) instead of
-     jumping between a few fixed breakpoints and leaving gaps. */
+  /* Product cards */
   .item-tags{
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 1.2rem;
   }
   .item-tag{
@@ -356,26 +474,53 @@
     opacity:.55;
   }
 
-  /* Stock badge — small pill on the left side of the card footer,
-     directly across from the Add-to-cart button on the right.
-     Status comes from the admin dashboard's saved stock quantity
-     (see getAdminStockStatus in catalog.js); falls back to a manual
-     data-stock="in|low|out" attribute on .item-tag if set by hand. */
+  /* Stock badge — top-left of image, populated via data-stock on .item-tag */
   .stock-badge{
-    display:inline-flex; align-items:center;
-    font-family: var(--font-display);
-    font-size:.58rem; font-weight:700; line-height:1;
-    letter-spacing:.02em; text-transform:uppercase;
+    position:absolute; top:10px; left:10px; z-index:2;
+    font-size:.62rem; font-weight:800;
+    letter-spacing:.08em; text-transform:uppercase;
     color:#fff;
-    padding:6px 10px;
-    border-radius:100px;
-    white-space:nowrap;
-    flex-shrink:0;
-    box-shadow: 0 4px 10px -4px rgba(6,59,63,.35);
+    background: var(--teal);
+    padding:5px 10px;
+    border-radius:6px;
+    display:none;
   }
-  .stock-badge.stock-in{ background: var(--teal-soft); }
-  .stock-badge.stock-low{ background:#b3401f; }
-  .stock-badge.stock-out{ background:#9aa5a4; box-shadow:none; }
+  /* Top-of-image badge removed per request — stock is now only shown as
+     the small note next to Add to Cart below, plus the dimmed image. */
+  .item-tag[data-stock="out"] .product-img-wrap img{ opacity:.5; filter:grayscale(.35); }
+
+  /* Footer is split into a left side (price + stock note) and the Add
+     control on the right, spread across the full row so the stock note
+     isn't bunched up next to the button with dead space beside it. */
+  .product-footer-left{
+    display:flex; flex-direction:column; gap:2px;
+    min-width:0;
+  }
+
+  /* Small text effect next to Add to Cart, driven by admin stock data */
+  .product-stock-note{
+    font-size:.6rem; font-weight:700; letter-spacing:.01em;
+    white-space:nowrap;
+  }
+  .product-stock-note.low{
+    color:#b3401f;
+    animation: zmStockPulse 1.6s ease-in-out infinite;
+  }
+  .product-stock-note.out{ color:#c0392b; }
+
+  @keyframes zmStockPulse{
+    0%, 100% { opacity:.6; }
+    50%      { opacity:1; }
+  }
+
+  .product-add-btn.disabled,
+  .product-add-btn:disabled{
+    color:#b7c2c1 !important;
+    cursor:not-allowed;
+    pointer-events:none;
+  }
+  .product-add-btn.disabled i,
+  .product-add-btn:disabled i{ opacity:.5; }
 
   .product-body{
     display:flex; flex-direction:column;
@@ -404,15 +549,8 @@
 
   .product-footer{
     display:flex; align-items:center; justify-content:space-between;
-    gap:8px; row-gap:10px;
     margin-top:auto;
-    padding-top:12px;
-    flex-wrap:wrap;
-  }
-  .product-footer-left{
-    display:flex; align-items:center; gap:8px;
-    min-width:0;
-    flex:1 1 auto;
+    padding-top:10px;
   }
   .product-price{
     font-size:.9rem; font-weight:800; color:var(--ink);
@@ -423,55 +561,16 @@
   }
   .item-tag[data-price] .product-price{ display:block; }
   .product-add-btn{
-    display:flex; align-items:center; justify-content:center; gap:6px;
-    background: var(--teal); border:none;
+    display:flex; align-items:center; gap:6px;
+    background:none; border:none;
     font-family: var(--font-display);
-    font-weight:700; font-size:.74rem;
-    color:#fff;
-    width:34px; height:34px;
-    padding:0;
-    border-radius:50%;
-    line-height:1;
-    box-shadow: 0 6px 14px -6px rgba(6,59,63,.45);
-    transition: background .25s, transform .25s, box-shadow .25s;
-    flex-shrink:0;
-    margin-left:auto;
+    font-weight:700; font-size:.82rem;
+    color: var(--teal-soft);
+    padding:4px 2px;
+    transition: color .25s, transform .25s;
   }
-  .product-add-btn span{ display:none; }
-  .product-add-btn:hover{ background: var(--orange); transform: translateY(-1px); box-shadow: 0 8px 16px -6px rgba(253,77,2,.4); }
+  .product-add-btn:hover{ color: var(--orange); transform: translateY(-1px); }
   .product-add-btn i{ font-size:.85rem; }
-
-  /* Out of stock — footer collapses to a single centered pill instead
-     of a badge + disabled button. */
-  .product-footer.is-unavailable{ justify-content:center; }
-  .product-unavailable{
-    display:inline-flex; align-items:center; gap:5px;
-    font-family: var(--font-display);
-    font-weight:700; font-size:.6rem;
-    letter-spacing:.02em; text-transform:uppercase;
-    color:#9aa5a4;
-    background:#eef1ef;
-    border:1px solid #dde2e0;
-    padding:6px 13px;
-    border-radius:100px;
-  }
-  .product-unavailable i{ font-size:.6rem; }
-
-  /* Unavailable pill inside the product viewer (quick view) modal —
-     shown instead of Add to Cart / qty controls when out of stock. */
-  .pv-unavailable{
-    display:inline-flex; align-items:center; gap:6px;
-    font-family: var(--font-display);
-    font-weight:700; font-size:.78rem;
-    letter-spacing:.02em; text-transform:uppercase;
-    color:#9aa5a4;
-    background:#eef1ef;
-    border:1px solid #dde2e0;
-    padding:9px 18px;
-    border-radius:100px;
-  }
-  .pv-unavailable i{ font-size:.78rem; }
-
 
 
 
@@ -592,6 +691,23 @@
   .chp-empty { text-align: center; padding: 70px 20px; color: #8a9f9f; }
   .chp-empty i { font-size: 2.1rem; opacity: .28; display: block; margin-bottom: 12px; }
   .chp-empty p { font-size: .84rem; line-height: 1.6; }
+
+  .cart-open-notice{
+    display: none;
+    align-items: center; gap: 8px;
+    margin: 12px 16px 0;
+    padding: 10px 14px;
+    background: #e3f8ee;
+    color: #0a9a60;
+    border-radius: 12px;
+    font-size: .8rem;
+    font-weight: 700;
+    transform: translateY(-8px);
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+  }
+  .cart-open-notice.show{ display: flex; transform: translateY(0); opacity: 1; }
+  .cart-open-notice i{ font-size: .95rem; }
 
   .cart-items {
     flex: 1;
@@ -992,18 +1108,22 @@
   .ccf-error.show { display: block; }
   .ccf-actions { display: flex; gap: 10px; width: 100%; margin-top: .3rem; }
 
+  @media (max-width: 1100px){
+    .item-tags{ grid-template-columns: repeat(3, 1fr); }
+  }
   @media (max-width: 700px){
     .item-tags{ grid-template-columns: repeat(2, 1fr); gap:.8rem; }
     .product-body{ padding:10px 12px 12px; }
     .product-name{ font-size:.78rem; }
-    .product-footer{ gap:6px; }
-    .product-footer-left{ min-width:0; }
-    .stock-badge{ font-size:.52rem; padding:5px 7px; letter-spacing:.01em; }
-    .product-add-btn{ width:30px; height:30px; }
-    .product-add-btn i{ font-size:.78rem; }
   }
   @media (max-width: 400px){
     .item-tags{ grid-template-columns: repeat(2, 1fr); gap:.6rem; }
+  }
+  @media (min-width:1500px){
+    .item-tags{ grid-template-columns: repeat(5, 1fr); }
+  }
+  @media (min-width:1850px){
+    .item-tags{ grid-template-columns: repeat(6, 1fr); }
   }
 
   .no-results{
@@ -1046,6 +1166,13 @@
     transform: scale(.93) translateY(16px);
     transition: transform .38s cubic-bezier(.34,1.28,.64,1);
   }
+  @media (min-width:640px){
+    .pv-box-wrap{ width: min(480px, 90vw); }
+    .pv-info{ padding: 1.4rem 1.8rem 1.6rem; }
+    .pv-info h3{ font-size: 1.15rem; }
+    .pv-similar-grid{ grid-template-columns: repeat(3, 1fr); padding: 1.1rem 1.8rem 1.7rem; }
+    .pv-similar-head{ padding: 1.1rem 1.8rem .9rem; }
+  }
   .pv-overlay.open .pv-box-wrap{ transform: scale(1) translateY(0); }
 
   .pv-box{
@@ -1067,6 +1194,34 @@
   .pv-box > .pv-info,
   .pv-box > .pv-similar{
     flex-shrink: 0;
+  }
+
+  @media (min-width:860px){
+    .pv-box-wrap{ width: min(920px, 92vw); max-height: 88vh; }
+    .pv-box{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      max-height: 88vh;
+    }
+    .pv-zoom-pill{ display: none; } /* zoom pill only useful in the tall mobile stage */
+    .pv-stage{
+      grid-column: 1; grid-row: 1;
+    }
+    .pv-info{
+      grid-column: 2; grid-row: 1;
+      justify-content: center;
+      padding: 2rem 2.4rem;
+    }
+    .pv-info h3{ font-size: 1.3rem; }
+    .pv-similar{
+      grid-column: 1 / -1; grid-row: 2;
+    }
+    .pv-similar-grid{ grid-template-columns: repeat(5, 1fr); }
+    .pv-close{
+      width: auto; padding: 8px 16px 8px 12px; border-radius: 100px;
+    }
+    .pv-close:hover{ transform: scale(1.03); }
+    .pv-close-label{ display: inline; font-size: .82rem; font-weight: 700; }
   }
 
   /* Adding-to-cart panel — same look as the "Sending your inquiry" loader */
@@ -1134,7 +1289,55 @@
     background: #fff;
   }
   .pv-info-top {
-    display: flex; align-items: flex-start;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 4px;
+  }
+  .pv-category{
+    font-size: .68rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--orange);
+  }
+  .pv-sku{
+    font-size: .74rem; font-weight: 600; color: #8a9f9f;
+  }
+  .pv-stock-note{
+    display: inline-flex; align-items: center;
+    font-size: .62rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+    color: #fff;
+    background: var(--teal);
+    padding: 5px 10px; border-radius: 6px;
+    margin-top: 2px;
+  }
+  .pv-stock-note.low{
+    background: #b3401f;
+    animation: zmStockPulse 1.6s ease-in-out infinite;
+  }
+  .pv-stock-note.out{ background: #6b7280; }
+  .pv-share-row{
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 6px;
+  }
+  .pv-share-btn{
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .84rem;
+    border: none; cursor: pointer;
+    color: #fff;
+    background: #9aa5a4;
+    transition: transform .15s, opacity .2s;
+  }
+  .pv-share-btn:hover{ transform: translateY(-2px); opacity: .9; }
+  .pv-share-fb{ background: #1877f2; }
+  .pv-share-viber{ background: #7360f2; }
+  .pv-share-generic{ background: var(--teal); }
+  .pv-price-line{
+    font-size: 1.3rem; font-weight: 800; color: var(--ink);
+    margin-top: 10px;
+  }
+  .pv-price-line span{ font-size: .78rem; font-weight: 600; color: #8a9f9f; }
+  .pv-divider{
+    border: none; border-top: 1px solid rgba(6,59,63,.1);
+    margin: 14px 0;
   }
   .pv-info h3{
     font-size: 1.05rem; font-weight: 800; color: var(--teal); margin: 0;
@@ -1197,11 +1400,14 @@
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23063B3F' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 16.5V7.5a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 7.5v9a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4a2 2 0 0 0 1-1.73Z'/%3E%3Cpath d='m3.3 7 8.7 5 8.7-5M12 22V12'/%3E%3C/svg%3E") center/contain no-repeat;
   }
   .pv-similar-stock{
-    position: absolute; top: 7px; left: 7px;
-    font-size: .56rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+    position: absolute; top: 6px; left: 6px;
+    font-size: .48rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase;
     color: #fff; background: #b3401f;
-    padding: 3px 7px; border-radius: 5px;
+    padding: 2px 6px; border-radius: 4px;
+    line-height: 1.4;
   }
+  .pv-similar-stock.out{ background: #6b7280; }
+  .pv-similar-img.sim-out img{ opacity:.5; filter: grayscale(.35); }
   .pv-similar-body{ padding: 9px 10px 11px; }
   .pv-similar-name{
     font-size: .74rem; font-weight: 700; color: var(--teal);
@@ -1326,6 +1532,20 @@
   }
   .pv-add-cart-btn.pv-loading:hover { transform: none; }
 
+  .pv-add-cart-btn.pv-disabled,
+  .pv-add-cart-btn:disabled {
+    background: #dfe6e4;
+    color: #97a5a3;
+    cursor: not-allowed;
+    pointer-events: none;
+    box-shadow: none;
+    transform: none;
+  }
+  .pv-add-cart-btn.pv-disabled:hover,
+  .pv-add-cart-btn:disabled:hover { background: #dfe6e4; transform: none; box-shadow: none; }
+
+  .pv-stage.pv-stock-out img{ opacity:.5; filter: grayscale(.35); }
+
   .pv-btn-spinner {
     display: inline-flex;
     flex-shrink: 0;
@@ -1364,6 +1584,7 @@
     color: var(--teal);
     border: none;
     display: flex; align-items: center; justify-content: center;
+    gap: 6px;
     font-size: 1rem;
     cursor: pointer;
     z-index: 10;
@@ -1371,9 +1592,21 @@
     transition: background .2s, color .2s, transform .2s;
   }
   .pv-close:hover{ background: var(--orange); color: #fff; transform: rotate(90deg) scale(1.05); }
+  .pv-close-label{ display: none; }
 
   @media (max-width:560px){
     .pv-info{ flex-direction:column; align-items:flex-start; gap:.9rem; }
+  }
+  @media (max-width:400px){
+    .pv-overlay{ padding:10px; }
+    .pv-box-wrap{ width:100%; max-height:94vh; }
+    .pv-box{ max-height:94vh; border-radius:18px; }
+    .pv-info{ padding:1rem 1.1rem 1.2rem; }
+    .pv-similar-head{ padding:.9rem 1.1rem .7rem; }
+    .pv-similar-grid{ padding:.9rem 1.1rem 1.2rem; gap:.6rem; }
+    .pv-similar-name{ font-size:.7rem; }
+    .pv-add-cart-btn{ font-size:.78rem; padding:12px 10px; }
+    .pv-info h3{ font-size:.96rem; }
   }
 </style>
 </head>
@@ -1442,6 +1675,12 @@ function goBackToAdmin() {
     <img src="img/logo.png" alt="Zami Mart logo">
     <span class="nav-logo-text">zami<span>mart</span></span>
   </a>
+  <div class="nav-search">
+    <form class="nav-search-form" id="navSearchForm" role="search">
+      <input type="text" id="navSearchInput" placeholder="Search products, e.g. Dettol, Shampoo, Vicks..." autocomplete="off">
+      <button type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+  </div>
   <div class="nav-right">
     <nav class="nav-links">
       <button class="nav-close" aria-label="Close menu">&times;</button>
@@ -1456,6 +1695,7 @@ function goBackToAdmin() {
       <a href="index.html"><span class="nav-icon"><i class="fa-solid fa-house"></i></span>Home</a>
       <a href="categories.html" class="active"><span class="nav-icon"><i class="fa-solid fa-grip"></i></span>Categories</a>
       <a href="contact.html"><span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>Contact</a>
+      <a href="#" id="cartDrawerBtn" class="nav-cart-drawer-link"><span class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></span>Cart<span class="nav-drawer-cart-badge" id="cartBadgeDrawer"></span></a>
     </nav>
     <button class="nav-cart" id="cartNavBtn" aria-label="Inquiry cart">
       <i class="fa-solid fa-cart-shopping"></i>
@@ -1464,6 +1704,7 @@ function goBackToAdmin() {
     <a href="login.html" class="nav-account" aria-label="Account"><i class="fa-solid fa-circle-user"></i></a>
     <button class="nav-toggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
+      <span class="nav-toggle-badge" id="navToggleBadge"></span>
     </button>
   </div>
 </header>
@@ -1471,13 +1712,11 @@ function goBackToAdmin() {
 <!-- Page hero -->
 <section class="page-hero">
   <div class="container">
-    <div class="eyebrow">Catalogue</div>
-    <h1 class="cat-hero-title">Everything on our shelves — <span class="accent">ready to stock.</span></h1>
-    <p>Browse our full product range below. Search by name or tap a category — every item is available for individual purchase or full-case wholesale, ask us for bulk pricing.</p>
-
-    <div class="cat-search">
-      <i class="fa-solid fa-magnifying-glass"></i>
-      <input type="text" id="productSearch" placeholder="Search products, e.g. Dettol, Shampoo, Vicks...">
+    <div class="cat-hero-row">
+      <div class="cat-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="productSearch" placeholder="Search products, e.g. Dettol, Shampoo, Vicks...">
+      </div>
     </div>
   </div>
 </section>
@@ -3630,7 +3869,7 @@ function goBackToAdmin() {
 <!-- Product Viewer Modal -->
 <div class="pv-overlay" id="pvOverlay">
   <div class="pv-box-wrap">
-    <button class="pv-close" id="pvClose" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+    <button class="pv-close" id="pvClose" aria-label="Close"><i class="fa-solid fa-xmark"></i><span class="pv-close-label">Close</span></button>
     <div class="pv-box">
     <div class="pv-zoom-pill pv-zoom" id="pvZoomPill">
       <i class="fa-solid fa-magnifying-glass-plus pv-zoom-icon"></i>
@@ -3644,8 +3883,18 @@ function goBackToAdmin() {
     </div>
     <div class="pv-info">
       <div class="pv-info-top">
+        <div class="pv-category" id="pvCategory"></div>
         <h3 id="pvName"></h3>
+        <div class="pv-sku" id="pvSku"></div>
+        <span class="pv-stock-note" id="pvStockNote"></span>
+        <div class="pv-share-row">
+          <a class="pv-share-btn pv-share-fb" id="pvShareFb" target="_blank" rel="noopener" aria-label="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a class="pv-share-btn pv-share-viber" id="pvShareViber" aria-label="Share on Viber"><i class="fa-brands fa-viber"></i></a>
+          <button type="button" class="pv-share-btn pv-share-generic" id="pvShareGeneric" aria-label="Share"><i class="fa-solid fa-share-nodes"></i></button>
+        </div>
+        <div class="pv-price-line" id="pvPriceLine"></div>
       </div>
+      <hr class="pv-divider">
       <div class="pv-info-actions">
         <button class="pv-remove-btn" id="pvRemoveBtn" style="display:none;">
           <i class="fa-solid fa-trash"></i> Remove
@@ -3658,9 +3907,6 @@ function goBackToAdmin() {
         <button class="pv-add-cart-btn" id="pvAddCartBtn">
           <i class="fa-solid fa-cart-plus"></i> Add to Cart
         </button>
-        <div class="pv-unavailable" id="pvUnavailable" style="display:none;">
-          <i class="fa-solid fa-ban"></i><span>Unavailable</span>
-        </div>
       </div>
     </div>
     <div class="pv-similar" id="pvSimilar">
@@ -3693,6 +3939,7 @@ function goBackToAdmin() {
       <h3><i class="fa-solid fa-cart-shopping" style="margin-right:8px;"></i>Cart</h3>
       <button class="cart-head-close" id="cartClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
+    <div class="cart-open-notice" id="cartOpenNotice"></div>
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-history-panel" id="cartHistoryPanel">
       <div class="chp-head">
@@ -3795,6 +4042,115 @@ function goBackToAdmin() {
 <script src="main.js"></script>
 <script src="catalog.js"></script>
 <script>
+// =============================================
+// NAV SEARCH (desktop) — same behavior as the Home page nav search
+// =============================================
+(function () {
+  function getProducts() {
+    try { return JSON.parse(localStorage.getItem('zm_products') || '[]'); } catch (e) { return []; }
+  }
+  function escHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, s => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
+  }
+
+  function wireSearch(formId, inputId) {
+    const form = document.getElementById(formId);
+    const input = document.getElementById(inputId);
+    if (!form || !input) return;
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      goSearch(input.value.trim());
+    });
+
+    function goSearch(q) {
+      window.location.href = 'categories.html' + (q ? '?search=' + encodeURIComponent(q) : '');
+    }
+
+    // ---- suggestions dropdown ----
+    const box = document.createElement('div');
+    box.className = 'nav-suggest';
+    box.setAttribute('role', 'listbox');
+    form.appendChild(box);
+
+    let activeIdx = -1;
+    let currentMatches = [];
+
+    function render(q) {
+      const query = q.trim().toLowerCase();
+      if (!query) { close(); return; }
+
+      const products = getProducts();
+      const matches = products.filter(p => (p.name || '').toLowerCase().includes(query)).slice(0, 6);
+      currentMatches = matches;
+      activeIdx = -1;
+
+      if (!products.length) { close(); return; }
+
+      if (!matches.length) {
+        box.innerHTML = '<div class="nav-suggest-empty">No products found for "' + escHtml(q) + '"</div>';
+        box.classList.add('show');
+        return;
+      }
+
+      box.innerHTML = matches.map((p, i) =>
+        '<div class="nav-suggest-item" data-idx="' + i + '" data-name="' + escHtml(p.name) + '" role="option">' +
+          '<img class="nav-suggest-img" src="' + escHtml(p.image || '') + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+          '<div class="nav-suggest-text">' +
+            '<div class="nav-suggest-name">' + escHtml(p.name) + '</div>' +
+            '<div class="nav-suggest-cat">' + escHtml(p.category || '') + '</div>' +
+          '</div>' +
+        '</div>'
+      ).join('') +
+      '<div class="nav-suggest-viewall"><i class="fa-solid fa-magnifying-glass"></i> See all results for "' + escHtml(q) + '"</div>';
+
+      box.classList.add('show');
+    }
+
+    function close() {
+      box.classList.remove('show');
+      box.innerHTML = '';
+      activeIdx = -1;
+    }
+
+    function setActive(idx) {
+      const items = box.querySelectorAll('.nav-suggest-item');
+      items.forEach(el => el.classList.remove('active'));
+      if (idx >= 0 && items[idx]) {
+        items[idx].classList.add('active');
+        items[idx].scrollIntoView({ block: 'nearest' });
+      }
+      activeIdx = idx;
+    }
+
+    input.addEventListener('input', () => render(input.value));
+    input.addEventListener('focus', () => { if (input.value.trim()) render(input.value); });
+
+    input.addEventListener('keydown', e => {
+      const items = box.querySelectorAll('.nav-suggest-item');
+      if (!items.length) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(Math.min(activeIdx + 1, items.length - 1)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(Math.max(activeIdx - 1, 0)); }
+      else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); goSearch(currentMatches[activeIdx].name); }
+      else if (e.key === 'Escape') { close(); }
+    });
+
+    box.addEventListener('click', e => {
+      const item = e.target.closest('.nav-suggest-item');
+      const viewAll = e.target.closest('.nav-suggest-viewall');
+      if (item) { goSearch(item.dataset.name); }
+      else if (viewAll) { goSearch(input.value.trim()); }
+    });
+
+    document.addEventListener('click', e => {
+      if (!form.contains(e.target)) close();
+    });
+  }
+
+  wireSearch('navSearchForm', 'navSearchInput');
+})();
+</script>
+<script>
 // ============================================
 // ZAMI MART — Cart
 // ============================================
@@ -3832,10 +4188,22 @@ function goBackToAdmin() {
 
   // ---- Badge ----
   const badge = document.getElementById('cartBadge');
+  const badgeDrawer = document.getElementById('cartBadgeDrawer');
+  const badgeToggle = document.getElementById('navToggleBadge');
+  const navToggleBtn = document.querySelector('.nav-toggle');
   function updateBadge() {
     const total = cart.reduce((s, i) => s + i.qty, 0);
     badge.textContent = total;
     badge.classList.toggle('show', total > 0);
+    if (badgeDrawer) {
+      badgeDrawer.textContent = total;
+      badgeDrawer.classList.toggle('show', total > 0);
+    }
+    if (badgeToggle) {
+      badgeToggle.textContent = total > 9 ? '9+' : total;
+      badgeToggle.classList.toggle('show', total > 0);
+    }
+    if (navToggleBtn) navToggleBtn.classList.toggle('has-cart', total > 0);
     document.getElementById('cartTotalCount').textContent = total;
     document.getElementById('cartFooter').style.display = total > 0 ? 'flex' : 'none';
   }
@@ -4306,7 +4674,20 @@ function goBackToAdmin() {
 
   // ---- Open/Close ----
   const overlay = document.getElementById('cartOverlay');
-  function openCart() { overlay.classList.add('open'); }
+  let cartNoticeTimer = null;
+  function showCartOpenNotice() {
+    const notice = document.getElementById('cartOpenNotice');
+    if (!notice) return;
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    if (!total) { notice.classList.remove('show'); return; }
+    notice.innerHTML = `<i class="fa-solid fa-circle-check"></i> You have ${total} item${total > 1 ? 's' : ''} in your order`;
+    notice.classList.remove('show');
+    void notice.offsetWidth;
+    notice.classList.add('show');
+    clearTimeout(cartNoticeTimer);
+    cartNoticeTimer = setTimeout(() => notice.classList.remove('show'), 2600);
+  }
+  function openCart() { overlay.classList.add('open'); showCartOpenNotice(); }
   function closeCart() {
     overlay.classList.remove('open');
     // Reset thank-you and confirm screens after slide-out
@@ -4332,6 +4713,10 @@ function goBackToAdmin() {
   document.getElementById('cartClose').addEventListener('click', closeCart);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCart(); });
   document.getElementById('cartNavBtn').addEventListener('click', openCart);
+  const cartDrawerBtn = document.getElementById('cartDrawerBtn');
+  if (cartDrawerBtn) {
+    cartDrawerBtn.addEventListener('click', (e) => { e.preventDefault(); openCart(); });
+  }
 
   // Quotation actions in thank-you screen
   const tyViewBtn = document.getElementById('tyViewBtn');
@@ -4705,22 +5090,6 @@ body:has(.cart-overlay.open) .zm-chat-btn{opacity:0;pointer-events:none;transfor
 .zm-chat-msg.admin.last-in-group .zm-chat-bubble{border-radius:4px 18px 18px 18px;}
 /* deleted */
 .zm-chat-bubble.deleted{font-style:italic;font-size:.74rem;background:rgba(0,0,0,0)!important;color:#aaa!important;border:1.5px dashed #ccc!important;padding:7px 11px;display:flex;align-items:center;gap:5px;border-radius:10px!important;}
-
-/* Order-inquiry card — replaces the plain "Hi! I'd like to inquire
-   about..." text block with a distinct, scannable receipt-style card
-   so orders stand out at a glance instead of reading as a normal message. */
-.zm-chat-bubble.has-order-card{padding:11px 13px;}
-.zm-order-card{min-width:190px;}
-.zm-oc-head{display:flex;align-items:center;gap:7px;font-weight:700;font-size:.8rem;letter-spacing:.01em;padding-bottom:8px;margin-bottom:8px;border-bottom:1px dashed rgba(255,255,255,.4);}
-.zm-oc-head i{font-size:.82rem;}
-.zm-oc-items{display:flex;flex-direction:column;gap:7px;}
-.zm-oc-item{display:flex;align-items:baseline;gap:6px;font-size:.81rem;line-height:1.4;}
-.zm-oc-num{font-weight:700;opacity:.8;flex-shrink:0;}
-.zm-oc-name{flex:1;}
-.zm-oc-qty{flex-shrink:0;background:rgba(255,255,255,.28);padding:1px 8px;border-radius:20px;font-size:.7rem;font-weight:700;}
-.zm-oc-foot{display:flex;align-items:center;gap:6px;font-size:.71rem;opacity:.85;padding-top:8px;margin-top:8px;border-top:1px dashed rgba(255,255,255,.4);}
-.zm-chat-msg.admin .zm-oc-head,.zm-chat-msg.admin .zm-oc-foot{border-color:rgba(6,59,63,.15);}
-.zm-chat-msg.admin .zm-oc-qty{background:rgba(6,59,63,.08);}
 /* time + sender label */
 .zm-chat-time{font-size:.6rem;color:#8a9faa;padding:0 3px;margin-top:1px;}
 .zm-chat-edited-tag{font-size:.6rem;color:#8a9faa;opacity:.85;font-style:italic;padding:0 3px;margin-top:1px;}
@@ -4948,39 +5317,6 @@ const unreadBadge=document.getElementById('zmChatUnread');
 let sessionId=null,visitorName=null,visitorAvatar=null;
 let zmReplyTarget=null;
 function escH(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML;}
-
-// ============================================
-// Detects the auto-generated "order inquiry" chat
-// message (sent when a customer taps Inquire/Checkout)
-// and renders it as a distinct card instead of plain
-// text, so it stands out at a glance in the chat.
-// ============================================
-function buildOrderInquiryCard(text){
-  const re = /^(👋 Hi! I'd like to inquire about:|📦 New Order Inquiry)\n━+\n([\s\S]*?)\n━+\n🕐 (.+)$/;
-  const match = text.match(re);
-  if(!match) return null;
-
-  const isNewOrder = match[1].indexOf('New Order') !== -1;
-  const items = match[2].split('\n').map(l=>l.trim()).filter(Boolean).map(line=>{
-    const im = line.match(/^(\d+)\.\s*(.+?)(?:\s*×\s*(\d+))?$/);
-    return im ? {num:im[1], name:im[2], qty:im[3]||''} : {num:'', name:line, qty:''};
-  });
-  const dateStr = match[3].trim();
-
-  const itemsHtml = items.map(it => `
-    <div class="zm-oc-item">
-      <span class="zm-oc-num">${escH(it.num)}.</span>
-      <span class="zm-oc-name">${escH(it.name)}</span>
-      ${it.qty ? `<span class="zm-oc-qty">×${escH(it.qty)}</span>` : ''}
-    </div>`).join('');
-
-  return `
-    <div class="zm-order-card">
-      <div class="zm-oc-head"><i class="fa-solid fa-bag-shopping"></i><span>${isNewOrder ? 'New Order Inquiry' : "I'd like to inquire about"}</span></div>
-      <div class="zm-oc-items">${itemsHtml}</div>
-      <div class="zm-oc-foot"><i class="fa-regular fa-clock"></i><span>${escH(dateStr)}</span></div>
-    </div>`;
-}
 
 // ── Reply-to state / bar ──
 const zmReplyBar=document.getElementById('zmReplyBar');
@@ -5290,11 +5626,10 @@ function renderMsgs(){
     const isImgOnly=(!isDeleted&&!!m.imageData);
     const fileH=(!isDeleted&&!m.imageData&&m.attachment)?ChatSystem.renderAttachmentHtml(m.attachment):'';
     const editedTag=(!isDeleted&&m.edited)?`<div class="zm-chat-edited-tag">edited</div>`:'';
-    const orderCardHtml = (!isDeleted && m.text) ? buildOrderInquiryCard(m.text) : null;
     const txtH=isDeleted
       ?`<span><i class="fa-solid fa-circle-xmark" style="font-size:.72rem;margin-right:5px;opacity:.7;"></i>Message unsent</span>`
-      :(orderCardHtml ? orderCardHtml : (m.text?`<div class="${isImgOnly?'zm-chat-caption':''}">${escH(m.text)}</div>`:''));
-    const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}${isImgOnly?' img-only':''}${orderCardHtml?' has-order-card':''}`;
+      :(m.text?`<div class="${isImgOnly?'zm-chat-caption':''}">${escH(m.text)}</div>`:'');
+    const bubbleCls=`zm-chat-bubble${isDeleted?' deleted':''}${isImgOnly?' img-only':''}`;
     const cls=['zm-chat-msg',isAdmin?'admin':'visitor',!isFirst?'same-sender':'',(isLast&&!isFirst)?'last-in-group':''].filter(Boolean).join(' ');
     const reactions=(!isDeleted)?(m.reactions||(m.reaction?{legacy:m.reaction}:{})):{};
     const reactionEntries=Object.entries(reactions).filter(([,em])=>em);

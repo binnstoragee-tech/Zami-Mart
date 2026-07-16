@@ -13,9 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const s = document.createElement('style');
     s.id = 'zmCartCtrlStyle';
     s.textContent = `
-      .product-cart-ctrl{ display:flex; align-items:center; gap:8px; margin-left:auto; }
-      .product-add-btn:disabled{ opacity:.5; cursor:not-allowed; }
-      .product-add-btn:disabled:hover{ transform:none; }
+      .product-cart-ctrl{ display:flex; align-items:center; margin-left:auto; }
       .item-tag[data-price] .product-cart-ctrl{ margin-left:0; }
 
       @keyframes zmCtrlPopIn{
@@ -76,6 +74,22 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   let zmAddToastTimer = null;
+  function showToastMsg(msg) {
+    let toast = document.getElementById('zmAddToast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'zmAddToast';
+      toast.innerHTML = '<span class="zat-icon"><i class="fa-solid fa-check"></i></span><span class="zat-text"></span>';
+      document.body.appendChild(toast);
+    }
+    toast.querySelector('.zat-text').textContent = msg;
+    toast.classList.remove('show');
+    void toast.offsetWidth;
+    toast.classList.add('show');
+    clearTimeout(zmAddToastTimer);
+    zmAddToastTimer = setTimeout(() => toast.classList.remove('show'), 1800);
+  }
+
   function showAddedToast(productName) {
     let toast = document.getElementById('zmAddToast');
     if (!toast) {
@@ -94,44 +108,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ============================================
-  // Admin-linked stock lookup. Reads the same localStorage
-  // key the admin dashboard (admin.html) saves products to
-  // ('zm_products'), matches by product name, and applies
-  // the exact same thresholds admin uses:
-  //   qty > 10  -> in stock
-  //   qty 1-10  -> low stock
-  //   qty === 0 -> out of stock
-  //   qty blank/unset -> no badge shown
-  // Falls back to a manual data-stock="in|low|out" attribute
-  // on the .item-tag (if present) when no admin match is found,
-  // so the badge still works for hand-authored product tags.
+  // Admin stock lookup — reads the same 'zm_products' localStorage
+  // record the admin panel writes to, keyed by normalized product name,
+  // so every catalog card reflects the live stock/price admin has set.
   // ============================================
-  function getAdminStockStatus(productName) {
+  let zmProductsByName = null;
+  function getZmProductsMap(forceRefresh) {
+    if (zmProductsByName && !forceRefresh) return zmProductsByName;
+    zmProductsByName = new Map();
     try {
-      const raw = localStorage.getItem('zm_products');
-      if (!raw) return null;
-      const list = JSON.parse(raw);
-      if (!Array.isArray(list)) return null;
-      const norm = s => (s || '').toString().trim().toLowerCase();
-      const match = list.find(p => norm(p.name) === norm(productName));
-      if (!match) return null;
-      if (match.stock === '' || match.stock === undefined || match.stock === null) return null;
-      const qty = parseInt(match.stock);
-      if (isNaN(qty)) return null;
-      if (qty <= 0) return 'out';
-      if (qty <= 10) return 'low';
-      return 'in';
-    } catch (e) {
-      return null;
+      const list = JSON.parse(localStorage.getItem('zm_products') || '[]');
+      list.forEach(p => {
+        if (!p || !p.name) return;
+        const key = p.name.trim().toLowerCase().replace(/\s+/g, ' ');
+        zmProductsByName.set(key, p);
+      });
+    } catch (e) {}
+    return zmProductsByName;
+  }
+
+  // stock === '' / null / undefined  -> no data entered yet, treat as In Stock
+  // stock === 0                      -> Out of Stock
+  // 1-10                             -> Low Stock
+  // >10                              -> In Stock
+  function getStockInfo(productName) {
+    const rec = getZmProductsMap().get(productName.trim().toLowerCase().replace(/\s+/g, ' '));
+    if (!rec || rec.stock === '' || rec.stock === undefined || rec.stock === null) {
+      return { status: 'in', qty: null };
     }
+    const qty = parseInt(rec.stock, 10);
+    if (isNaN(qty)) return { status: 'in', qty: null };
+    if (qty <= 0) return { status: 'out', qty: 0 };
+    if (qty <= 10) return { status: 'low', qty };
+    return { status: 'in', qty };
   }
 
   // ============================================
   // Enhance product cards: category label + structured
-  // body (SKU / price / stock badge render only once that
-  // data exists — set via data-sku / data-price / data-unit /
-  // data-stock="in|low" attributes on the .item-tag element)
+  // body (SKU / price render only once that data exists — set via
+  // data-sku / data-price / data-unit on the .item-tag element).
+  // Stock status is pulled live from admin's product data above and
+  // drives the stock badge, the small note next to Add to Cart, and
+  // whether Add to Cart is even clickable.
   // ============================================
+  const zmStockRefreshers = [];
+
   document.querySelectorAll('.cat-block').forEach(block => {
     const catNameEl = block.querySelector('.cat-block-head h2');
     const catName = catNameEl ? catNameEl.textContent.trim() : '';
@@ -142,6 +163,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const imgWrap = tag.querySelector('.product-img-wrap');
       const nameEl = tag.querySelector('.product-name');
       if (!nameEl) return;
+
+      const productName = nameEl.textContent.trim();
 
       const body = document.createElement('div');
       body.className = 'product-body';
@@ -161,47 +184,27 @@ document.addEventListener('DOMContentLoaded', () => {
       const footer = document.createElement('div');
       footer.className = 'product-footer';
 
-      // ---- Add button <-> quantity stepper control ----
-      const productName = nameEl.textContent.trim();
-
-      // Stock status — driven by the admin-set stock quantity
-      // (falls back to a manual data-stock attribute if no admin record found).
-      const stockStatus = getAdminStockStatus(productName) || tag.dataset.stock || null;
-
-      if (stockStatus === 'out') {
-        // Out of stock: just one centered "Unavailable" pill, no badge,
-        // no Add/quantity controls (there's nothing to add to cart).
-        footer.classList.add('is-unavailable');
-        const unavailableEl = document.createElement('div');
-        unavailableEl.className = 'product-unavailable';
-        unavailableEl.innerHTML = '<i class="fa-solid fa-ban"></i><span>Unavailable</span>';
-        footer.appendChild(unavailableEl);
-        body.appendChild(footer);
-        tag.appendChild(body);
-        return;
-      }
-
-      const footerLeft = document.createElement('div');
-      footerLeft.className = 'product-footer-left';
-
       const priceEl = document.createElement('div');
       priceEl.className = 'product-price';
       if (tag.dataset.price) {
         priceEl.innerHTML = `MVR ${tag.dataset.price}` + (tag.dataset.unit ? `<span> / ${tag.dataset.unit}</span>` : '');
       }
-      footerLeft.appendChild(priceEl);
 
-      // Stock badge — sits on the left of the footer, directly across
-      // from the Add button.
-      if (stockStatus === 'in' || stockStatus === 'low') {
-        const stockBadge = document.createElement('span');
-        stockBadge.className = 'stock-badge stock-' + stockStatus;
-        stockBadge.textContent = stockStatus === 'low' ? 'Low Stock' : 'In Stock';
-        footerLeft.appendChild(stockBadge);
-      }
+      // Left side of the footer: price (if any) + the small stock note.
+      // Keeping this on the left and the Add control flush right (via
+      // .product-cart-ctrl's own margin-left:auto) spreads the row across
+      // the full card width instead of bunching everything to one side.
+      const leftWrap = document.createElement('div');
+      leftWrap.className = 'product-footer-left';
+      leftWrap.appendChild(priceEl);
 
-      footer.appendChild(footerLeft);
+      const stockNote = document.createElement('span');
+      stockNote.className = 'product-stock-note';
+      leftWrap.appendChild(stockNote);
 
+      footer.appendChild(leftWrap);
+
+      // ---- Add button <-> quantity stepper control ----
       const ctrl = document.createElement('div');
       ctrl.className = 'product-cart-ctrl';
 
@@ -225,6 +228,33 @@ document.addEventListener('DOMContentLoaded', () => {
       const incBtn = stepper.querySelector('.pq-inc');
       const valEl = stepper.querySelector('.pq-val');
 
+      let currentStockStatus = 'in';
+
+      function applyStock() {
+        const info = getStockInfo(productName);
+        currentStockStatus = info.status;
+        tag.dataset.stock = info.status;
+
+        stockNote.className = 'product-stock-note';
+        if (info.status === 'out') {
+          stockNote.classList.add('out');
+          stockNote.textContent = 'Out of stock';
+        } else if (info.status === 'low') {
+          stockNote.classList.add('low');
+          stockNote.textContent = info.qty != null ? `Only ${info.qty} left` : 'Low stock';
+        } else {
+          stockNote.textContent = '';
+        }
+
+        const isOut = info.status === 'out';
+        addBtn.disabled = isOut;
+        addBtn.classList.toggle('disabled', isOut);
+        incBtn.disabled = isOut;
+        addBtn.innerHTML = isOut
+          ? '<span>Sold Out</span>'
+          : '<span>Add</span><i class="fa-solid fa-cart-plus"></i>';
+      }
+
       function syncCtrl() {
         const item = window.ZMCart ? window.ZMCart.getItem(productName) : null;
         if (item) {
@@ -239,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       addBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (!window.ZMCart) return;
+        if (addBtn.disabled || currentStockStatus === 'out' || !window.ZMCart) return;
         const img = imgWrap ? imgWrap.querySelector('img') : null;
         const productImg = (img && !imgWrap.classList.contains('no-img')) ? img.src : null;
         const ok = window.ZMCart.addItem(productName, productImg);
@@ -262,18 +292,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
       incBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        if (!window.ZMCart) return;
+        if (incBtn.disabled || currentStockStatus === 'out' || !window.ZMCart) return;
         const item = window.ZMCart.getItem(productName);
         if (!item) return;
         window.ZMCart.setQty(productName, item.qty + 1);
         syncCtrl();
       });
 
+      applyStock();
       syncCtrl();
+      zmStockRefreshers.push(applyStock);
 
       body.appendChild(footer);
       tag.appendChild(body);
     });
+  });
+
+  // Keep cards in sync if admin updates stock in another tab/window while
+  // this catalog page is open (localStorage 'storage' event fires cross-tab).
+  window.addEventListener('storage', (e) => {
+    if (e.key && e.key !== 'zm_products') return;
+    getZmProductsMap(true);
+    zmStockRefreshers.forEach(fn => fn());
   });
 
   const filterBtns = document.querySelectorAll('.filter-btn');
@@ -394,63 +434,59 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // On mobile, the search box + Categories toggle sit together in a
-  // toolbar placed right after the currently-visible category's header
-  // (icon/title/description), just above that category's products.
-  const mobileToolbarSidebar = document.querySelector('.catalog-layout > .catalog-sidebar');
-  const mobileToolbarLayout = document.querySelector('.catalog-layout');
-  const mobileToolbarMain = document.querySelector('.catalog-layout > .catalog-main');
-  const mobileToolbarFirstBlock = document.querySelector('#personal-care');
-  const mobileToolbarSearch = document.querySelector('.cat-search');
-  const mobileToolbarHeroContainer = document.querySelector('.page-hero .container');
+  // On mobile, move the Categories toggle so it sits just below the
+  // first category's item count (instead of above it). On desktop it
+  // stays in its normal sidebar position.
+  (function repositionCatFilterPanel() {
+    const sidebar = document.querySelector('.catalog-layout > .catalog-sidebar');
+    const catalogLayout = document.querySelector('.catalog-layout');
+    const catalogMain = document.querySelector('.catalog-layout > .catalog-main');
+    // NOTE: anchor to the first cat-block SECTION itself (not something inside
+    // it) so we can insert the toolbar as a SIBLING before it. Previously the
+    // toolbar was inserted *inside* #personal-care's .cat-block-inner — when
+    // a different category filter was tapped, #personal-care got the
+    // .cat-hidden (display:none) class and took the toggle button down with it.
+    const firstBlock = document.querySelector('#personal-care');
+    const searchWrap = document.querySelector('.cat-search');
+    const heroContainer = document.querySelector('.page-hero .container');
 
-  let catMobileToolbar = document.getElementById('catMobileToolbar');
-  if (!catMobileToolbar) {
-    catMobileToolbar = document.createElement('div');
-    catMobileToolbar.id = 'catMobileToolbar';
-    catMobileToolbar.className = 'cat-mobile-toolbar';
-  }
+    if (!sidebar || !catalogLayout || !catalogMain || !firstBlock) return;
 
-  const mobileToolbarMq = window.matchMedia('(max-width: 980px)');
-  let isCurrentlyMobileToolbar = null;
-
-  // Finds whichever category block is currently on screen (not filtered
-  // out) and drops the toolbar right after its header, before its
-  // product grid — so it always follows that block's title, wherever
-  // it happens to be in the filtered list.
-  function repositionMobileToolbarInline() {
-    if (!isCurrentlyMobileToolbar) return;
-    const activeBlock = document.querySelector('.cat-block:not(.cat-hidden)') || mobileToolbarFirstBlock;
-    if (!activeBlock) return;
-    const head = activeBlock.querySelector('.cat-block-head');
-    const inner = activeBlock.querySelector('.cat-block-inner') || activeBlock;
-    if (head && head.parentNode) {
-      head.insertAdjacentElement('afterend', catMobileToolbar);
-    } else {
-      inner.insertBefore(catMobileToolbar, inner.firstChild);
+    // Wrapper that holds the search box + Categories toggle side by side on mobile
+    let toolbar = document.getElementById('catMobileToolbar');
+    if (!toolbar) {
+      toolbar = document.createElement('div');
+      toolbar.id = 'catMobileToolbar';
+      toolbar.className = 'cat-mobile-toolbar';
     }
-  }
 
-  function placeMobileToolbar(isMobile) {
-    if (isCurrentlyMobileToolbar === isMobile) return;
-    isCurrentlyMobileToolbar = isMobile;
+    const mq = window.matchMedia('(max-width: 980px)');
+    let isCurrentlyMobile = null;
 
-    if (isMobile) {
-      catMobileToolbar.appendChild(mobileToolbarSidebar);
-      if (mobileToolbarSearch) catMobileToolbar.appendChild(mobileToolbarSearch);
-      repositionMobileToolbarInline();
-      mobileToolbarSidebar.classList.add('cat-filter-inline');
-    } else {
-      mobileToolbarLayout.insertBefore(mobileToolbarSidebar, mobileToolbarMain);
-      mobileToolbarSidebar.classList.remove('cat-filter-inline');
-      if (mobileToolbarSearch && mobileToolbarHeroContainer) mobileToolbarHeroContainer.appendChild(mobileToolbarSearch);
+    function place(isMobile) {
+      if (isCurrentlyMobile === isMobile) return;
+      isCurrentlyMobile = isMobile;
+
+      if (isMobile) {
+        if (searchWrap) toolbar.appendChild(searchWrap);
+        toolbar.appendChild(sidebar);
+        // Insert as a sibling BEFORE the first cat-block, not inside it —
+        // this way toggling .cat-hidden on any category block (including
+        // personal-care) never affects the toolbar/toggle's visibility.
+        catalogMain.insertBefore(toolbar, firstBlock);
+        sidebar.classList.add('cat-filter-inline');
+      } else {
+        catalogLayout.insertBefore(sidebar, catalogMain);
+        sidebar.classList.remove('cat-filter-inline');
+        const heroRow = document.querySelector('.cat-hero-row');
+        if (searchWrap && heroRow) heroRow.appendChild(searchWrap);
+        else if (searchWrap && heroContainer) heroContainer.appendChild(searchWrap);
+      }
     }
-  }
 
-  if (mobileToolbarSidebar && mobileToolbarLayout && mobileToolbarMain && mobileToolbarFirstBlock) {
-    placeMobileToolbar(mobileToolbarMq.matches);
-    mobileToolbarMq.addEventListener('change', e => placeMobileToolbar(e.matches));
-  }
+    place(mq.matches);
+    mq.addEventListener('change', e => place(e.matches));
+  })();
   const searchInput = document.getElementById('productSearch');
   const noResults = document.getElementById('noResults');
 
@@ -485,7 +521,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     noResults.classList.toggle('show', !anyVisible);
-    repositionMobileToolbarInline();
   }
 
   filterBtns.forEach(btn => {
@@ -524,6 +559,17 @@ document.addEventListener('DOMContentLoaded', () => {
     debounceTimer = setTimeout(applyFilters, 120);
   });
 
+  // Prefill from ?search= query param (e.g. coming from the homepage nav search)
+  (function prefillFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('search');
+    if (q) {
+      searchInput.value = q;
+      applyFilters();
+      searchInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  })();
+
   /* ============================================
      Product Viewer (zoom modal)
   ============================================ */
@@ -532,13 +578,19 @@ document.addEventListener('DOMContentLoaded', () => {
   const pvImgWrap     = document.getElementById('pvImgWrap');
   const pvImg         = document.getElementById('pvImg');
   const pvName        = document.getElementById('pvName');
+  const pvCategory    = document.getElementById('pvCategory');
+  const pvSku         = document.getElementById('pvSku');
+  const pvPriceLine   = document.getElementById('pvPriceLine');
+  const pvShareFb     = document.getElementById('pvShareFb');
+  const pvShareViber  = document.getElementById('pvShareViber');
+  const pvShareGeneric = document.getElementById('pvShareGeneric');
   const pvClose       = document.getElementById('pvClose');
   const pvZoomIn      = document.getElementById('pvZoomIn');
   const pvZoomOut     = document.getElementById('pvZoomOut');
   const pvAddCartBtn  = document.getElementById('pvAddCartBtn');
+  const pvStockNote   = document.getElementById('pvStockNote');
   const pvRemoveBtn   = document.getElementById('pvRemoveBtn');
   const pvQtyCtrl     = document.getElementById('pvQtyCtrl');
-  const pvUnavailable = document.getElementById('pvUnavailable');
   const pvQtyDec      = document.getElementById('pvQtyDec');
   const pvQtyInc      = document.getElementById('pvQtyInc');
   const pvQtyVal      = document.getElementById('pvQtyVal');
@@ -602,39 +654,66 @@ document.addEventListener('DOMContentLoaded', () => {
     pvQtyVal.textContent = qty;
   }
 
-  function syncPvCartBtn(productName, productImg, stockStatus) {
+  // Current stock status of whatever product is open in the viewer —
+  // read by the Add to Cart click handler and the qty steppers so an
+  // out-of-stock item can never actually be added.
+  let pvCurrentStock = { status: 'in', qty: null };
+
+  function syncPvCartBtn(productName, productImg) {
     pvCurrentProduct = { name: productName, img: productImg };
     if (!pvAddCartBtn) return;
 
-    // Out of stock: hide Add/Remove/Qty controls entirely and show
-    // the "Unavailable" pill instead, same as the product card.
-    if (stockStatus === 'out') {
-      pvAddCartBtn.style.display = 'none';
-      pvRemoveBtn.style.display = 'none';
-      if (pvQtyCtrl) pvQtyCtrl.style.display = 'none';
-      if (pvUnavailable) pvUnavailable.style.display = '';
-      return;
+    const info = getStockInfo(productName);
+    pvCurrentStock = info;
+    const isOut = info.status === 'out';
+    if (pvStage) pvStage.classList.toggle('pv-stock-out', isOut);
+
+    if (pvStockNote) {
+      pvStockNote.className = 'pv-stock-note';
+      if (isOut) {
+        pvStockNote.classList.add('out');
+        pvStockNote.textContent = 'Out of Stock';
+      } else if (info.status === 'low') {
+        pvStockNote.classList.add('low');
+        pvStockNote.textContent = info.qty != null ? `Only ${info.qty} left` : 'Low Stock';
+      } else {
+        pvStockNote.textContent = 'In Stock';
+      }
     }
-    if (pvUnavailable) pvUnavailable.style.display = 'none';
 
     const qty = getPvQty();
     if (qty > 0) {
       pvAddCartBtn.style.display = 'none';
       pvRemoveBtn.style.display = '';
       updatePvQtyDisplay(qty);
+      if (pvQtyInc) pvQtyInc.disabled = isOut || (info.status === 'low' && info.qty != null && qty >= info.qty);
     } else {
       pvAddCartBtn.style.display = '';
-      pvAddCartBtn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
-      pvAddCartBtn.classList.remove('pv-added');
       pvRemoveBtn.style.display = 'none';
       pendingQty = 1;
       updatePvQtyDisplay(pendingQty);
+
+      if (isOut) {
+        pvAddCartBtn.disabled = true;
+        pvAddCartBtn.classList.add('pv-disabled');
+        pvAddCartBtn.classList.remove('pv-added');
+        pvAddCartBtn.innerHTML = '<i class="fa-solid fa-ban"></i> Out of Stock';
+        if (pvQtyCtrl) pvQtyCtrl.style.display = 'none';
+      } else {
+        pvAddCartBtn.disabled = false;
+        pvAddCartBtn.classList.remove('pv-disabled');
+        pvAddCartBtn.classList.remove('pv-added');
+        pvAddCartBtn.innerHTML = '<i class="fa-solid fa-cart-plus"></i> Add to Cart';
+        if (pvQtyCtrl) pvQtyCtrl.style.display = '';
+        if (pvQtyInc) pvQtyInc.disabled = info.status === 'low' && info.qty != null && pendingQty >= info.qty;
+      }
     }
   }
 
   if (pvAddCartBtn) {
     pvAddCartBtn.addEventListener('click', () => {
       if (!window.ZMCart || !pvCurrentProduct.name) return;
+      if (pvAddCartBtn.disabled || pvCurrentStock.status === 'out') return;
       if (pvAddCartBtn.classList.contains('pv-loading') || pvAddCartBtn.classList.contains('pv-added')) return;
 
       // Check login first before showing loading animation
@@ -711,9 +790,12 @@ document.addEventListener('DOMContentLoaded', () => {
         window.ZMCart.setQty(pvCurrentProduct.name, qty + 1);
         syncPvCartBtn(pvCurrentProduct.name, pvCurrentProduct.img);
       } else {
-        // Not yet added — just adjust the quantity to add
-        pendingQty = pendingQty + 1;
+        // Not yet added — just adjust the quantity to add, capped at
+        // whatever's left when stock is low.
+        const cap = (pvCurrentStock.status === 'low' && pvCurrentStock.qty != null) ? pvCurrentStock.qty : Infinity;
+        pendingQty = Math.min(cap, pendingQty + 1);
         updatePvQtyDisplay(pendingQty);
+        if (pvQtyInc) pvQtyInc.disabled = pendingQty >= cap;
       }
     });
   }
@@ -800,12 +882,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         imgBox.appendChild(cloneImg);
       }
-      if (simTag.dataset.stock === 'low') {
+      if (simTag.dataset.stock === 'low' || simTag.dataset.stock === 'out') {
         const badge = document.createElement('span');
-        badge.className = 'pv-similar-stock';
-        badge.textContent = 'Low Stock';
+        badge.className = 'pv-similar-stock' + (simTag.dataset.stock === 'out' ? ' out' : '');
+        badge.textContent = simTag.dataset.stock === 'out' ? 'Out of Stock' : 'Low Stock';
         imgBox.appendChild(badge);
       }
+      if (simTag.dataset.stock === 'out') imgBox.classList.add('sim-out');
       card.appendChild(imgBox);
 
       const body = document.createElement('div');
@@ -840,10 +923,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const productName = name ? name.textContent.trim() : '';
     const productImg  = (img && !wrap.classList.contains('no-img')) ? img.src : null;
-    const stockStatus = getAdminStockStatus(productName) || tag.dataset.stock || null;
 
     pvName.textContent = productName;
     resetView();
+
+    const catEl = tag.querySelector('.product-cat');
+    const skuEl = tag.querySelector('.product-sku');
+    const priceEl = tag.querySelector('.product-price');
+    if (pvCategory) pvCategory.textContent = catEl ? catEl.textContent.trim() : '';
+    if (pvSku) pvSku.textContent = (skuEl && skuEl.textContent.trim()) ? skuEl.textContent.trim() : '';
+    if (pvPriceLine) pvPriceLine.innerHTML = (priceEl && priceEl.innerHTML.trim()) ? priceEl.innerHTML : '';
+
+    if (pvShareFb) {
+      pvShareFb.href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(location.href);
+    }
+    if (pvShareViber) {
+      pvShareViber.href = 'viber://forward?text=' + encodeURIComponent(productName + ' — ' + location.href);
+    }
+    if (pvShareGeneric) {
+      pvShareGeneric.onclick = () => {
+        if (navigator.share) {
+          navigator.share({ title: productName, url: location.href }).catch(() => {});
+        } else {
+          navigator.clipboard.writeText(location.href).then(() => showToastMsg('Link copied'));
+        }
+      };
+    }
 
     if (img && !wrap.classList.contains('no-img')) {
       pvImg.src = img.src;
@@ -855,8 +960,7 @@ document.addEventListener('DOMContentLoaded', () => {
       pvStage.classList.add('no-img');
     }
 
-    if (pvQtyCtrl) pvQtyCtrl.style.display = '';
-    syncPvCartBtn(productName, productImg, stockStatus);
+    syncPvCartBtn(productName, productImg);
     renderSimilarProducts(tag);
 
     if (pvBox) pvBox.scrollTop = 0;

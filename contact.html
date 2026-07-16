@@ -326,6 +326,23 @@
   .chp-empty i { font-size: 2.1rem; opacity: .28; display: block; margin-bottom: 12px; }
   .chp-empty p { font-size: .84rem; line-height: 1.6; }
 
+  .cart-open-notice{
+    display: none;
+    align-items: center; gap: 8px;
+    margin: 12px 16px 0;
+    padding: 10px 14px;
+    background: #e3f8ee;
+    color: #0a9a60;
+    border-radius: 12px;
+    font-size: .8rem;
+    font-weight: 700;
+    transform: translateY(-8px);
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+  }
+  .cart-open-notice.show{ display: flex; transform: translateY(0); opacity: 1; }
+  .cart-open-notice i{ font-size: .95rem; }
+
   .cart-items {
     flex: 1;
     overflow-y: auto;
@@ -801,6 +818,7 @@
       <a href="index.html"><span class="nav-icon"><i class="fa-solid fa-house"></i></span>Home</a>
       <a href="categories.html"><span class="nav-icon"><i class="fa-solid fa-grip"></i></span>Categories</a>
       <a href="contact.html" class="active"><span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>Contact</a>
+      <a href="#" id="cartDrawerBtn" class="nav-cart-drawer-link"><span class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></span>Cart<span class="nav-drawer-cart-badge" id="cartBadgeDrawer"></span></a>
     </nav>
     <button class="nav-cart" id="cartNavBtn" aria-label="Inquiry cart">
       <i class="fa-solid fa-cart-shopping"></i>
@@ -809,6 +827,7 @@
     <a href="login.html" class="nav-account" aria-label="Account"><i class="fa-solid fa-circle-user"></i></a>
     <button class="nav-toggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
+      <span class="nav-toggle-badge" id="navToggleBadge"></span>
     </button>
   </div>
 </header>
@@ -990,6 +1009,7 @@
       <h3><i class="fa-solid fa-cart-shopping" style="margin-right:8px;"></i>My Cart</h3>
       <button class="cart-head-close" id="cartClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
+    <div class="cart-open-notice" id="cartOpenNotice"></div>
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-history-panel" id="cartHistoryPanel">
       <div class="chp-head">
@@ -1143,10 +1163,22 @@
 
   // ---- Badge ----
   const badge = document.getElementById('cartBadge');
+  const badgeDrawer = document.getElementById('cartBadgeDrawer');
+  const badgeToggle = document.getElementById('navToggleBadge');
+  const navToggleBtn = document.querySelector('.nav-toggle');
   function updateBadge() {
     const total = cart.reduce((s, i) => s + i.qty, 0);
     badge.textContent = total;
     badge.classList.toggle('show', total > 0);
+    if (badgeDrawer) {
+      badgeDrawer.textContent = total;
+      badgeDrawer.classList.toggle('show', total > 0);
+    }
+    if (badgeToggle) {
+      badgeToggle.textContent = total > 9 ? '9+' : total;
+      badgeToggle.classList.toggle('show', total > 0);
+    }
+    if (navToggleBtn) navToggleBtn.classList.toggle('has-cart', total > 0);
     document.getElementById('cartTotalCount').textContent = total;
     document.getElementById('cartFooter').style.display = total > 0 ? 'flex' : 'none';
   }
@@ -1617,7 +1649,20 @@
 
   // ---- Open/Close ----
   const overlay = document.getElementById('cartOverlay');
-  function openCart() { overlay.classList.add('open'); }
+  let cartNoticeTimer = null;
+  function showCartOpenNotice() {
+    const notice = document.getElementById('cartOpenNotice');
+    if (!notice) return;
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    if (!total) { notice.classList.remove('show'); return; }
+    notice.innerHTML = `<i class="fa-solid fa-circle-check"></i> You have ${total} item${total > 1 ? 's' : ''} in your order`;
+    notice.classList.remove('show');
+    void notice.offsetWidth;
+    notice.classList.add('show');
+    clearTimeout(cartNoticeTimer);
+    cartNoticeTimer = setTimeout(() => notice.classList.remove('show'), 2600);
+  }
+  function openCart() { overlay.classList.add('open'); showCartOpenNotice(); }
   function closeCart() {
     overlay.classList.remove('open');
     // Reset thank-you and confirm screens after slide-out
@@ -1643,6 +1688,10 @@
   document.getElementById('cartClose').addEventListener('click', closeCart);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCart(); });
   document.getElementById('cartNavBtn').addEventListener('click', openCart);
+  const cartDrawerBtn = document.getElementById('cartDrawerBtn');
+  if (cartDrawerBtn) {
+    cartDrawerBtn.addEventListener('click', (e) => { e.preventDefault(); openCart(); });
+  }
 
   // Quotation actions in thank-you screen
   const tyViewBtn = document.getElementById('tyViewBtn');

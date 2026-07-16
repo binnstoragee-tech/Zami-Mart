@@ -13,343 +13,301 @@
 <style>
 
 /* =============================================
-   HERO — full-viewport split
+   HERO CAROUSEL — contained peek carousel
+   Center slide large + cropped side peeks, like a
+   classic "centered mode" carousel. Much smaller
+   footprint than a full-bleed banner.
    ============================================= */
-.hero {
-  min-height: 80vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: stretch;
+.hero-carousel {
+  width: 100%;
+  padding: 152px 0 42px;
   background: var(--cream);
-  background-image: radial-gradient(rgba(6,59,63,.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(6,59,63,.06) 1px, transparent 1px);
   background-size: 22px 22px;
-  overflow: hidden;
+}
+
+.hc-wrap {
   position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 60px;
 }
 
-.hero-copy {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 110px 4% 60px 7%;
+.hc-viewport {
   position: relative;
-  z-index: 2;
+  width: 100%;
+  aspect-ratio: 3.4 / 1;
+  max-height: 260px;
 }
 
-.hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .24em;
-  text-transform: uppercase;
-  color: var(--orange);
-  margin-bottom: 1.8rem;
-  opacity: 0;
-  animation: fadeUp .7s var(--ease-soft) .1s forwards;
-}
-.hero-eyebrow::before {
-  content: '';
-  width: 28px; height: 2px;
-  background: var(--orange);
-  border-radius: 2px;
-  flex-shrink: 0;
-}
-
-.hero-meta {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-bottom: 1.8rem;
-}
-.hero-meta .hero-eyebrow { margin-bottom: 0; }
-
-.hero-status {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 5px 14px 5px 10px;
-  border-radius: 100px;
-  background: rgba(6,59,63,.06);
-  font-size: .72rem;
-  font-weight: 700;
-  letter-spacing: .04em;
-  color: var(--teal);
-  opacity: 0;
-  animation: fadeUp .7s var(--ease-soft) .2s forwards;
-}
-.hero-status .status-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: #2f9e6e;
-  flex-shrink: 0;
-  position: relative;
-}
-.hero-status .status-dot::after {
-  content: '';
-  position: absolute; inset: -4px;
-  border-radius: 50%;
-  background: #2f9e6e;
-  opacity: .4;
-  animation: statusPulse 2s ease-out infinite;
-}
-.hero-status.is-closed .status-dot,
-.hero-status.is-closed .status-dot::after { background: #c2492f; }
-@keyframes statusPulse {
-  0% { transform: scale(1); opacity: .5; }
-  100% { transform: scale(2.4); opacity: 0; }
-}
-
-
-.hero-scroll-cue {
-  display: none;
-  align-items: center;
-  gap: 10px;
-  margin-top: 2.6rem;
-  font-size: .8rem;
-  font-weight: 600;
-  color: #8aa0a0;
-  cursor: pointer;
-  background: none;
-  width: fit-content;
-}
-.hero-scroll-cue i {
-  animation: scrollBounce 1.6s ease-in-out infinite;
-  color: var(--orange);
-}
-@keyframes scrollBounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(6px); }
-}
-
-.hero-title {
-  font-size: clamp(2rem, 3.2vw, 3.8rem);
-  line-height: 1.04;
-  letter-spacing: -.035em;
-  color: var(--teal);
-  margin-bottom: 1.6rem;
-}
-.hero-title .line { display: block; overflow: hidden; }
-.hero-title .line span {
-  display: block;
-  transform: translateY(110%);
-  animation: lineUp .9s var(--ease-soft) forwards;
-}
-.hero-title .line:nth-child(1) span { animation-delay: .15s; }
-.hero-title .line:nth-child(2) span { animation-delay: .28s; }
-.hero-title .line:nth-child(3) span { animation-delay: .38s; }
-@keyframes lineUp { to { transform: translateY(0); } }
-
-.hero-title .accent {
-  color: var(--orange);
-  font-style: italic;
-  position: relative;
-  display: inline-block;
-}
-.hero-title .accent::after {
-  content: '';
+.hc-slide {
   position: absolute;
-  left: -3%; right: -3%; bottom: .06em;
-  height: .22em;
-  background: var(--mint);
-  z-index: -1;
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: underlineGrow .6s var(--ease-soft) .9s forwards;
+  top: 0; height: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 18px 40px -16px rgba(6,59,63,.35);
+  transition: left .6s var(--ease-soft), width .6s var(--ease-soft),
+              transform .6s var(--ease-soft), opacity .5s ease, filter .5s ease;
 }
-@keyframes underlineGrow { to { transform: scaleX(1); } }
-
-.hero-sub {
-  font-size: 0.92rem;
-  line-height: 1.7;
-  color: #5a6e6e;
-  max-width: 440px;
-  margin-bottom: 2.6rem;
+.hc-slide-img {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+}
+.hc-slide-scrim {
+  position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(6,20,20,.7) 0%, rgba(6,20,20,.32) 32%, rgba(6,20,20,0) 58%);
   opacity: 0;
-  animation: fadeUp .8s var(--ease-soft) .5s forwards;
+  transition: opacity .4s ease;
 }
+.hc-slide.c .hc-slide-scrim { opacity: 1; }
 
-.hero-ctas {
-  display: flex; gap: 1rem; flex-wrap: wrap;
-  margin-bottom: 0;
+.hc-slide.c  { left: 50%; width: 64%; transform: translateX(-50%) scale(1);    opacity: 1;  z-index: 3; filter: none; }
+.hc-slide.l1 { left: 18%; width: 24%; transform: translateX(-50%) scale(.94); opacity: .65; z-index: 2; filter: brightness(.72) saturate(.85); }
+.hc-slide.r1 { left: 82%; width: 24%; transform: translateX(-50%) scale(.94); opacity: .65; z-index: 2; filter: brightness(.72) saturate(.85); }
+.hc-slide.l2 { left: 3%;  width: 18%; transform: translateX(-50%) scale(.86); opacity: 0;   z-index: 0; filter: brightness(.6); pointer-events: none; }
+.hc-slide.r2 { left: 97%; width: 18%; transform: translateX(-50%) scale(.86); opacity: 0;   z-index: 0; filter: brightness(.6); pointer-events: none; }
+.hc-slide.c:hover .hc-slide-img { filter: brightness(1.03); }
+
+.hc-slide-caption {
+  position: absolute;
+  left: 24px; right: 24px; bottom: 18px;
+  z-index: 2;
+  display: flex; flex-direction: column; gap: .3rem;
   opacity: 0;
-  animation: fadeUp .8s var(--ease-soft) .65s forwards;
+  transform: translateY(14px);
+  transition: opacity .4s ease .1s, transform .4s var(--ease-soft) .1s;
+}
+.hc-slide.c .hc-slide-caption { opacity: 1; transform: translateY(0); }
+.hc-cap-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: .6rem; font-weight: 700;
+  letter-spacing: .18em; text-transform: uppercase;
+  color: var(--mint);
+}
+.hc-cap-eyebrow::before { content: ''; width: 16px; height: 2px; background: var(--orange); border-radius: 2px; flex-shrink: 0; }
+.hc-cap-title {
+  font-size: clamp(1.05rem, 1.7vw, 1.4rem);
+  font-weight: 800; letter-spacing: -.02em;
+  line-height: 1.15;
+  color: #fff;
+  text-shadow: 0 4px 16px rgba(0,0,0,.3);
 }
 
-.hero-divider {
-  width: 48px; height: 2px;
-  background: rgba(6,59,63,.12);
-  margin-top: 1.4rem;
-  margin-bottom: 1.4rem;
-  opacity: 0;
-  animation: fadeUp .6s var(--ease-soft) .78s forwards;
+/* Arrows sit in the side padding, outside the peeking cards */
+.hc-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 42px; height: 42px; border-radius: 50%;
+  border: 1px solid rgba(6,59,63,.14); background: #fff; color: var(--teal);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 10px 24px -10px rgba(6,59,63,.3); z-index: 5;
+  transition: border-color .2s, color .2s, transform .15s, background .2s;
+}
+.hc-arrow:hover { border-color: var(--orange); color: #fff; background: var(--orange); }
+.hc-arrow:active { transform: translateY(-50%) scale(.92); }
+.hc-arrow.prev { left: 0; }
+.hc-arrow.next { right: 0; }
+
+.hc-dots {
+  display: flex; justify-content: center; align-items: center; gap: 8px;
+  margin-top: 22px;
+}
+.hc-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: rgba(6,59,63,.18);
+  cursor: pointer;
+  transition: background .25s, transform .25s, width .25s;
+}
+.hc-dot.active { background: var(--orange); width: 22px; border-radius: 4px; }
+
+@media (max-width: 1024px) {
+  .hero-carousel { padding: 146px 0 36px; }
+  .hc-wrap { padding: 0 50px; }
+  .hc-viewport { aspect-ratio: 2.6 / 1; max-height: 240px; }
+  .hc-slide.c  { width: 70%; }
+  .hc-slide.l1 { left: 12%; width: 22%; }
+  .hc-slide.r1 { left: 88%; width: 22%; }
 }
 
-.hero-stat-row {
-  display: flex; gap: 2.8rem;
-  opacity: 0;
-  animation: fadeUp .8s var(--ease-soft) .82s forwards;
-}
-.hero-stat { display: flex; flex-direction: column; }
-.hero-stat-num {
-  font-size: 1.6rem; font-weight: 800;
-  color: var(--teal); letter-spacing: -.04em; line-height: 1;
-}
-.hero-stat-num span { color: var(--orange); }
-.hero-stat-label {
-  font-size: .72rem; font-weight: 600;
-  letter-spacing: .08em; text-transform: uppercase;
-  color: #9ab0b0; margin-top: .3rem;
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to   { opacity: 1; transform: translateY(0); }
+@media (max-width: 700px) {
+  .hero-carousel { padding: 94px 0 28px; }
+  .hc-wrap { padding: 0 20px; }
+  .hc-viewport { aspect-ratio: 1.8 / 1; max-height: 210px; }
+  .hc-slide { border-radius: 16px; }
+  .hc-slide.c  { width: 80%; }
+  .hc-slide.l1 { left: 10%; width: 16%; }
+  .hc-slide.r1 { left: 90%; width: 16%; }
+  .hc-slide.l2, .hc-slide.r2 { width: 8%; }
+  .hc-slide-caption { left: 16px; right: 16px; bottom: 14px; }
+  .hc-cap-title { font-size: 1rem; }
+  .hc-cap-eyebrow { font-size: .55rem; }
+  .hc-arrow { width: 34px; height: 34px; }
+  .hc-arrow.prev { left: 2px; }
+  .hc-arrow.next { right: 2px; }
 }
 
 /* =============================================
-   SLIDESHOW
+   NAV SEARCH — centered search bar in the header
    ============================================= */
-.hero-slideshow {
-  position: relative;
-  overflow: hidden;
-  background: var(--teal);
-  opacity: 0;
-  animation: fadeIn .9s var(--ease-soft) .2s forwards;
+.nav-search {
+  flex: 1;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 40px 4%;
+  padding: 0 2rem;
 }
-.hero-slideshow-inner {
+.nav-search-form {
   position: relative;
   width: 100%;
-  max-width: 440px;
-  aspect-ratio: 1 / 1;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: 0 32px 80px -16px rgba(0,0,0,.35);
+  max-width: 420px;
 }
-@keyframes fadeIn { to { opacity: 1; } }
-
-.slide {
-  position: absolute; inset: 0;
-  opacity: 0;
-  transition: opacity .8s cubic-bezier(.4,0,.2,1);
-  will-change: opacity;
+.nav-search-form input {
+  width: 100%;
+  padding: 11px 44px 11px 18px;
+  border-radius: 100px;
+  border: 1px solid rgba(6,59,63,.14);
+  background: rgba(255,255,255,.7);
+  font-family: var(--font-body);
+  font-size: .88rem;
+  color: var(--teal);
+  transition: border-color .25s, background .25s, box-shadow .25s;
 }
-.slide.active { opacity: 1; }
-
-.slide img {
-  width: 100%; height: 100%;
-  object-fit: cover; object-position: center;
-  display: block;
-  transform: scale(1.05);
-  transition: transform 6s ease-out;
+.nav-search-form input::placeholder { color: #9ab0b0; }
+.nav-search-form input:focus {
+  outline: none;
+  border-color: var(--orange);
+  background: #fff;
+  box-shadow: 0 6px 20px -10px rgba(253,77,2,.35);
 }
-.slide.active img { transform: scale(1); }
-
-.slide::after {
-  content: '';
-  position: absolute; inset: 0;
-  pointer-events: none;
-}
-
-.slide-placeholder {
-  position: absolute; inset: 0;
+.nav-search-form button {
+  position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+  width: 34px; height: 34px; border-radius: 50%;
+  border: none; background: transparent;
+  color: var(--teal);
   display: flex; align-items: center; justify-content: center;
-  background: linear-gradient(145deg, var(--teal-soft), var(--teal));
+  cursor: pointer; font-size: .92rem;
+  transition: background .2s, color .2s;
 }
-.slide-placeholder .ph-icon { font-size: 5rem; color: rgba(255,255,255,.1); }
+.nav-search-form button:hover { background: var(--orange); color: #fff; }
 
-.slide-label {
-  position: absolute; bottom: 4.6rem; left: 2.4rem; right: 2.4rem;
-  z-index: 10; color: #fff;
-  opacity: 0; transform: translateY(14px);
-  transition: opacity .55s ease .25s, transform .55s ease .25s;
-  pointer-events: none;
-  text-shadow: 0 2px 12px rgba(0,0,0,.7), 0 1px 4px rgba(0,0,0,.5);
-}
-.slide.active .slide-label { opacity: 1; transform: translateY(0); }
-.slide-label-tag {
-  font-size: .65rem; font-weight: 700;
-  letter-spacing: .2em; text-transform: uppercase;
-  color: var(--orange); margin-bottom: .4rem;
-  display: flex; align-items: center; gap: 6px;
-  text-shadow: 0 2px 8px rgba(0,0,0,.6);
-}
-.slide-label-tag::before {
-  content: ''; width: 16px; height: 2px;
-  background: var(--orange); border-radius: 2px;
-}
-.slide-label h3 {
-  font-size: clamp(1.1rem, 1.8vw, 1.6rem);
-  font-weight: 800; color: #fff;
-  line-height: 1.12; letter-spacing: -.025em;
-  text-shadow: 0 2px 16px rgba(0,0,0,.8), 0 1px 4px rgba(0,0,0,.6);
-}
-.slide-label p { font-size: .85rem; color: rgba(255,255,255,.85); margin-top: .3rem; text-shadow: 0 1px 8px rgba(0,0,0,.7); }
+.nav-search-mobile { display: none; }
 
-.slide-progress {
-  position: absolute; top: 0; left: 0;
-  height: 3px; background: var(--orange);
-  z-index: 20; width: 0%;
-  border-radius: 0 2px 2px 0;
+/* =============================================
+   NAV SEARCH SUGGESTIONS — live product dropdown
+   ============================================= */
+.nav-suggest {
+  position: absolute;
+  left: 0; right: 0; top: calc(100% + 8px);
+  background: #fff;
+  border: 1px solid rgba(6,59,63,.1);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px -14px rgba(6,59,63,.35);
+  max-height: 360px;
+  overflow-y: auto;
+  z-index: 1100;
+  display: none;
+  padding: 6px;
 }
-
-.slide-counter {
-  position: absolute; top: 2rem; right: 2rem;
-  z-index: 20; font-size: .75rem; font-weight: 700;
-  letter-spacing: .1em; color: rgba(255,255,255,.45);
-}
-.slide-counter span { color: #fff; }
-
-.slide-dots {
-  position: absolute; top: 50%; right: 1.6rem;
-  transform: translateY(-50%);
-  z-index: 20; display: flex; flex-direction: column; gap: .55rem;
-}
-.slide-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: rgba(255,255,255,.3);
-  border: none; cursor: pointer; padding: 0;
-  transition: background .3s, height .35s var(--ease-soft), border-radius .35s;
-}
-.slide-dot.active {
-  background: #fff; height: 22px; border-radius: 3px;
-}
-
-.slide-controls {
-  position: absolute; bottom: 1.6rem; left: 50%;
-  transform: translateX(-50%);
-  z-index: 20; display: flex; align-items: center; gap: .7rem;
-}
-.slide-btn {
-  width: 44px; height: 44px; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,.25);
-  background: rgba(255,255,255,.08);
-  backdrop-filter: blur(8px);
-  color: #fff; font-size: .85rem;
-  display: flex; align-items: center; justify-content: center;
+.nav-suggest.show { display: block; }
+.nav-suggest-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 10px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background .3s, border-color .3s, transform .25s var(--ease-soft);
+  transition: background .15s;
 }
-.slide-btn:hover { background: var(--orange); border-color: var(--orange); transform: scale(1.1); }
+.nav-suggest-item:hover,
+.nav-suggest-item.active { background: rgba(6,59,63,.06); }
+.nav-suggest-img {
+  width: 38px; height: 38px; border-radius: 8px;
+  object-fit: contain;
+  background: #f3f0e8;
+  flex-shrink: 0;
+}
+.nav-suggest-text { min-width: 0; flex: 1; }
+.nav-suggest-name {
+  font-size: .85rem; font-weight: 600; color: var(--teal);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-suggest-cat {
+  font-size: .72rem; color: #8a9f9f;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.nav-suggest-empty {
+  padding: 14px 12px;
+  font-size: .82rem; color: #8a9f9f; text-align: center;
+}
+.nav-suggest-viewall {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px; margin-top: 2px;
+  border-top: 1px solid rgba(6,59,63,.08);
+  font-size: .8rem; font-weight: 700; color: var(--orange);
+  cursor: pointer;
+}
+
+@media (max-width: 980px) {
+  .nav-search { display: none; }
+  .nav-search-mobile {
+    display: block;
+    position: fixed;
+    top: 68px; left: 0; right: 0;
+    z-index: 999;
+    padding: 10px 6%;
+    background: rgba(251,246,238,.92);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(6,59,63,.07);
+  }
+  .nav-search-mobile .nav-search-form { max-width: none; }
+  .navbar.scrolled + .nav-search-mobile,
+  body.is-scrolled .nav-search-mobile { top: 56px; }
+  .hero-carousel { padding-top: 156px; }
+}
+
+@media (max-width: 700px) {
+  .hero-carousel { padding-top: 148px; }
+}
 
 /* =============================================
    NEW ARRIVALS — coming soon centered style
    ============================================= */
 .new-arrivals-section {
-  padding: 5rem 0 6rem;
+  padding: 2.75rem 0 5rem;
   background: var(--cream);
   position: relative;
 }
 
+.na-viewall {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.2rem;
+}
+.na-viewall-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: .82rem;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--teal);
+  padding: 10px 20px;
+  border-radius: 100px;
+  border: 1.5px solid rgba(6,59,63,.16);
+  transition: background .25s, color .25s, border-color .25s, transform .25s;
+}
+.na-viewall-link i { font-size: .75rem; transition: transform .25s; }
+.na-viewall-link:hover {
+  background: var(--teal);
+  color: #fff;
+  border-color: var(--teal);
+  transform: translateY(-2px);
+}
+.na-viewall-link:hover i { transform: translateX(3px); }
+
 .na-section-head {
   text-align: center;
-  margin-bottom: 2.6rem;
+  margin-bottom: 2rem;
 }
 .na-section-head h2 {
   font-size: clamp(2rem, 4vw, 3rem);
@@ -368,13 +326,13 @@
   position: relative;
   background: #f4f5ee;
   border-radius: 24px;
-  padding: 4rem 2rem 3.5rem;
+  padding: 3rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 1.4rem;
+  gap: 1.7rem;
   max-width: 640px;
   margin: 0 auto;
   overflow: hidden;
@@ -426,33 +384,6 @@
   100% { opacity: 0;  transform: scale(1.2); }
 }
 
-.na-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  background: #f8f8f8;
-  border: 1px solid#FD4D02;
-  color:#FD4D02;
-  font-size: .65rem;
-  font-weight: 800;
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  padding: .35rem .85rem;
-  border-radius: 100px;
-  width: fit-content;
-}
-.na-badge-dot {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: #FD4D02;
-  box-shadow: 0 0 6px#FD4D02;
-  animation: nabDotBlink 1.4s ease-in-out infinite;
-}
-@keyframes nabDotBlink {
-  0%, 100% { opacity: 1; box-shadow: 0 0 6px #FD4D02; }
-  50%       { opacity: .4; box-shadow: none; }
-}
-
 .na-card h3 {
   font-size: clamp(1.5rem, 3vw, 2rem);
   text-transform: uppercase;
@@ -488,42 +419,6 @@
 .na-btn-viber:hover {
   transform: translateY(-3px);
   box-shadow: 0 16px 36px -8px rgba(115,96,242,.7);
-}
-
-/* hide old elements not used */
-.na-left, .na-divider, .na-right, .na-scan, .na-grid, .na-corner { display: none; }
-
-/* =============================================
-   (placeholder for old na-right styles — kept for safety)
-   ============================================= */
-.na-right-placeholder {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 1.6rem;
-}
-
-.na-right-label {
-  font-size: .7rem;
-  font-weight: 700;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-  color: #9ab0b0;
-}
-
-.na-right h3 {
-  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
-  font-weight: 700;
-  color: var(--teal);
-  line-height: 1.25;
-  letter-spacing: -.02em;
-  margin: 0;
-}
-
-.na-perks {
-  display: flex;
-  flex-direction: column;
-  gap: .75rem;
 }
 
 /* =============================================
@@ -700,31 +595,15 @@
    RESPONSIVE
    ============================================= */
 @media (max-width: 1024px) {
-  .hero { grid-template-columns: 1fr; grid-template-rows: auto auto; min-height: auto; }
-  .hero-copy { padding: 130px 6% 60px; }
-  .hero-slideshow { padding: 40px 6% 60px; }
-  .hero-scroll-cue { display: flex; }
   .why-cards { grid-template-columns: 1fr 1fr; }
-  .na-card { grid-template-columns: 1fr; grid-template-rows: auto 1px auto; }
-  .na-divider { grid-column: 1; grid-row: 2; min-height: 1px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hero-status .status-dot::after,
-  .hero-scroll-cue i,
-  .marquee-track { animation: none !important; }
+  .hc-slide { transition: none !important; animation: none !important; }
 }
 
 @media (max-width: 700px) {
-  .hero-slideshow-inner { box-shadow: 0 16px 40px -12px rgba(0,0,0,.3); }
-  .hero-copy { padding: 110px 5% 50px; }
-  .hero-slideshow { padding: 30px 5% 40px; }
-  .hero-stat-row { gap: 1.6rem; }
   .why-cards { grid-template-columns: 1fr; }
-  .na-left { padding: 2.4rem 1.8rem; }
-  .na-right { padding: 2.4rem 1.8rem; }
-  .slide-dots { display: none; }
-  .slide-label { left: 1.6rem; right: 1.6rem; }
   .cta-banner { grid-template-columns: 1fr; text-align: center; justify-items: center; padding: 3rem 6%; }
 }
   .nav-cart { position:relative; width:40px; height:40px; border-radius:50%; background:transparent; border:none; color:var(--teal); font-size:1.15rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:color .2s; }
@@ -744,6 +623,21 @@
     border: 2px solid var(--cream);
   }
   .cart-badge.show { display: flex; }
+  .nav-drawer-cart-badge {
+    margin-left: auto;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 100px;
+    background: var(--orange);
+    color: #fff;
+    font-size: .7rem;
+    font-weight: 800;
+    display: none;
+    align-items: center;
+    justify-content: center;
+  }
+  .nav-drawer-cart-badge.show { display: flex; }
 
   /* ===== Cart Drawer ===== */
   .cart-overlay {
@@ -832,6 +726,23 @@
   .chp-empty { text-align: center; padding: 70px 20px; color: #8a9f9f; }
   .chp-empty i { font-size: 2.1rem; opacity: .28; display: block; margin-bottom: 12px; }
   .chp-empty p { font-size: .84rem; line-height: 1.6; }
+
+  .cart-open-notice{
+    display: none;
+    align-items: center; gap: 8px;
+    margin: 12px 16px 0;
+    padding: 10px 14px;
+    background: #e3f8ee;
+    color: #0a9a60;
+    border-radius: 12px;
+    font-size: .8rem;
+    font-weight: 700;
+    transform: translateY(-8px);
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
+  }
+  .cart-open-notice.show{ display: flex; transform: translateY(0); opacity: 1; }
+  .cart-open-notice i{ font-size: .95rem; }
 
   .cart-items {
     flex: 1;
@@ -1247,6 +1158,12 @@
   <a href="index.html" class="nav-logo">
     <img src="img/logo.png" alt="Zami Mart logo">
   </a>
+  <div class="nav-search">
+    <form class="nav-search-form" id="navSearchForm" role="search">
+      <input type="text" id="navSearchInput" placeholder="Search products, e.g. Dettol, Shampoo, Vicks..." autocomplete="off">
+      <button type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+    </form>
+  </div>
   <div class="nav-right">
     <nav class="nav-links">
       <button class="nav-close" aria-label="Close menu">&times;</button>
@@ -1261,6 +1178,7 @@
       <a href="index.html" class="active"><span class="nav-icon"><i class="fa-solid fa-house"></i></span>Home</a>
       <a href="categories.html"><span class="nav-icon"><i class="fa-solid fa-grip"></i></span>Categories</a>
       <a href="contact.html"><span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>Contact</a>
+      <a href="#" id="cartDrawerBtn" class="nav-cart-drawer-link"><span class="nav-icon"><i class="fa-solid fa-cart-shopping"></i></span>Cart<span class="nav-drawer-cart-badge" id="cartBadgeDrawer"></span></a>
     </nav>
     <button class="nav-cart" id="cartNavBtn" aria-label="Cart">
       <i class="fa-solid fa-cart-shopping"></i>
@@ -1269,149 +1187,30 @@
     <a href="login.html" class="nav-account" aria-label="Account"><i class="fa-solid fa-circle-user"></i></a>
     <button class="nav-toggle" aria-label="Toggle menu">
       <span></span><span></span><span></span>
+      <span class="nav-toggle-badge" id="navToggleBadge"></span>
     </button>
   </div>
 </header>
+<div class="nav-search-mobile">
+  <form class="nav-search-form" id="navSearchFormMobile" role="search">
+    <input type="text" id="navSearchInputMobile" placeholder="Search products..." autocomplete="off">
+    <button type="submit" aria-label="Search"><i class="fa-solid fa-magnifying-glass"></i></button>
+  </form>
+</div>
 
 <!-- =============================================
-     HERO
-     ============================================= -->
-<section class="hero">
-
-  <!-- LEFT: Copy -->
-  <div class="hero-copy">
-    <div class="hero-meta">
-      <div class="hero-eyebrow">Convenience Store &amp; Wholesale</div>
-    </div>
-    <h1 class="hero-title">
-      <span class="line"><span>Everyday</span></span>
-      <span class="line"><span>essentials,</span></span>
-      <span class="line"><span><em class="accent">stocked</em> &amp; priced</span></span>
-    </h1>
-    <p class="hero-sub">
-      From personal care to household needs — Zami Mart supplies households, shops, and businesses across Male' with everyday essentials, fair prices, and fast turnaround.
-    </p>
-    <div class="hero-ctas">
-      <a href="categories.html" class="btn btn-primary"><span>Browse Categories</span></a>
-      <a href="contact.html" class="btn btn-outline">Get a Wholesale Quote <i class="fa-solid fa-arrow-right"></i></a>
-    </div>
-    <div class="hero-divider"></div>
-    <div class="hero-stat-row">
-      <div class="hero-stat">
-        <span class="hero-stat-num"><span class="count-num" data-count="8">0</span><span>+</span></span>
-        <span class="hero-stat-label">Categories</span>
-      </div>
-      <div class="hero-stat">
-        <span class="hero-stat-num"><span class="count-num" data-count="200">0</span><span>+</span></span>
-        <span class="hero-stat-label">Products</span>
-      </div>
-      <div class="hero-stat">
-        <span class="hero-stat-num">B2B<span> &amp; B2C</span></span>
-        <span class="hero-stat-label">Retail &amp; Wholesale</span>
-      </div>
-    </div>
-    <button class="hero-scroll-cue" id="heroScrollCue" aria-label="Scroll to see categories">
-      See what we stock <i class="fa-solid fa-chevron-down"></i>
-    </button>
-  </div>
-
-  <!-- RIGHT: Slideshow -->
-  <div class="hero-slideshow" id="heroSlideshow">
-   <div class="hero-slideshow-inner">
-    <div class="slide-progress" id="slideProgress"></div>
-    <div class="slide-counter"><span id="slideCurrentNum">1</span> / 8</div>
-    <div class="slide-dots" id="slideDots"></div>
-
-    <div class="slide active" data-index="0">
-      <div class="slide-placeholder"><i class="fa-solid fa-pump-soap ph-icon"></i></div>
-      <img src="img/personal_care.jpg" alt="Personal Care" loading="eager">
-      <div class="slide-label">
-        <div class="slide-label-tag">Category 1 of 8</div>
-        <h3>Personal Care</h3>
-        <p>Soaps, shampoos, skincare &amp; oral care</p>
-      </div>
-    </div>
-    <div class="slide" data-index="1">
-      <div class="slide-placeholder"><i class="fa-solid fa-suitcase-medical ph-icon"></i></div>
-      <img src="img/health&wellness.jpg" alt="Health & Wellness" loading="lazy">
-      <div class="slide-label">
-        <div class="slide-label-tag">Category 2 of 8</div>
-        <h3>Health &amp; Wellness</h3>
-        <p>Balms, cold &amp; cough remedies, first aid</p>
-      </div>
-    </div>
-    <div class="slide" data-index="2">
-      <div class="slide-placeholder"><i class="fa-solid fa-spray-can-sparkles ph-icon"></i></div>
-      <img src="img/household&cleaning.jpg" alt="Household & Cleaning" loading="lazy">
-      <div class="slide-label">
-        <div class="slide-label-tag">Category 3 of 8</div>
-        <h3>Household &amp; Cleaning</h3>
-        <p>Detergents, cleaners &amp; insect control</p>
-      </div>
-    </div>
-    <div class="slide" data-index="3">
-      <div class="slide-placeholder"><i class="fa-solid fa-candy-cane ph-icon"></i></div>
-      <img src="img/snacks&confectionery.jpg" alt="Snacks & Confectionery" loading="lazy">
-      <div class="slide-label">
-        <div class="slide-label-tag">Category 4 of 8</div>
-        <h3>Snacks &amp; Confectionery</h3>
-        <p>Gums, candies &amp; chocolates</p>
-      </div>
-    </div>
-    <div class="slide" data-index="4">
-      <div class="slide-placeholder"><i class="fa-solid fa-baby ph-icon"></i></div>
-      <img src="img/baby_care.jpg" alt="Baby Care" loading="lazy">
-      <div class="slide-label">
-        <div class="slide-label-tag">Category 5 of 8</div>
-        <h3>Baby Care</h3>
-        <p>Wipes, fabric care &amp; baby treats</p>
-      </div>
-    </div>
-    <div class="slide" data-index="5">
-      <div class="slide-placeholder"><i class="fa-solid fa-bowl-rice ph-icon"></i></div>
-      <img src="img/pantry&coocking.jpg" alt="Pantry & Cooking" loading="lazy">
-      <div class="slide-label">
-        <div class="slide-label-tag">Category 6 of 8</div>
-        <h3>Pantry &amp; Cooking</h3>
-        <p>Basmati rice varieties &amp; cooking oils</p>
-      </div>
-    </div>
-    <div class="slide" data-index="6">
-      <div class="slide-placeholder"><i class="fa-solid fa-bottle-water ph-icon"></i></div>
-      <img src="img/beverages&hydration.jpg" alt="Beverages & Hydration" loading="lazy">
-      <div class="slide-label">
-        <div class="slide-label-tag">Category 7 of 8</div>
-        <h3>Beverages &amp; Hydration</h3>
-        <p>Fruit drinks, glucose &amp; essentials</p>
-      </div>
-    </div>
-    <div class="slide" data-index="7">
-      <div class="slide-placeholder"><i class="fa-solid fa-pen ph-icon"></i></div>
-      <img src="img/stationery&misc.jpg" alt="Stationery & Misc" loading="lazy">
-      <div class="slide-label">
-        <div class="slide-label-tag">Category 8 of 8</div>
-        <h3>Stationery &amp; Misc</h3>
-        <p>Pens, pencils, staplers &amp; office supplies</p>
-      </div>
-    </div>
-
-    <div class="slide-controls">
-      <button class="slide-btn" id="slidePrev" aria-label="Previous"><i class="fa-solid fa-arrow-left"></i></button>
-      <button class="slide-btn" id="slideNext" aria-label="Next"><i class="fa-solid fa-arrow-right"></i></button>
-    </div>
-   </div>
-  </div>
-
-</section>
-
 <!-- =============================================
-     BRAND STRIP
+     HERO CAROUSEL — contained peek carousel
      ============================================= -->
-<section class="marquee" aria-label="Brands we carry">
-  <div class="marquee-track">
-    <span>Colgate</span><span>Cetaphil</span><span>Himalaya</span><span>Dabur</span><span>Dettol</span><span>Harpic</span><span>Duracell</span><span>AXE</span><span>Boomer</span><span>Five Star</span><span>Bajaj</span><span>Cinthol</span><span>Comfort</span><span>Happydent</span>
-    <span>Colgate</span><span>Cetaphil</span><span>Himalaya</span><span>Dabur</span><span>Dettol</span><span>Harpic</span><span>Duracell</span><span>AXE</span><span>Boomer</span><span>Five Star</span><span>Bajaj</span><span>Cinthol</span><span>Comfort</span><span>Happydent</span>
+<section class="hero-carousel" id="heroCarousel">
+  <div class="hc-wrap">
+    <button type="button" class="hc-arrow prev" id="hcPrev" aria-label="Previous slide"><i class="fa-solid fa-chevron-left"></i></button>
+    <div class="hc-viewport">
+      <div class="hc-track" id="hcTrack"></div>
+    </div>
+    <button type="button" class="hc-arrow next" id="hcNext" aria-label="Next slide"><i class="fa-solid fa-chevron-right"></i></button>
   </div>
+  <div class="hc-dots" id="hcDots"></div>
 </section>
 
 <!-- =============================================
@@ -1419,6 +1218,11 @@
      ============================================= -->
 <section class="new-arrivals-section">
   <div class="container">
+
+    <!-- View all link -->
+    <div class="na-viewall reveal">
+      <a href="categories.html" class="na-viewall-link"><span>View All Products</span> <i class="fa-solid fa-arrow-right"></i></a>
+    </div>
 
     <!-- Section heading -->
     <div class="na-section-head reveal">
@@ -1429,20 +1233,12 @@
     <!-- Coming soon card -->
     <div class="na-card reveal">
 
-      <span class="na-badge">
-        <span class="na-badge-dot"></span>
-        New Stock
-      </span>
-
       <!-- Pulse rings + box icon -->
       <div class="na-pulse-rings">
         <div class="na-pulse-inner">
           <i class="fa-solid fa-box-open"></i>
         </div>
       </div>
-
-      <h3>New Arrivals Coming Soon...</h3>
-      <p>We're preparing fresh new products for you. Join our Viber community to be the first to know when they drop!</p>
 
       <a href="https://invite.viber.com/?g2=AQB%2Fd4PEZ8YkAVYmZZ762Zy6AqCJROwY3pa1dbwERu0F5rWFZX65J325G%2Fra1A5m" target="_blank" rel="noopener" class="na-btn-viber">
         <i class="fa-brands fa-viber"></i> Join Viber Community
@@ -1563,6 +1359,7 @@
       <h3><i class="fa-solid fa-cart-shopping" style="margin-right:8px;"></i>My Cart</h3>
       <button class="cart-head-close" id="cartClose"><i class="fa-solid fa-xmark"></i></button>
     </div>
+    <div class="cart-open-notice" id="cartOpenNotice"></div>
     <div class="cart-items" id="cartItems"></div>
     <div class="cart-history-panel" id="cartHistoryPanel">
       <div class="chp-head">
@@ -1701,10 +1498,22 @@
 
   // ---- Badge ----
   const badge = document.getElementById('cartBadge');
+  const badgeDrawer = document.getElementById('cartBadgeDrawer');
+  const badgeToggle = document.getElementById('navToggleBadge');
+  const navToggleBtn = document.querySelector('.nav-toggle');
   function updateBadge() {
     const total = cart.reduce((s, i) => s + i.qty, 0);
     badge.textContent = total;
     badge.classList.toggle('show', total > 0);
+    if (badgeDrawer) {
+      badgeDrawer.textContent = total;
+      badgeDrawer.classList.toggle('show', total > 0);
+    }
+    if (badgeToggle) {
+      badgeToggle.textContent = total > 9 ? '9+' : total;
+      badgeToggle.classList.toggle('show', total > 0);
+    }
+    if (navToggleBtn) navToggleBtn.classList.toggle('has-cart', total > 0);
     document.getElementById('cartTotalCount').textContent = total;
     document.getElementById('cartFooter').style.display = total > 0 ? 'flex' : 'none';
   }
@@ -2175,7 +1984,20 @@
 
   // ---- Open/Close ----
   const overlay = document.getElementById('cartOverlay');
-  function openCart() { overlay.classList.add('open'); }
+  let cartNoticeTimer = null;
+  function showCartOpenNotice() {
+    const notice = document.getElementById('cartOpenNotice');
+    if (!notice) return;
+    const total = cart.reduce((s, i) => s + i.qty, 0);
+    if (!total) { notice.classList.remove('show'); return; }
+    notice.innerHTML = `<i class="fa-solid fa-circle-check"></i> You have ${total} item${total > 1 ? 's' : ''} in your order`;
+    notice.classList.remove('show');
+    void notice.offsetWidth;
+    notice.classList.add('show');
+    clearTimeout(cartNoticeTimer);
+    cartNoticeTimer = setTimeout(() => notice.classList.remove('show'), 2600);
+  }
+  function openCart() { overlay.classList.add('open'); showCartOpenNotice(); }
   function closeCart() {
     overlay.classList.remove('open');
     // Reset thank-you and confirm screens after slide-out
@@ -2201,6 +2023,10 @@
   document.getElementById('cartClose').addEventListener('click', closeCart);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) closeCart(); });
   document.getElementById('cartNavBtn').addEventListener('click', openCart);
+  const cartDrawerBtn = document.getElementById('cartDrawerBtn');
+  if (cartDrawerBtn) {
+    cartDrawerBtn.addEventListener('click', (e) => { e.preventDefault(); openCart(); });
+  }
 
   // Quotation actions in thank-you screen
   const tyViewBtn = document.getElementById('tyViewBtn');
@@ -2496,81 +2322,218 @@
 </script>
 <script>
 // =============================================
-// HERO SLIDESHOW
+// NAV SEARCH — redirects to categories.html with the query prefilled
 // =============================================
 (function () {
-  const SLIDE_DURATION = 5000;
-  const slides = document.querySelectorAll('.slide');
-  const dotsWrap = document.getElementById('slideDots');
-  const progress = document.getElementById('slideProgress');
-  const counter = document.getElementById('slideCurrentNum');
-  const btnPrev = document.getElementById('slidePrev');
-  const btnNext = document.getElementById('slideNext');
-  let current = 0;
-  let timer = null;
-  const total = slides.length;
-
-  slides.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'slide-dot' + (i === 0 ? ' active' : '');
-    dot.setAttribute('aria-label', 'Slide ' + (i + 1));
-    dot.addEventListener('click', () => goTo(i));
-    dotsWrap.appendChild(dot);
-  });
-
-  function getDots() { return dotsWrap.querySelectorAll('.slide-dot'); }
-
-  function goTo(idx) {
-    slides[current].classList.remove('active');
-    getDots()[current].classList.remove('active');
-    current = (idx + total) % total;
-    slides[current].classList.add('active');
-    getDots()[current].classList.add('active');
-    counter.textContent = current + 1;
-    restartProgress();
-    restartTimer();
+  function getProducts() {
+    try { return JSON.parse(localStorage.getItem('zm_products') || '[]'); } catch (e) { return []; }
+  }
+  function escHtml(str) {
+    return String(str == null ? '' : str).replace(/[&<>"']/g, s => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
   }
 
+  function wireSearch(formId, inputId) {
+    const form = document.getElementById(formId);
+    const input = document.getElementById(inputId);
+    if (!form || !input) return;
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      goSearch(input.value.trim());
+    });
+
+    function goSearch(q) {
+      window.location.href = 'categories.html' + (q ? '?search=' + encodeURIComponent(q) : '');
+    }
+
+    // ---- suggestions dropdown ----
+    const box = document.createElement('div');
+    box.className = 'nav-suggest';
+    box.setAttribute('role', 'listbox');
+    form.appendChild(box);
+
+    let activeIdx = -1;
+    let currentMatches = [];
+
+    function render(q) {
+      const query = q.trim().toLowerCase();
+      if (!query) { close(); return; }
+
+      const products = getProducts();
+      const matches = products.filter(p => (p.name || '').toLowerCase().includes(query)).slice(0, 6);
+      currentMatches = matches;
+      activeIdx = -1;
+
+      if (!products.length) { close(); return; }
+
+      if (!matches.length) {
+        box.innerHTML = '<div class="nav-suggest-empty">No products found for "' + escHtml(q) + '"</div>';
+        box.classList.add('show');
+        return;
+      }
+
+      box.innerHTML = matches.map((p, i) =>
+        '<div class="nav-suggest-item" data-idx="' + i + '" data-name="' + escHtml(p.name) + '" role="option">' +
+          '<img class="nav-suggest-img" src="' + escHtml(p.image || '') + '" alt="" onerror="this.style.visibility=\'hidden\'">' +
+          '<div class="nav-suggest-text">' +
+            '<div class="nav-suggest-name">' + escHtml(p.name) + '</div>' +
+            '<div class="nav-suggest-cat">' + escHtml(p.category || '') + '</div>' +
+          '</div>' +
+        '</div>'
+      ).join('') +
+      '<div class="nav-suggest-viewall"><i class="fa-solid fa-magnifying-glass"></i> See all results for "' + escHtml(q) + '"</div>';
+
+      box.classList.add('show');
+    }
+
+    function close() {
+      box.classList.remove('show');
+      box.innerHTML = '';
+      activeIdx = -1;
+    }
+
+    function setActive(idx) {
+      const items = box.querySelectorAll('.nav-suggest-item');
+      items.forEach(el => el.classList.remove('active'));
+      if (idx >= 0 && items[idx]) {
+        items[idx].classList.add('active');
+        items[idx].scrollIntoView({ block: 'nearest' });
+      }
+      activeIdx = idx;
+    }
+
+    input.addEventListener('input', () => render(input.value));
+    input.addEventListener('focus', () => { if (input.value.trim()) render(input.value); });
+
+    input.addEventListener('keydown', e => {
+      const items = box.querySelectorAll('.nav-suggest-item');
+      if (!items.length) return;
+      if (e.key === 'ArrowDown') { e.preventDefault(); setActive(Math.min(activeIdx + 1, items.length - 1)); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); setActive(Math.max(activeIdx - 1, 0)); }
+      else if (e.key === 'Enter' && activeIdx >= 0) { e.preventDefault(); goSearch(currentMatches[activeIdx].name); }
+      else if (e.key === 'Escape') { close(); }
+    });
+
+    box.addEventListener('click', e => {
+      const item = e.target.closest('.nav-suggest-item');
+      const viewAll = e.target.closest('.nav-suggest-viewall');
+      if (item) { goSearch(item.dataset.name); }
+      else if (viewAll) { goSearch(input.value.trim()); }
+    });
+
+    document.addEventListener('click', e => {
+      if (!form.contains(e.target)) close();
+    });
+  }
+
+  wireSearch('navSearchForm', 'navSearchInput');
+  wireSearch('navSearchFormMobile', 'navSearchInputMobile');
+})();
+
+// Center-large + cropped side peeks, autoplay + swipe
+// =============================================
+(function () {
+  const AUTOPLAY_MS = 4200;
+
+  const CATEGORIES = [
+    { name: "Personal Care",          img: "img/personal_care.jpg",        anchor: "personal-care" },
+    { name: "Health & Wellness",      img: "img/health&wellness.jpg",      anchor: "health" },
+    { name: "Household & Cleaning",   img: "img/household&cleaning.jpg",   anchor: "household" },
+    { name: "Snacks & Confectionery", img: "img/snacks&confectionery.jpg", anchor: "snacks" },
+    { name: "Baby Care",              img: "img/baby_care.jpg",            anchor: "baby" },
+    { name: "Pantry & Cooking",       img: "img/pantry&coocking.jpg",      anchor: "pantry" },
+    { name: "Beverages & Hydration",  img: "img/beverages&hydration.jpg",  anchor: "beverages" },
+    { name: "Stationery & Misc",      img: "img/stationery&misc.jpg",      anchor: "stationery" }
+  ];
+  const total = CATEGORIES.length;
+
+  function goToCategory(anchor) {
+    window.location.href = 'categories.html#' + anchor;
+  }
+
+  const track = document.getElementById('hcTrack');
+  const dotsWrap = document.getElementById('hcDots');
+  const POS_CLASSES = ['l2', 'l1', 'c', 'r1', 'r2'];
+  let index = 0;
+
+  track.innerHTML = CATEGORIES.map((c, i) => `
+    <div class="hc-slide" data-idx="${i}" data-anchor="${c.anchor}">
+      <div class="hc-slide-img" style="background-image:url('${c.img}')"></div>
+      <div class="hc-slide-scrim"></div>
+      <div class="hc-slide-caption">
+        <span class="hc-cap-eyebrow">Shop the category</span>
+        <span class="hc-cap-title">${c.name}</span>
+      </div>
+    </div>
+  `).join('');
+
+  dotsWrap.innerHTML = CATEGORIES.map((c, i) => `
+    <div class="hc-dot" data-idx="${i}" role="button" aria-label="Go to ${c.name}"></div>
+  `).join('');
+
+  const slides = [...track.querySelectorAll('.hc-slide')];
+  const dots = [...dotsWrap.querySelectorAll('.hc-dot')];
+
+  function diffFor(idx) {
+    let diff = (idx - index) % total;
+    if (diff > total / 2) diff -= total;
+    if (diff < -total / 2) diff += total;
+    return diff;
+  }
+
+  function render() {
+    slides.forEach(el => {
+      const idx = parseInt(el.dataset.idx, 10);
+      const diff = Math.max(-2, Math.min(2, diffFor(idx)));
+      el.classList.remove(...POS_CLASSES);
+      el.classList.add(POS_CLASSES[diff + 2]);
+    });
+    dots.forEach((el, i) => el.classList.toggle('active', i === index));
+  }
+
+  function goTo(newIndex) {
+    index = (newIndex + total) % total;
+    render();
+  }
+  function next() { goTo(index + 1); }
+  function prev() { goTo(index - 1); }
+
+  slides.forEach(el => {
+    el.addEventListener('click', () => {
+      const idx = parseInt(el.dataset.idx, 10);
+      const diff = diffFor(idx);
+      if (diff === 0) {
+        goToCategory(el.dataset.anchor);
+      } else {
+        goTo(idx);
+        restartTimer();
+      }
+    });
+  });
+
+  let timer = setInterval(next, AUTOPLAY_MS);
   function restartTimer() {
-    clearTimeout(timer);
-    timer = setTimeout(() => goTo(current + 1), SLIDE_DURATION);
+    clearInterval(timer);
+    timer = setInterval(next, AUTOPLAY_MS);
   }
 
-  function restartProgress() {
-    progress.style.transition = 'none';
-    progress.style.width = '0%';
-    void progress.offsetWidth;
-    progress.style.transition = 'width ' + SLIDE_DURATION + 'ms linear';
-    progress.style.width = '100%';
-  }
+  document.getElementById('hcNext').addEventListener('click', () => { next(); restartTimer(); });
+  document.getElementById('hcPrev').addEventListener('click', () => { prev(); restartTimer(); });
+  dots.forEach(el => el.addEventListener('click', () => {
+    goTo(parseInt(el.dataset.idx, 10));
+    restartTimer();
+  }));
 
-  btnNext.addEventListener('click', () => goTo(current + 1));
-  btnPrev.addEventListener('click', () => goTo(current - 1));
-
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight') goTo(current + 1);
-    if (e.key === 'ArrowLeft')  goTo(current - 1);
-  });
+  const carousel = document.getElementById('heroCarousel');
 
   let touchX = 0;
-  const ss = document.getElementById('heroSlideshow');
-  ss.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
-  ss.addEventListener('touchend', e => {
+  carousel.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+  carousel.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - touchX;
-    if (Math.abs(dx) > 40) dx < 0 ? goTo(current + 1) : goTo(current - 1);
+    if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); restartTimer(); }
   });
 
-  ss.addEventListener('mouseenter', () => {
-    clearTimeout(timer);
-    progress.style.transition = 'none';
-  });
-  ss.addEventListener('mouseleave', () => {
-    restartProgress();
-    restartTimer();
-  });
-
-  restartProgress();
-  restartTimer();
+  render();
 })();
 </script>
 <!-- ============================================

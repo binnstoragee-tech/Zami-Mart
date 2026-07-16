@@ -804,6 +804,7 @@
   </div>
   <button class="nav-toggle" id="navToggle" aria-label="Open menu">
     <span></span><span></span><span></span>
+    <span class="nav-toggle-badge" id="navToggleBadge"></span>
   </button>
 </nav>
 
@@ -2690,6 +2691,30 @@ document.addEventListener('click', function(e) {
   }
   o.innerHTML = '<img src="' + src + '" style="max-width:90vw;max-height:90vh;border-radius:10px;">';
 });
+</script>
+
+<script>
+/* Hamburger notification dot — profile page has no cart link of its own,
+   but should still flag the visitor that items are waiting in their cart. */
+(function() {
+  const navToggleBadge = document.getElementById('navToggleBadge');
+  const navToggleBtn = document.querySelector('.nav-toggle');
+  if (!navToggleBadge) return;
+  function syncNavToggleBadge() {
+    let total = 0;
+    try {
+      const cart = JSON.parse(localStorage.getItem('zm_inquiry_cart')) || [];
+      total = cart.reduce((s, i) => s + (i.qty || 0), 0);
+    } catch (e) {}
+    navToggleBadge.textContent = total > 9 ? '9+' : total;
+    navToggleBadge.classList.toggle('show', total > 0);
+    if (navToggleBtn) navToggleBtn.classList.toggle('has-cart', total > 0);
+  }
+  syncNavToggleBadge();
+  window.addEventListener('storage', (e) => {
+    if (!e.key || e.key === 'zm_inquiry_cart') syncNavToggleBadge();
+  });
+})();
 </script>
 </body>
 </html>
